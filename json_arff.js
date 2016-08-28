@@ -1,14 +1,17 @@
 var fs = require('fs');
 
-var file = 'dummy1.json';
-jsonToArff(file);
+var source = 'json/dummy1.json';
+var destination = 'arff/dummy1.arff';
+jsonToArff(source, destination);
 
 
-function jsonToArff(file) {
-    var data = fs.readFileSync(file, 'utf8');
+function jsonToArff(source, destination) {
+    var data = fs.readFileSync(source, 'utf8');
     var json_data = JSON.parse(data);
 
-    var splitedFileName = file.split('.');
+    var splitedFileName = source.split('/');
+    splitedFileName = splitedFileName[splitedFileName.length-1];
+    splitedFileName = splitedFileName.split('.');
     var fileName = splitedFileName[0];
 
     var arff = '';
@@ -43,7 +46,7 @@ function jsonToArff(file) {
         arff = arff + randomPlusMinus() + '\n';
     }
 
-    fs.writeFileSync(fileName + '.arff', arff, 'utf8');
+    fs.writeFileSync(destination, arff, 'utf8');
 }
 
 function randomPlusMinus() {
