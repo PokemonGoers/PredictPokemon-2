@@ -1,0 +1,14 @@
+@RELATION dummy1
+
+@ATTRIBUTE id string
+@ATTRIBUTE created numeric
+@ATTRIBUTE downvotes numeric
+@ATTRIBUTE upvotes numeric
+@ATTRIBUTE latitude numeric
+@ATTRIBUTE longitude numeric
+@ATTRIBUTE pokemonId numeric
+@ATTRIBUTE trainerName string
+@ATTRIBUTE userId string
+@ATTRIBUTE deviceId string
+@ATTRIBUTE class {+1,-1}
+
