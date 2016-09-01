@@ -1,37 +1,26 @@
 var fs = require('fs');
-var crypto = require('crypto');
-var hash = crypto.createHash('sha256');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
 
-var sources = [
-    'json/dummy1.json',
-    'json/dummy2.json',
-    'json/dummy3.json',
-    'json/dummy4.json'];
+var destination = 'arff/apiData.arff';
 
-var destination = 'arff/pokeDummyData_numeric.arff';
+httpGetAsync(url, destination, 'pokemonId');
 
-filesToArff(sources, destination, 'pokemonId');
-
-function filesToArff(sources, destination, classKey) {
-    var splitedFileName = sources[0].split('/');
-    splitedFileName = splitedFileName[splitedFileName.length - 1];
-    splitedFileName = splitedFileName.split('.');
-    var fileName = splitedFileName[0];
-
-    var json_data = filesTojson(sources);
-    jsonToArff(json_data, classKey, fileName, destination);
-}
-
-
-function filesTojson(sources) {
-    var json_data = [];
-
-    sources.forEach(function (file) {
-        var data = fs.readFileSync(file, 'utf8');
-        json_data = json_data.concat(JSON.parse(data));
-    });
-
-    return json_data;
+function httpGetAsync(url, destination, classKey) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            try {
+                var apiData = JSON.parse(xmlHttp.responseText);
+            } catch (e) {
+                console.log(e.stack);
+            }
+            jsonToArff(apiData, classKey, 'apiData', destination);
+        }
+    };
+    xmlHttp.open("GET", url, true);
+    xmlHttp.send();
+    return xmlHttp.responseText;
 }
 
 function jsonToArff(json_data, classKey, fileName, destination) {
@@ -59,9 +48,7 @@ function jsonToArff(json_data, classKey, fileName, destination) {
         for (var key in element) {
             if (key !== classKey) {
                 if (typeof element[key] === 'string') {
-                    hash = crypto.createHash('sha256');
-                    hash.update(element[key]);
-                    arff = arff + parseInt('0x' + hash.digest('hex'), 'hex') + ',';
+                    arff = arff + element[key].replace(/\s+/g, '') + ',';
                 } else {
                     arff = arff + element[key] + ',';
                 }
@@ -72,7 +59,6 @@ function jsonToArff(json_data, classKey, fileName, destination) {
 
     fs.writeFileSync(destination, arff, 'utf8');
 }
-
 
 function allValuesForKeyInData(key, json_data) {
     var values = [];

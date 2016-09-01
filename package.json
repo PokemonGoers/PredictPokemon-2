@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/PokemonGoers/PredictPokemon-2/issues"
   },
-  "homepage": "https://github.com/PokemonGoers/PredictPokemon-2#readme"
+  "homepage": "https://github.com/PokemonGoers/PredictPokemon-2#readme",
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
 }
