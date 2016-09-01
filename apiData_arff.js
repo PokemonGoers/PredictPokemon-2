@@ -10,11 +10,7 @@ function httpGetAsync(url, destination, classKey) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            try {
-                var apiData = JSON.parse(xmlHttp.responseText);
-            } catch (e) {
-                console.log(e.stack);
-            }
+            var apiData = JSON.parse(xmlHttp.responseText);
             jsonToArff(apiData, classKey, 'apiData', destination);
         }
     };
