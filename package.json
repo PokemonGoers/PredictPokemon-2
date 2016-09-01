@@ -1,0 +1,27 @@
+{
+  "name": "predict-pokemon",
+  "version": "1.0.0",
+  "description": "npm-packages",
+  "main": "prediction.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PokemonGoers/PredictPokemon-2.git"
+  },
+  "keywords": [
+    "prediction",
+    "svm",
+    "naive",
+    "bayes",
+    "machine",
+    "learning"
+  ],
+  "author": "PokemonGoers",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/PokemonGoers/PredictPokemon-2/issues"
+  },
+  "homepage": "https://github.com/PokemonGoers/PredictPokemon-2#readme"
+}
