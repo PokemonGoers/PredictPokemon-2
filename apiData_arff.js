@@ -43,10 +43,16 @@ function jsonToArff(json_data, classKey, fileName, destination) {
         var element = json_data[i];
         for (var key in element) {
             if (key !== classKey) {
-                if (typeof element[key] === 'string') {
-                    arff = arff + element[key].replace(/\s+/g, '') + ',';
+                if (key === "location" && element[key] !== null) {
+                    arff = arff + element[key]["coordinates"][0] + ',';
+                    arff = arff + element[key]["coordinates"][1] + ',';
+
                 } else {
-                    arff = arff + element[key] + ',';
+                    if (typeof element[key] === 'string') {
+                        arff = arff + element[key].replace(/\s+/g, '') + ',';
+                    } else {
+                        arff = arff + element[key] + ',';
+                    }
                 }
             }
         }
@@ -54,6 +60,16 @@ function jsonToArff(json_data, classKey, fileName, destination) {
     }
 
     fs.writeFileSync(destination, arff, 'utf8');
+}
+
+
+function getProperty(json, path) {
+    var tokens = path.split(".");
+    var obj = json;
+    for (var i = 0; i < tokens.length; i++) {
+        obj = obj[tokens[i]];
+    }
+    return obj;
 }
 
 function allValuesForKeyInData(key, json_data) {
