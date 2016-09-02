@@ -8,18 +8,16 @@ var destination = 'arff/apiData.arff';
 
 dataToArff(source, destination, 'pokemonID');
 
-function dataToArff(sources, destionation, classKey) {
-    var json_data = filesTojson(sources);
+function dataToArff(source, destination, classKey) {
+    var json_data = fileTojson(source);
     jsonToArff(json_data, classKey, 'apiData', destination);
 }
 
-function filesTojson(sources) {
+function fileTojson(source) {
     var json_data = [];
 
-    sources.forEach(function (file) {
-        var data = fs.readFileSync(file, 'utf8');
-        json_data = json_data.concat(JSON.parse(data));
-    });
+    var data = fs.readFileSync(source, 'utf8');
+    json_data = json_data.concat(JSON.parse(data));
 
     return json_data;
 }
@@ -96,3 +94,6 @@ function allValuesForKeyInData(key, json_data) {
 
     return Array.from(new Set(values));
 }
+
+
+module.exports.dataToArff = dataToArff;

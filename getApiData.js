@@ -4,8 +4,13 @@ var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/
 
 var destination = 'json/apiData.json';
 
+var source = 'json/convertedTimeApi.json';
+var destination2 = 'arff/apiData.arff';
+
 
 httpGetAsync(url, destination, 'pokemonID');
+
+require('./apiDataToArff.js').dataToArff(source, destination2, 'pokemonID');
 
 function httpGetAsync(url, destination, classKey) {
     var xmlHttp = new XMLHttpRequest();
@@ -18,4 +23,5 @@ function httpGetAsync(url, destination, classKey) {
     xmlHttp.open("GET", url, true);
     xmlHttp.send();
     return xmlHttp.responseText;
+
 }
