@@ -19,6 +19,20 @@ function httpGetAsync(url, destination, classKey) {
     return xmlHttp.responseText;
 }
 
+function sortFile(apiData, classKey, fileName, destination) {
+    apiData = apiData.sort(function (a, b) {
+        var sortStatus = 0;
+        if (a.pokemonID < b.pokemonID) {
+            sortStatus = -1;
+        } else if (a.pokemonID > b.pokemonID) {
+            sortStatus = 1;
+        }
+        return sortStatus;
+    });
+    jsonToArff(apiData, classKey, fileName, destination);
+}
+
+
 function jsonToArff(json_data, classKey, fileName, destination) {
     var classLabels = allValuesForKeyInData(classKey, json_data);
     var arff = '';
@@ -41,22 +55,31 @@ function jsonToArff(json_data, classKey, fileName, destination) {
     arff = arff + '@DATA\n';
     for (var i = 0; i < json_data.length; i++) {
         var element = json_data[i];
-        for (var key in element) {
-            if (key !== classKey) {
-                if (key === "location" && element[key] !== null) {
-                    arff = arff + element[key]["coordinates"][0] + ',';
-                    arff = arff + element[key]["coordinates"][1] + ',';
+        if (element["location"] !== null) {
+            // for (var key in element) {
+            //     if (key !== classKey) {
+            //         if (key === "location" && element[key] !== null) {
+            //             arff = arff + element[key]["coordinates"][0] + ',';
+            //             arff = arff + element[key]["coordinates"][1] + ',';
+            //
+            //         } else {
+            //             if (typeof element[key] === 'string') {
+            //                 arff = arff + element[key].replace(/\s+/g, '') + ',';
+            //             } else {
+            //                 arff = arff + element[key] + ',';
+            //             }
+            //         }
+            //     }
+            // }
 
-                } else {
-                    if (typeof element[key] === 'string') {
-                        arff = arff + element[key].replace(/\s+/g, '') + ',';
-                    } else {
-                        arff = arff + element[key] + ',';
-                    }
-                }
-            }
+            arff = arff + element["_id"].replace(/\s+/g, '') + ',';
+            arff = arff + element["source"].replace(/\s+/g, '') + ',';
+            arff = arff + element[key]["coordinates"][0] + ',';
+            arff = arff + element[key]["coordinates"][1] + ',';
+            arff = arff + element["appearedOn"].replace(/\s+/g, '') + ',';
+            arff = arff + element["__v"] + ',';
+            arff = arff + element[classKey] + '\n';
         }
-        arff = arff + element[classKey] + '\n';
     }
 
     fs.writeFileSync(destination, arff, 'utf8');
