@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/PokemonGoers/PredictPokemon-2#readme",
   "dependencies": {
+    "requirejs": "^2.2.0",
+    "tzwhere": "^1.0.0",
     "xmlhttprequest": "^1.8.0"
   }
 }
