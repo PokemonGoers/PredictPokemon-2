@@ -66,7 +66,7 @@ function jsonToArff(json_data, classKey, fileName, destination) {
             arff = arff + element["source"].replace(/\s+/g, '') + ',';
             arff = arff + element[key]["coordinates"][0] + ',';
             arff = arff + element[key]["coordinates"][1] + ',';
-            arff = arff + element["appearedOn"].replace(/\s+/g, '') + ',';
+            arff = arff + element["appearedOn"] + ',';
             arff = arff + element["__v"] + ',';
             arff = arff + element[classKey] + '\n';
         }
