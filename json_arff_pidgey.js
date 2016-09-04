@@ -19,6 +19,7 @@ function ArrayJsonToArff(source, pokemonId) {
 
     // attributes
     arff += '@ATTRIBUTE timestamp numeric\n';
+    arff += '@ATTRIBUTE minutesSinceNoon numeric\n';
     arff += '@ATTRIBUTE latitude numeric\n';
     arff += '@ATTRIBUTE longitude numeric\n';
 
@@ -89,6 +90,7 @@ function fileToJson(path) {
 function jsonToArff(jsonData) {
     var arff = '';
     jsonData.forEach(function (element) {
+        arff += element['created'] + ',';
         arff += getMinutesSinceNoon(element['created']) + ',';
         arff += element['latitude'] + ',';
         arff += element['longitude'] + ',';
