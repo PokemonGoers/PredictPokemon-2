@@ -8,6 +8,12 @@ var pokemonId = 16;
 var arff = ArrayJsonToArff(source, pokemonId);
 fs.writeFileSync(destination, arff, 'utf8');
 
+/**
+ * parses the array of json files to one arff file with pokemonId as class
+ * @param source which is an array if file paths
+ * @param pokemonId which will be the class
+ * @returns the arff string
+ */
 function ArrayJsonToArff(source, pokemonId) {
     var arff = '@RELATION ' + getFileName(source[0]) + '\n' + '\n';
 
@@ -29,6 +35,11 @@ function ArrayJsonToArff(source, pokemonId) {
     return arff;
 }
 
+/**
+ * get the file name of the path
+ * @param path of file
+ * @returns file name as string
+ */
 function getFileName(path) {
     var splitedFileName = path.split('/');
     splitedFileName = splitedFileName[splitedFileName.length-1];
@@ -36,11 +47,22 @@ function getFileName(path) {
     return splitedFileName[0];
 }
 
+/**
+ * get the minutes since noon from a date
+ * @param seconds since unix time
+ * @returns minutes since noon
+ */
 function getMinutesSinceNoon(seconds) {
     var date = new Date(seconds*1000);
     return date.getHours()*60 + date.getMinutes();
 }
 
+/**
+ * checks if pokemonId is equal to id of appeared pokemon
+ * @param pokemonId
+ * @param id of pokemo
+ * @returns +1 if true and -1 if false
+ */
 function isPokemonId(pokemonId, id) {
     if (pokemonId === id) {
         return '+1';
@@ -49,11 +71,21 @@ function isPokemonId(pokemonId, id) {
     }
 }
 
+/**
+ * reads file and parses it to json
+ * @param path to file
+ * @returns json data
+ */
 function fileToJson(path) {
     var data = fs.readFileSync(path, 'utf8');
     return JSON.parse(data);
 }
 
+/**
+ * parses one json file to an arff string
+ * @param json data from file
+ * @returns arff as string
+ */
 function jsonToArff(jsonData) {
     var arff = '';
     jsonData.forEach(function (element) {
