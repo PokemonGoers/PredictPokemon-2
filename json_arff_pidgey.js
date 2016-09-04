@@ -1,16 +1,15 @@
 var fs = require('fs');
 
-var source = 'json/dummy1.json';
-var destination = 'arff/my_test_dummy.arff';
+var source = ['json/dummy1.json', 'json/dummy2.json',
+                'json/dummy3.json', 'json/dummy4.json'];
+var destination = 'arff/dummy_pidgey.arff';
 var pokemonId = 16;
 
-var data = fs.readFileSync(source, 'utf8');
-data = JSON.parse(data);
-var arff = jsonToArff(data, getFileName(source), pokemonId);
+var arff = ArrayJsonToArff(source, pokemonId);
 fs.writeFileSync(destination, arff, 'utf8');
 
-function jsonToArff(json_data, fileName, pokemonId) {
-    var arff = '@RELATION ' + fileName + '\n' + '\n';
+function ArrayJsonToArff(source, pokemonId) {
+    var arff = '@RELATION ' + getFileName(source[0]) + '\n' + '\n';
 
     // attributes
     arff += '@ATTRIBUTE timestamp numeric\n';
@@ -18,16 +17,13 @@ function jsonToArff(json_data, fileName, pokemonId) {
     arff += '@ATTRIBUTE longitude numeric\n';
 
     //class
-    arff += '@ATTRIBUTE class {+1, -1}\n\n';
+    arff += '@ATTRIBUTE class {+1,-1}\n\n';
 
     //data
     arff += '@DATA\n';
 
-    json_data.forEach(function (element) {
-        arff += getMinutesSinceNoon(element['created']) + ',';
-        arff += element['latitude'] + ',';
-        arff += element['longitude'] + ',';
-        arff += isPokemonId(pokemonId, element['pokemonId']) + '\n';
+    source.forEach(function (file) {
+        arff += jsonToArff(fileToJson(file));
     });
 
     return arff;
@@ -51,4 +47,20 @@ function isPokemonId(pokemonId, id) {
     } else {
         return '-1';
     }
+}
+
+function fileToJson(path) {
+    var data = fs.readFileSync(path, 'utf8');
+    return JSON.parse(data);
+}
+
+function jsonToArff(jsonData) {
+    var arff = '';
+    jsonData.forEach(function (element) {
+        arff += getMinutesSinceNoon(element['created']) + ',';
+        arff += element['latitude'] + ',';
+        arff += element['longitude'] + ',';
+        arff += isPokemonId(pokemonId, element['pokemonId']) + '\n';
+    });
+    return arff;
 }
