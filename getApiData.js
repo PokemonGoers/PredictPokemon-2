@@ -4,14 +4,14 @@ var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/
 
 var destination = 'arff/apiData.arff';
 
-httpGetAsync(url, destination, 'pokemonID');
+httpGetAsync(url, destination);
 
-function httpGetAsync(url, destination, classKey) {
+function httpGetAsync(url, destination) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
-            jsonToArff(apiData, classKey, 'apiData', destination);
+            jsonToArff(apiData, 'apiData', destination);
         }
     };
     xmlHttp.open("GET", url, true);
@@ -19,67 +19,53 @@ function httpGetAsync(url, destination, classKey) {
     return xmlHttp.responseText;
 }
 
+function jsonToArff(json_data, fileName, destination) {
+    var valid_data = removeIncompleteData(json_data);
+    var arff = '@RELATION ' + fileName + '\n\n';
 
-function jsonToArff(json_data, classKey, fileName, destination) {
-    var classLabels = allValuesForKeyInData(classKey, json_data);
-    var arff = '';
-    arff = arff + '@RELATION ' + fileName + '\n' + '\n';
+    // attributes
+    arff += '@ATTRIBUTE _id string\n';
+    arff += '@ATTRIBUTE source string\n';
+    arff += '@ATTRIBUTE latitude numeric\n';
+    arff += '@ATTRIBUTE longitude numeric\n';
+    arff += '@ATTRIBUTE appearedOn numeric\n';
+    arff += '@ATTRIBUTE __v numeric\n';
 
-    var firstElement = json_data[0];
-    for (var key in firstElement) {
-        if (key !== classKey) {
-            if (typeof firstElement[key] === 'string') {
-                arff = arff + '@ATTRIBUTE ' + key + ' string\n';
-            }
-            if (typeof firstElement[key] === 'number'
-                || typeof firstElement[key] === 'boolean') {
-                arff = arff + '@ATTRIBUTE ' + key + ' numeric\n';
-            }
-        }
-    }
-    arff = arff + '@ATTRIBUTE class {' + classLabels.join(', ') + '}\n\n';
+    // class
+    var classKey = 'pokemonId';
+    var classLabels = allValuesForKeyInData(classKey, valid_data);
+    arff += '@ATTRIBUTE class {' + classLabels.join(', ') + '}\n\n';
 
-    arff = arff + '@DATA\n';
-    for (var i = 0; i < json_data.length; i++) {
-        var element = json_data[i];
-        if (element["location"] !== null) {
-            // for (var key in element) {
-            //     if (key !== classKey) {
-            //         if (key === "location" && element[key] !== null) {
-            //             arff = arff + element[key]["coordinates"][0] + ',';
-            //             arff = arff + element[key]["coordinates"][1] + ',';
-            //
-            //         } else {
-            //             if (typeof element[key] === 'string') {
-            //                 arff = arff + element[key].replace(/\s+/g, '') + ',';
-            //             } else {
-            //                 arff = arff + element[key] + ',';
-            //             }
-            //         }
-            //     }
-            // }
-
-            arff = arff + element["_id"].replace(/\s+/g, '') + ',';
-            arff = arff + element["source"].replace(/\s+/g, '') + ',';
-            arff = arff + element[key]["coordinates"][0] + ',';
-            arff = arff + element[key]["coordinates"][1] + ',';
-            arff = arff + Date.parse(element["appearedOn"]) + ',';
-            arff = arff + element["__v"] + ',';
-            arff = arff + element[classKey] + '\n';
-        }
-    }
+    // data
+    arff += '@DATA\n';
+    valid_data.forEach(function (element) {
+        arff += element["_id"].replace(/\s+/g, '') + ',';
+        arff += element["source"].replace(/\s+/g, '') + ',';
+        arff += element["location"]["coordinates"][0] + ',';
+        arff += element["location"]["coordinates"][1] + ',';
+        arff += Date.parse(element["appearedOn"]) + ',';
+        arff += element["__v"] + ',';
+        arff += element[classKey] + '\n';
+    });
 
     fs.writeFileSync(destination, arff, 'utf8');
 }
 
+/**
+ * remove data entries which do not provided all required features
+ * @param json_data data to filter
+ * @returns {Array} array which contains only entries which provide all necessary features
+ */
+function removeIncompleteData(json_data) {
+    var complete_data = [];
 
-function getProperty(json, path) {
-    var tokens = path.split(".");
-    var obj = json;
-    for (var i = 0; i < tokens.length; i++) {
-        obj = obj[tokens[i]];
-    }
-    return obj;
+    json_data.forEach(function (element) {
+        if (element["location"] !== null) {
+            complete_data.push(element);
+        }
+    });
+
+    return complete_data;
 }
 
 function allValuesForKeyInData(key, json_data) {
