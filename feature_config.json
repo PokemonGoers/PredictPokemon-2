@@ -32,8 +32,8 @@
         },
         {
           "key": "source",
-          "type": "string",
-          "enabled": false
+          "type": "nominal",
+          "enabled": true
         }
       ]
     },
