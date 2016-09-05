@@ -101,7 +101,12 @@ var fs = require('fs');
         // add attributes for the configured features
         featureSources.forEach(function (source) {
             source.features.forEach(function (feature) {
-                arff += '@ATTRIBUTE ' + feature.key + ' ' + feature.type + '\n';
+                if (feature.type === 'nominal') {
+                    var nominalValues = allValuesForKeyInData(feature.key, dataSet);
+                    arff += '@ATTRIBUTE ' + feature.key + ' {' + nominalValues.join(', ') + '}\n';
+                } else {
+                    arff += '@ATTRIBUTE ' + feature.key + ' ' + feature.type + '\n';
+                }
             });
         });
 
@@ -116,7 +121,7 @@ var fs = require('fs');
             for (var key in dataRow) {
                 values.push(dataRow[key])
             }
-            arff += values.join(', ') + '\n';
+            arff += values.join(',') + '\n';
         });
 
         fs.writeFileSync(fileNamePath, arff, 'utf8');
