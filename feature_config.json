@@ -1,0 +1,82 @@
+{
+  "classKey": "pokemonId",
+  "feature_sources": [
+    {
+      "name": "API Features",
+      "path": "./feature_sources/api_features.js",
+      "features": [
+        {
+          "key": "pokemonId",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "longitude",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "latitude",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedOn",
+          "type": "string",
+          "enabled": false
+        },
+        {
+          "key": "_id",
+          "type": "string",
+          "enabled": false
+        },
+        {
+          "key": "source",
+          "type": "string",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "name": "S2 Features",
+      "path": "./feature_sources/s2_features.js",
+      "features": [
+        {
+          "key": "cellId_90m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_180m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_370m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_730m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_1460m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_2920m",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "cellId_5850m",
+          "type": "numeric",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}
