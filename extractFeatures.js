@@ -10,6 +10,8 @@
 * 1.1. Latitude (already inserted)
 * 1.2. Longitude (already inserted)
 * (1.3. S2 box ID) -> see @bensLine implementation
+* 1.4. Address
+* 1.5. City
 *
 * 2. Timestamp
 * 2.1. Day of the Week
@@ -26,16 +28,22 @@
 var fs = require('fs');
 
 //source and output file
-var source = 'source.json';
-var output = 'output.json';
+var source = "source.json";
+var output = "output.json";
 
-var data = JSON.parse(source);
+var source_json = fs.readFileSync(source, 'utf8');
+var dirty_data = JSON.parse(source_json);
+var data = removeIncompleteData(dirty_data);
+
 switchLatitudeLongitude(data);
 tolocaltime(data);
 addDayMonthYear(data);
 addHourMinute(data);
 addTimeOfDay(data);
+//buggy atm
+//addAddress(data);
 
+fs.writeFileSync(output, JSON.stringify(data), 'utf8');
 
 /*
  This function adds the time of the day:
@@ -50,7 +58,8 @@ addTimeOfDay(data);
  */
 function addTimeOfDay(_data) {
     _data.forEach(function (element) {
-        var hour = element.appearedOn.getHours();
+        var date = new Date(element.appearedOn);
+        var hour = date.getHours();
         if(20<=hour && hour<24){
             element.appearedTimeOfDay = 'night';
         } else if (0<=hour && hour<7){
@@ -63,6 +72,7 @@ function addTimeOfDay(_data) {
             element.appearedTimeOfDay = 'evening';
         }
     });
+    console.log("addTimeOfDay completed");
 }
 
 
@@ -72,9 +82,11 @@ function addTimeOfDay(_data) {
  */
 function addHourMinute(_data) {
     _data.forEach(function (element) {
-        element.appearedHour = element.appearedOn.getHours();
-        element.appearedMinute = element.appearedOn.getMinutes();
+        var date = new Date(element.appearedOn);
+        element.appearedHour = date.getHours();
+        element.appearedMinute = date.getMinutes();
     });
+    console.log("addHourMinute completed");
 }
 
 /*
@@ -83,11 +95,13 @@ function addHourMinute(_data) {
  */
 function addDayMonthYear(_data) {
     _data.forEach(function (element) {
-        element.appearedDayOfWeek = element.appearedOn.getDay();
-        element.appearedDay = element.appearedOn.getDate();
-        element.appearedMonth = element.appearedOn.getMonth();
-        element.appearedYear = element.appearedOn.getFullYear();
+        var date = new Date(element.appearedOn);
+        element.appearedDayOfWeek = date.getDay();
+        element.appearedDay = date.getDate();
+        element.appearedMonth = date.getMonth();
+        element.appearedYear = date.getFullYear();
     });
+    console.log("addDayMonthYear completed");
 }
 
 /*
@@ -101,6 +115,7 @@ function switchLatitudeLongitude(_data) {
         element.location.coordinates[0] = element.location.coordinates[1];
         element.location.coordinates[1] = tmp;
     });
+    console.log("switchLatitudeLongitude completed");
 }
 
 
@@ -127,4 +142,78 @@ function tolocaltime(_data) {
         newDate = new Date(newDate.getTime() + offset);
         element.appearedOn = newDate.toJSON();
     });
+    console.log("toLocalTime completed");
+}
+
+/*
+ This function is TAKEN FROM @marwage's file latlngToAdress.js
+ It adds the address in the field 'address' based on the coordinates.
+ It also adds the city in the field 'city'.
+ */
+//buggy. gotta test more tomorrow
+function addAddress(_data) {
+    const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    var xmlhttp = new XMLHttpRequest();
+
+    var cnt = 0;
+    _data.forEach(function (element) {
+        var lat = element.location.coordinates[0];
+        var lon = element.location.coordinates[1];
+        var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='
+            + lat + ',' + lon;
+        var _address;
+        var _city;
+
+
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var data = JSON.parse(this.responseText);
+                console.log(data);
+                if(data.hasOwnProperty('results') && data.results !== null) {
+                    if(data.results[0].hasOwnProperty('formattedAddress')) {
+                        _address = data.results[0].formatted_address;
+                    } else {
+                        _address = "undefined";
+                        console.log("undefined filled in for address");
+                    }
+                    if(data.results[1].hasOwnProperty('formattedAddress')) {
+                        _city = data.results[1].formatted_address;
+                    } else {
+                        _city = "undefined";
+                        console.log("undefined filled in for city");
+                    }
+                } else {
+                    console.log("undefined filled in for address and city");
+                    _address = "undefined";
+                    _city = "undefined";
+                }
+            }
+        };
+        xmlhttp.open("GET", url, false);
+        xmlhttp.send();
+        cnt=cnt+1;
+        console.log(cnt + ": " + xmlhttp.readyState);
+        _data.address = _address;
+        _data.city = _city;
+    });
+    console.log("addAddress completed");
+}
+
+//TAKEN FROM @bensLine' getApiData.js
+//For Testing only. Later this part will be moved to the getAPI-part
+/**
+ * remove data entries which do not provided all required features
+ * @param json_data data to filter
+ * @returns {Array} array which contains only entries which provide all necessary features
+ */
+function removeIncompleteData(json_data) {
+    var complete_data = [];
+
+    json_data.forEach(function (element) {
+        if (element["location"] !== null) {
+            complete_data.push(element);
+        }
+    });
+    console.log("removeIncompletedData completed");
+    return complete_data;
 }
