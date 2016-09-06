@@ -76,6 +76,8 @@
             case 7:
                 return 'Sunday';
                 break;
+            default:
+                return 'dummy_day';
         }
     };
 
