@@ -1,4 +1,5 @@
 var fs = require('fs');
+var tzwhere = require('tzwhere');
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -54,9 +55,13 @@ var fs = require('fs');
 
         dataSet = [];
 
+        //Initialize the script to convert UTC to local time
+        tzwhere.init();
+
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             addCoordinatesToPokeEntry(pokeEntry);
+            addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
@@ -151,6 +156,23 @@ var fs = require('fs');
         pokeEntry.latitude = pokeEntry["location"]["coordinates"][0];
         pokeEntry.longitude = pokeEntry["location"]["coordinates"][1];
     }
+
+
+    /**
+     * add Local Time. Offset is based on coordinates
+     * @param _pokeEntry the JSON object which is received from the API for a Pokemon sighting
+     */
+    function addLocalTime(_pokeEntry) {
+        //If at some point a error tracks back to here, it might be that the data team changes Lat/Lon.
+        //In this case just exchange the ...[1] and ...[0] in the next line
+        var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
+        //add the offset (milliseconds) to date
+        var newDate = new Date(_pokeEntry.appearedOn);
+        newDate = new Date(newDate.getTime() + offset);
+        _pokeEntry.appearedLocalTime = newDate.toJSON();
+    }
+
+
 
     /**
      * remove data entries which do not provided all required features
