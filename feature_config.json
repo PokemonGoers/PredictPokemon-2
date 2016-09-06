@@ -26,6 +26,11 @@
           "enabled": false
         },
         {
+          "key": "appearedLocalTime",
+          "type": "string",
+          "enabled": true
+        },
+        {
           "key": "_id",
           "type": "string",
           "enabled": false
@@ -73,6 +78,47 @@
         },
         {
           "key": "cellId_5850m",
+          "type": "numeric",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Time Features",
+      "path": "./feature_sources/time_features.js",
+      "features": [
+        {
+          "key": "appearedTimeOfDay",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "appearedHour",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedMinute",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedDayOfWeek",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "appearedDay",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedMonth",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedYear",
           "type": "numeric",
           "enabled": true
         }
