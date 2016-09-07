@@ -126,6 +126,98 @@
           "enabled": true
         }
       ]
+    },
+    {
+      "name": "Pokemon Type Features",
+      "path": "./feature_sources/poketype_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "typeSteel",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeGhost",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeElectric",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeIce",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeNormal",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeFire",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typePsychic",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeFlying",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typePoison",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeDragon",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeWater",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeFighting",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeRock",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeFairy",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeGrass",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeBug",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "typeGround",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
     }
   ]
 }
