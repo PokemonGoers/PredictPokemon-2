@@ -4,6 +4,7 @@
     {
       "name": "API Features",
       "path": "./feature_sources/api_features.js",
+      "enabled": true,
       "features": [
         {
           "key": "pokemonId",
@@ -45,6 +46,7 @@
     {
       "name": "S2 Features",
       "path": "./feature_sources/s2_features.js",
+      "enabled": true,
       "features": [
         {
           "key": "cellId_90m",
@@ -86,6 +88,7 @@
     {
       "name": "Time Features",
       "path": "./feature_sources/time_features.js",
+      "enabled": true,
       "features": [
         {
           "key": "appearedTimeOfDay",

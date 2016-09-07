@@ -24,7 +24,7 @@ var tzwhere = require('tzwhere');
             var features = [];
             var isClassKeySource = false;
             source.features.forEach(function (feature) {
-                if (feature.enabled === true && feature.key !== config.classKey) {
+                if (source.enabled === true && feature.enabled === true && feature.key !== config.classKey) {
                     features.push(feature);
                 }
                 else if (feature.key === config.classKey) {
