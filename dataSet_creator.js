@@ -153,8 +153,8 @@ var tzwhere = require('tzwhere');
      * @param pokeEntry the JSON object which is received from the API for a Pokemon sighting
      */
     function addCoordinatesToPokeEntry(pokeEntry) {
-        pokeEntry.latitude = pokeEntry["location"]["coordinates"][0];
-        pokeEntry.longitude = pokeEntry["location"]["coordinates"][1];
+        pokeEntry.latitude = pokeEntry["location"]["coordinates"][1];
+        pokeEntry.longitude = pokeEntry["location"]["coordinates"][0];
     }
 
 
