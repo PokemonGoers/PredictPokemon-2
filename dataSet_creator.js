@@ -24,7 +24,7 @@ var tzwhere = require('tzwhere');
             var features = [];
             var isClassKeySource = false;
             source.features.forEach(function (feature) {
-                if (feature.enabled === true && feature.key !== config.classKey) {
+                if (source.enabled === true && feature.enabled === true && feature.key !== config.classKey) {
                     features.push(feature);
                 }
                 else if (feature.key === config.classKey) {
@@ -153,8 +153,8 @@ var tzwhere = require('tzwhere');
      * @param pokeEntry the JSON object which is received from the API for a Pokemon sighting
      */
     function addCoordinatesToPokeEntry(pokeEntry) {
-        pokeEntry.latitude = pokeEntry["location"]["coordinates"][0];
-        pokeEntry.longitude = pokeEntry["location"]["coordinates"][1];
+        pokeEntry.latitude = pokeEntry["location"]["coordinates"][1];
+        pokeEntry.longitude = pokeEntry["location"]["coordinates"][0];
     }
 
 
