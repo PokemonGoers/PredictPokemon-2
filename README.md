@@ -12,8 +12,8 @@ The data set which is used for the prediction consists out of different features
 - whereas another extracts local time, hour of the day and other time-related features from the timestamp of the API data
 - another source uses location and time to extract weather related features and so on...
 
-##### getFeature Method
-To handle all feature sources in a generic way they have to provide the `getFeature(key, pokeEntry)` method. The method receives a unique key which refers to a feature, e.g. the `hourOfTheDay` feature, and it receives a pokeEntry, which represents the JSON object that Team A uses to describe the sighting of a Pokemon. The pokeEntry provides the following data:
+##### getFeatures Method
+To handle all feature sources in a generic way they have to provide the `getFeatures(keys, pokeEntry)` method. The method receives an array of unique keys which refer to features, e.g. the `hourOfTheDay` feature, and it receives a pokeEntry, which represents the JSON object that Team A uses to describe the sighting of a Pokemon. The pokeEntry provides the following data:
 
 ###### pokeEntry
 
@@ -41,22 +41,29 @@ Here is an example how a feature source has to be implemented in order to work w
 (function (exports) {
     var module = exports.module = {};
 
-    module.getFeature = function (key, pokeEntry) {
-        if (key === "hourOfTheDay") {
-            return parseHourOfTheDay(pokeEntry.appearedOn);
-        }
-        else {
-            console.log("The key " + key + " is not handled by the time feature source.");
-            throw "UnknownFeatureKey";
-        }
-    };
+    module.getFeatures = function (keys, pokeEntry) {
+    	var values = {};
+
+    	keys.forEach(function (key) {
+    		if (key === "hourOfTheDay") {
+            	values[key] = parseHourOfTheDay(pokeEntry.appearedOn);
+	        }
+	        else {
+	            console.log("The key " + key + " is not handled by the time feature source.");
+	            throw "UnknownFeatureKey";
+	        }
+    	}        
+
+    	return values;
+    });
 })('undefined' !== typeof module ? module.exports : window);
 ```
 
-The source has to specify the `module` variable and implement `module.getFeature = function (key, pokeEntry)` so that it can be used by *dataSet_creator.js*. The implementation of the function depends on the feature to extract.
+The source has to specify the `module` variable and implement `module.getFeatures = function (keys, pokeEntry)` so that it can be used by *dataSet_creator.js*. 
+The source has to return an object as result, which maps a value to every key. The implementation of the function depends on the features to extract.
 
 ##### Feature config
-The keys which are used in the `getFeature` method have to be specified in the `feature_config.json` file, which looks like this:
+The keys which are used in the `getFeatures` method have to be specified in the `feature_config.json` file, which looks like this:
 
 ```
 {

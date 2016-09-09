@@ -1,5 +1,5 @@
 var fs = require('fs');
-var tzwhere = require('tzwhere');
+//var tzwhere = require('tzwhere');
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -34,12 +34,16 @@ var tzwhere = require('tzwhere');
 
             if (features.length > 0 || isClassKeySource === true) {
                 var module = require(source.path).module;
+                var featureKeys = source.features.map(function (feature) {
+                    return feature.key;
+                });
 
                 if (features.length > 0) {
                     featureSources.push({
                         "module": module,
                         "name": source.name,
-                        "features": features
+                        "features": features,
+                        "featureKeys": featureKeys
                     });
                 }
 
@@ -56,7 +60,7 @@ var tzwhere = require('tzwhere');
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        tzwhere.init();
+        //tzwhere.init();
 
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
@@ -65,15 +69,16 @@ var tzwhere = require('tzwhere');
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
+                var values = source.module.getFeatures(source.featureKeys, pokeEntry);
+
                 source.features.forEach(function (feature) {
-                    var value = source.module.getFeature(feature.key, pokeEntry);
-                    dataRow[feature.key] = value;
+                    dataRow[feature.key] = values[feature.key];
                 });
             });
 
             // add the class label to the data row
-            var classLabel = classSource.module.getFeature(classSource.classKey, pokeEntry);
-            dataRow[classSource.classKey] = classLabel;
+            var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
+            dataRow[classSource.classKey] = classLabel[classSource.classKey];
 
             dataSet.push(dataRow);
         });
@@ -165,10 +170,10 @@ var tzwhere = require('tzwhere');
     function addLocalTime(_pokeEntry) {
         //If at some point a error tracks back to here, it might be that the data team changes Lat/Lon.
         //In this case just exchange the ...[1] and ...[0] in the next line
-        var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
+        //var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
         //add the offset (milliseconds) to date
         var newDate = new Date(_pokeEntry.appearedOn);
-        newDate = new Date(newDate.getTime() + offset);
+        //newDate = new Date(newDate.getTime() + offset);
         _pokeEntry.appearedLocalTime = newDate.toJSON();
     }
 
