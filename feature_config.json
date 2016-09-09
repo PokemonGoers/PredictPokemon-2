@@ -9,7 +9,7 @@
         {
           "key": "pokemonId",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "longitude",

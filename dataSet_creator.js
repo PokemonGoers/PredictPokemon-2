@@ -65,15 +65,20 @@ var tzwhere = require('tzwhere');
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
+                var featureKeys = source.features.map(function (feature) {
+                    return feature.key;
+                });
+
+                var values = source.module.getFeatures(featureKeys, pokeEntry);
+
                 source.features.forEach(function (feature) {
-                    var value = source.module.getFeature(feature.key, pokeEntry);
-                    dataRow[feature.key] = value;
+                    dataRow[feature.key] = values[feature.key];
                 });
             });
 
             // add the class label to the data row
-            var classLabel = classSource.module.getFeature(classSource.classKey, pokeEntry);
-            dataRow[classSource.classKey] = classLabel;
+            var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
+            dataRow[classSource.classKey] = classLabel[classSource.classKey];
 
             dataSet.push(dataRow);
         });

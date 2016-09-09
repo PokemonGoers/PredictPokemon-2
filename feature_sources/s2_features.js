@@ -6,36 +6,42 @@ var S2 = require('s2-geometry').S2;
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
      * which represents the JSON object which is returned from the API for a Pokemon sighting.
-     * @param key the name of the feature. The key is read out from the feature_config.json
+     * @param keys array of keys which refer to the name of features. The keys are read out from the feature_config.json
      * @param pokeEntry the JSON object which is received from the API for a Pokemon sighting
-     * @returns the value for the specified feature by considering the given data.
+     * @returns the values for the specified features by considering the given data.
      */
-    module.getFeature = function (key, pokeEntry) {
-        if (key === "cellId_90m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 17);
-        }
-        else if (key === "cellId_180m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 16);
-        }
-        else if (key === "cellId_370m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 15);
-        }
-        else if (key === "cellId_730m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 14);
-        }
-        else if (key === "cellId_1460m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 13);
-        }
-        else if (key === "cellId_2920m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 12);
-        }
-        else if (key === "cellId_5850m") {
-            return cllId(pokeEntry.latitude, pokeEntry.longitude, 11);
-        }
-        else {
-            console.log("The key " + key + " is not handled by the S2 feature source.");
-            throw "UnknownFeatureKey";
-        }
+    module.getFeatures = function (keys, pokeEntry) {
+        var values = {};
+
+        keys.forEach(function (key) {
+            if (key === "cellId_90m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 17);
+            }
+            else if (key === "cellId_180m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 16);
+            }
+            else if (key === "cellId_370m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 15);
+            }
+            else if (key === "cellId_730m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 14);
+            }
+            else if (key === "cellId_1460m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 13);
+            }
+            else if (key === "cellId_2920m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 12);
+            }
+            else if (key === "cellId_5850m") {
+                values[key] = cllId(pokeEntry.latitude, pokeEntry.longitude, 11);
+            }
+            else {
+                console.log("The key " + key + " is not handled by the S2 feature source.");
+                throw "UnknownFeatureKey";
+            }
+        });
+
+        return values;
     };
 
     // public method to print average cell distances for all S2 levels
@@ -51,7 +57,7 @@ var S2 = require('s2-geometry').S2;
      * @param latitude
      * @param longitude
      * @param level S2 level
-     * @return cell id for the specified arguments
+     * @values[key] = cell id for the specified arguments
      */
     function cllId(latitude, longitude, level) {
         var key = S2.latLngToKey(latitude, longitude, level);
