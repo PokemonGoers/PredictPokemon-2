@@ -5,8 +5,10 @@ var latitude = 43.271338;
 var longitude = 6.638375;
 
 var city = latLonToCity(latitude, longitude);
-
 console.log(city);
+
+var population = getPopulation('Munich');
+console.log(population);
 
 function latLonToCity(latitude, longitude) {
     var url = 'http://nominatim.openstreetmap.org/reverse?format=json'
@@ -37,4 +39,26 @@ function getCity(data) {
         return data['address']['village'];
     }
     return 'failure\n' + data;
+}
+
+function getPopulation(place) {
+    var appId = 'TV9Y52-9297TEGQHH';
+    var url = 'http://api.wolframalpha.com/v2/query?input=' + place
+                + '&appid=' +  appId;
+
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parseXML(this);
+        }
+    };
+    xmlhttp.open("GET", url, false);
+    xmlhttp.send();
+
+    return place;
+}
+
+function parseXML(xml) {
+    var xmlDoc = xml.responseXML;
+    document.getElementById("queryresult").innerHTML =
+    xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
 }
