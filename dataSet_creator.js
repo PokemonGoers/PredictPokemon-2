@@ -34,12 +34,16 @@ var fs = require('fs');
 
             if (features.length > 0 || isClassKeySource === true) {
                 var module = require(source.path).module;
+                var featureKeys = source.features.map(function (feature) {
+                    return feature.key;
+                });
 
                 if (features.length > 0) {
                     featureSources.push({
                         "module": module,
                         "name": source.name,
-                        "features": features
+                        "features": features,
+                        "featureKeys": featureKeys
                     });
                 }
 
@@ -65,11 +69,7 @@ var fs = require('fs');
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
-                var featureKeys = source.features.map(function (feature) {
-                    return feature.key;
-                });
-
-                var values = source.module.getFeatures(featureKeys, pokeEntry);
+                var values = source.module.getFeatures(source.featureKeys, pokeEntry);
 
                 source.features.forEach(function (feature) {
                     dataRow[feature.key] = values[feature.key];
