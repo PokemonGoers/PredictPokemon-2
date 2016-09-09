@@ -219,5 +219,17 @@
         }
       ]
     }
+    {
+      "name": "Weather Features",
+      "path": "./feature_sources/weather_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "weather",
+          "type": "array",///!!!!! Timezone: String, Weather: String, WeatherShort: String, Temperature: numeric, Humidity: numeric, Speed of wind: numeric, Wind bearing: numeric, Pressure: numeric
+          "enabled": true
+        }
+      ]
+    }
   ]
 }
