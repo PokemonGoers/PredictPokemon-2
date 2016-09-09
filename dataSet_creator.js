@@ -1,5 +1,5 @@
 var fs = require('fs');
-var tzwhere = require('tzwhere');
+//var tzwhere = require('tzwhere');
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -56,7 +56,7 @@ var tzwhere = require('tzwhere');
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        tzwhere.init();
+        //tzwhere.init();
 
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
@@ -170,10 +170,10 @@ var tzwhere = require('tzwhere');
     function addLocalTime(_pokeEntry) {
         //If at some point a error tracks back to here, it might be that the data team changes Lat/Lon.
         //In this case just exchange the ...[1] and ...[0] in the next line
-        var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
+        //var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
         //add the offset (milliseconds) to date
         var newDate = new Date(_pokeEntry.appearedOn);
-        newDate = new Date(newDate.getTime() + offset);
+        //newDate = new Date(newDate.getTime() + offset);
         _pokeEntry.appearedLocalTime = newDate.toJSON();
     }
 
