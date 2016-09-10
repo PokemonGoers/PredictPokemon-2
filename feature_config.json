@@ -231,15 +231,50 @@
           "enabled": false
         }
       ]
-    }
+    },
     {
       "name": "Weather Features",
       "path": "./feature_sources/weather_features.js",
       "enabled": true,
       "features": [
         {
+          "key": "timezone",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
           "key": "weather",
-          "type": "array",///!!!!! Timezone: String, Weather: String, WeatherShort: String, Temperature: numeric, Humidity: numeric, Speed of wind: numeric, Wind bearing: numeric, Pressure: numeric
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "precipType",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "temperature",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "humidity",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windSpeed",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windBearing",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "pressure",
+          "type": "numeric",
           "enabled": true
         }
       ]
