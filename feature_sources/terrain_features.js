@@ -1,7 +1,7 @@
 (function (exports) {
     var module = exports.module = {};
 
-    var landcover = require('json/landcover.json');
+    var landcover = fileToJson('json/landcover.json');
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
      * which represents the JSON object which is returned from the API for a Pokemon sighting.
@@ -13,8 +13,8 @@
         if (key === "terrainType") {
             return getTerrain(pokeEntry.latitude, pokeEntry.longitude);
         }
-        else if(key == 'getSurroundingTerrain500m'){
-
+        else if (key == 'closeToWater') {
+            return closeToWater(pokeEntry.latitude, pokeEntry.longitude);
         }
         else {
             console.log("The key " + key + " is not in the raw API data.");
@@ -29,23 +29,64 @@
     module.getTerrain = function (lat, lon) {
         var landcover = require('json/landcover.json');
         var cellsize = 0.0833333333333;
-        if (lat > -64.0 && lat <= 84.0 && lng >= -180.0 && lng < 180.0) {
+        if (lat > -64.0 && lat <= 84.0 && lon >= -180.0 && lon < 180.0) {
             var y = Math.floor((84.0 - lat) / cellsize);
-            var x = Math.floor((lng + 180.0) / cellsize);
+            var x = Math.floor((lon + 180.0) / cellsize);
             return landcover[y][x];
-        } else
+        } else {
             return 255;
+        }
     };
 
 
-    module.getSurroundingTerrain = function (lat, lon) {
+    /*
+     *check the surrounding are from the current location by one cell as
+     * described at http://glcf.umd.edu/data/lc/
+     */
+    module.closeToWater = function (lat, lon) {
         var cellsize = 0.0833333333333;
-        if (lat > -64.0 && lat <= 84.0 && lng >= -180.0 && lng < 180.0) {
+        if (lat > -64.0 && lat <= 84.0 && lon >= -180.0 && lon < 180.0) {
             var y = Math.floor((84.0 - lat) / cellsize);
-            var x = Math.floor((lng + 180.0) / cellsize);
-            return landcover[y][x];
-        } else
-            return 255;
+            var x = Math.floor((lon + 180.0) / cellsize);
+
+            if (landcover[y][x] == 0) {
+                return true;
+            } else if (landcover[y][x + 1] == 0) {
+                return true;
+
+            } else if (landcover[y + 1][x + 1] == 0) {
+                return true;
+            }
+            else if (landcover[y + 1][x] == 0) {
+                return true;
+            }
+            else if (landcover[y + 1][x - 1] == 0) {
+                return true;
+            }
+            else if (landcover[y][x - 1] == 0) {
+                return true;
+            }
+            else if (landcover[y - 1][x - 1] == 0) {
+                return true;
+            }
+            else if (landcover[y - 1][x] == 0) {
+                return true;
+            }
+            else if (landcover[y - 1][x + 1] == 0) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
     };
+
+
+    function fileToJson(file) {
+        var data = fs.readFileSync(file, 'utf8');
+        return JSON.parse(data);
+    }
 
 })('undefined' !== typeof module ? module.exports : window);
