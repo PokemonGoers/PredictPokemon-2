@@ -1,17 +1,18 @@
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xmlhttp = new XMLHttpRequest();
 
-var latitude = 43.271338;
-var longitude = 6.638375;
+var latitude = 48.148641;
+var longitude = 11.568721;
 
 var city = latLonToCity(latitude, longitude);
 console.log(city);
 
-var population = getPopulation('Munich');
+var population = getPopulation(city);
 console.log(population);
 
 function latLonToCity(latitude, longitude) {
     var url = 'http://nominatim.openstreetmap.org/reverse?format=json'
+                + '&accept-language=en-US'
                 + '&lat=' + latitude + '&lon=' + longitude;
 
     var city;
@@ -42,31 +43,43 @@ function getCity(data) {
 }
 
 function getPopulation(place) {
-    var appId = 'TV9Y52-9297TEGQHH';
+    const appId = 'TV9Y52-9297TEGQHH';
     var url = 'http://api.wolframalpha.com/v2/query?input=' + place
                 + '&appid=' +  appId;
 
+    var population;
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            parseXML(this);
+            population = extractNumber(this.responseText);
         }
     };
     xmlhttp.open("GET", url, false);
     xmlhttp.send();
 
-    return place;
+    return population;
 }
 
-function parseXML(xml) {
-    require("jsdom").env("", function(err, window) {
-    if (err) {
-        console.error(err);
-        return;
+function extractNumber(str) {
+    var offset = str.search('population');
+    var input = '';
+    var spaces = 0;
+    var i = 0;
+    while (spaces < 2) {
+        if (str[offset+13+i] === ' ') {
+            spaces++;
+        }
+        input += str[offset+13+i];
+        i++;
     }
-
-    var $ = require("jquery")(window);
-
-    var value = $(xml).find('pod[title="Population"]');
-    console.log(value);
-    });
+    var population_string = '';
+    i = 0;
+    while (input[i] !== ' ') {
+        population_string += input[i];
+        i++;
+    }
+    var population = parseFloat(population_string);
+    if (input.indexOf('million') > -1) {
+        population = population * 1000000;
+    }
+    return population;
 }
