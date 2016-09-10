@@ -66,7 +66,7 @@ function parseXML(xml) {
 
     var $ = require("jquery")(window);
 
-    var value = $(xml).find('pod[title="Population"]');//.attr('plaintext');
-    console.log(value);  // prints: smith
+    var value = $(xml).find('pod[title="Population"]');
+    console.log(value);
     });
 }
