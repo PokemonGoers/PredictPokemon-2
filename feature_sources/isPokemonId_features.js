@@ -12,17 +12,18 @@
         var values = {};
 
         keys.forEach(function (key) {
-            if (key === "_id") {
-                values[key] = pokeEntry[key].replace(/\s+/g, '');
-            }
-            else if (key === "source") {
-                values[key] = pokeEntry[key].replace(/\s+/g, '');
-            }
-            else if (hasOwnProperty.call(pokeEntry, key)) {
-                values[key] = pokeEntry[key];
+            var splitKey = key.split('_');
+
+            if (splitKey.length == 2 && splitKey[0] === "isPokemonId") {
+                if (pokeEntry.pokemonId == splitKey[1]) {
+                    values[key] = 'isId' + splitKey[1];
+                }
+                else {
+                    values[key] = 'otherId';
+                }
             }
             else {
-                console.log("The key " + key + " is not in the raw API data.");
+                console.log("The key " + key + " is not handled by the Is Pokemon feature source.");
                 throw "UnknownFeatureKey";
             }
         });

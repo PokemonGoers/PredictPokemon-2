@@ -4,55 +4,58 @@
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
      * which represents the JSON object which is returned from the API for a Pokemon sighting.
-     * @param key the name of the feature. The key is read out from the feature_config.json
+     * @param keys array of keys which refer to the name of features. The keys are read out from the feature_config.json
      * @param pokeEntry the JSON object which is received from the API for a Pokemon sighting
-     * @returns the value for the specified feature by considering the given data.
+     * @returns the values for the specified features by considering the given data.
      */
-    module.getFeature = function (key, pokeEntry) {
-        if (key === "appearedTimeOfDay") {
-            return addTimeOfDay(pokeEntry);
-        }
-        else if (key === "appearedHour") {
-            return addHour(pokeEntry);
-        }
-        else if (key === "appearedMinute") {
-            return addMinute(pokeEntry);
-        }
-        else if (key === "appearedDayOfWeek") {
-            return addDayOfWeek(pokeEntry);
-        }
-        else if (key === "appearedDay") {
-            return addDay(pokeEntry);
-        }
-        else if (key === "appearedMonth") {
-            return addMonth(pokeEntry);
-        }
-        else if (key === "appearedYear") {
-            return addYear(pokeEntry);
-        }
-        else {
-            console.log("The key " + key + " is not in the raw API data.");
-            throw "UnknownFeatureKey";
-        }
+    module.getFeatures = function (keys, pokeEntry) {
+        var values = {};
+        var date = new Date(pokeEntry.appearedLocalTime);
+
+        keys.forEach(function (key) {
+            if (key === "appearedTimeOfDay") {
+                values[key] = addTimeOfDay(date);
+            }
+            else if (key === "appearedHour") {
+                values[key] = addHour(date);
+            }
+            else if (key === "appearedMinute") {
+                values[key] = addMinute(date);
+            }
+            else if (key === "appearedDayOfWeek") {
+                values[key] = addDayOfWeek(date);
+            }
+            else if (key === "appearedDay") {
+                values[key] = addDay(date);
+            }
+            else if (key === "appearedMonth") {
+                values[key] = addMonth(date);
+            }
+            else if (key === "appearedYear") {
+                values[key] = addYear(date);
+            }
+            else {
+                console.log("The key " + key + " is not in the raw API data.");
+                throw "UnknownFeatureKey";
+            }
+        });
+
+        return values;
     };
 
-    function addHour(_pokeEntry) {
-        var date = new Date(_pokeEntry.appearedLocalTime);
+    function addHour(date) {
         return date.getHours();
-    };
+    }
 
-    function addMinute(_pokeEntry) {
-        var date = new Date(_pokeEntry.appearedLocalTime);
+    function addMinute(date) {
         return date.getMinutes();
-    };
+    }
 
-    function addDay(_pokeEntry) {
-            var date = new Date(_pokeEntry.appearedLocalTime);
-            return date.getDate();
-    };
+    function addDay(date) {
+        return date.getDate();
+    }
 
-    function addDayOfWeek(_pokeEntry) {
-        var date = new Date(_pokeEntry.appearedLocalTime);
+    function addDayOfWeek(date) {
         var day = date.getDate();
         switch (day){
             case 1:
@@ -79,27 +82,24 @@
             default:
                 return 'dummy_day';
         }
-    };
+    }
 
-    function addMonth(_pokeEntry) {
-        var date = new Date(_pokeEntry.appearedLocalTime);
+    function addMonth(date) {
         return date.getMonth();
-    };
+    }
 
-    function addYear(_pokeEntry) {
-        var date = new Date(_pokeEntry.appearedLocalTime);
+    function addYear(date) {
         return date.getFullYear();
-    };
+    }
 
     /**
      * Adds a nominal value for the time of day
      * Requires a local time field
-     * @param _pokeEntry JSON entry to evaluate
+     * @param date date object representing the local time when the pokemon was sighted
      * @returns string: time of the day
      */
-    function addTimeOfDay(_pokeEntry) {
-            var date = new Date(_pokeEntry.appearedLocalTime);
-            var hour = date.getHours();
+    function addTimeOfDay(date) {
+        var hour = date.getHours();
             if(20<=hour && hour<24){
                 return 'night';
             } else if (0<=hour && hour<7){
@@ -111,8 +111,7 @@
             } else if (16<=hour && hour<20){
                 return 'evening';
             }
-    };
-
+    }
 
 })('undefined' !== typeof module ? module.exports : window);
 

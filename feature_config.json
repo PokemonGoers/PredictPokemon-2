@@ -1,5 +1,5 @@
 {
-  "classKey": "pokemonId",
+  "classKey": "isPokemonId_16",
   "feature_sources": [
     {
       "name": "API Features",
@@ -9,7 +9,7 @@
         {
           "key": "pokemonId",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "longitude",
@@ -216,6 +216,19 @@
           "key": "typeGround",
           "type": "nominal",
           "enabled": true
+        }
+      ]
+    },
+    {
+
+      "name": "Is Pokemon id Features",
+      "path": "./feature_sources/isPokemonId_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "isPokemonId_16",
+          "type": "nominal",
+          "enabled": false
         }
       ]
     }
