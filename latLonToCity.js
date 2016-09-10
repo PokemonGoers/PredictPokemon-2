@@ -58,7 +58,15 @@ function getPopulation(place) {
 }
 
 function parseXML(xml) {
-    var xmlDoc = xml.responseXML;
-    document.getElementById("queryresult").innerHTML =
-    xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+    require("jsdom").env("", function(err, window) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+
+    var $ = require("jquery")(window);
+
+    var value = $(xml).find('pod[title="Population"]');//.attr('plaintext');
+    console.log(value);  // prints: smith
+    });
 }
