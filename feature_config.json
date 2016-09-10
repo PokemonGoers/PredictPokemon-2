@@ -34,7 +34,7 @@
         {
           "key": "_id",
           "type": "string",
-          "enabled": false
+          "enabled": true
         },
         {
           "key": "source",
@@ -88,7 +88,7 @@
     {
       "name": "Time Features",
       "path": "./feature_sources/time_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "appearedTimeOfDay",
@@ -130,7 +130,7 @@
     {
       "name": "Pokemon Type Features",
       "path": "./feature_sources/poketype_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "typeSteel",
