@@ -220,13 +220,29 @@
       ]
     },
     {
-
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
       "enabled": true,
       "features": [
         {
           "key": "isPokemonId_16",
+          "type": "nominal",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "name": "Is Pokemon id Features",
+      "path": "./feature_sources/isPokemonId_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "terrainType",
+          "type": "numerical",
+          "enabled": false
+        },
+        {
+          "key": "closeToWater",
           "type": "nominal",
           "enabled": false
         }
