@@ -46,7 +46,7 @@
     {
       "name": "S2 Features",
       "path": "./feature_sources/s2_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "cellId_90m",
@@ -223,7 +223,7 @@
 
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "isPokemonId_16",

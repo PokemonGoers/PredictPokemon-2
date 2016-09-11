@@ -1,6 +1,7 @@
 var fs = require('fs');
 var DS = require('./dataSet_creator.js').DC;
 var destination = 'arff/apiDataMockup.arff';
+respond={"empty": "json file"};
 
 SOMEDATA=[  {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
     /*{"_id":"57c92f926ffa1ace02c48f01","source":"POKESNIPER","appearedOn":"2016-09-02T07:52:57.000Z","__v":0,"pokemonId":122,"location":{"coordinates":[22.411684,40.791931],"type":"Point"}},
