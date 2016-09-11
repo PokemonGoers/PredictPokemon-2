@@ -32,7 +32,6 @@
      * for meaning of return values see http://glcf.umd.edu/data/lc/
      */
     function getTerrain(lat, lon) {
-        var landcover = require('json/landcover.json');
         var cellsize = 0.0833333333333;
         if (lat > -64.0 && lat <= 84.0 && lon >= -180.0 && lon < 180.0) {
             var y = Math.floor((84.0 - lat) / cellsize);
