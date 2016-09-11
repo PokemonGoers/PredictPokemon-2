@@ -5,9 +5,9 @@
 @ATTRIBUTE appearedLocalTime string
 @ATTRIBUTE _id string
 @ATTRIBUTE source {POKESNIPER}
-@ATTRIBUTE timezone {e}
-@ATTRIBUTE weather {m}
-@ATTRIBUTE precipType {p}
+@ATTRIBUTE timezone {}
+@ATTRIBUTE weather {}
+@ATTRIBUTE precipType {}
 @ATTRIBUTE temperature numeric
 @ATTRIBUTE humidity numeric
 @ATTRIBUTE windSpeed numeric
@@ -16,4 +16,4 @@
 @ATTRIBUTE class {otherId}
 
 @DATA
-151.199544,-33.871224,2016-09-02T07:53:21.000Z,57c92f926ffa1ace02c48f04,POKESNIPER,e,m,p,t,y,y,e,t,otherId
+151.199544,-33.871224,2016-09-02T07:53:21.000Z,57c92f926ffa1ace02c48f04,POKESNIPER,,,,,,,,,otherId
