@@ -7,7 +7,7 @@
         dataSet.forEach(function (dataRow) {
             var pokeIdSet = pokemonIdsInCellForDate(cellGroups[dataRow.cellId_90m], dateFromDataRow(dataRow), dataRow.pokemonId);
 
-            for (var i=0; i<=151; i += 1) {
+            for (var i=1; i<=151; i += 1) {
                 var co_occurrence = pokeIdSet.has(i);
 
                 if (co_occurrence) {

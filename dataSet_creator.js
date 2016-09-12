@@ -71,6 +71,8 @@ var fs = require('fs');
         //Initialize the script to convert UTC to local time
         //tzwhere.init();
 
+        var classLables = [];
+
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             addCoordinatesToPokeEntry(pokeEntry);
@@ -84,17 +86,21 @@ var fs = require('fs');
                     dataRow[feature.key] = values[feature.key];
                 });
             });
-
-            // add the class label to the data row
-            var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
-            dataRow[classSource.classKey] = classLabel[classSource.classKey];
-
             dataSet.push(dataRow);
+
+            var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
+            classLables.push(classLabel[classSource.classKey]);
         });
 
         // post processing on existing features
         postProcessSources.forEach(function (postSource) {
-            postSource.module.addFeatures(postSource.featureKeys, dataSet);
+            dataSet = postSource.module.addFeatures(postSource.featureKeys, dataSet);
+        });
+
+        // add the class label to the data row
+        classLables.reverse();
+        dataSet.forEach(function (dataRow) {
+            dataRow[classSource.classKey] = classLables.pop();
         });
 
         return dataSet;
@@ -124,7 +130,7 @@ var fs = require('fs');
         var sourcesForHeader = featureSources.concat(postProcessSources);
 
         // add attributes for the configured features
-        featureSources.forEach(function (source) {
+        sourcesForHeader.forEach(function (source) {
             source.features.forEach(function (feature) {
                 if (feature.type === 'nominal') {
                     var nominalValues = allValuesForKeyInData(feature.key, dataSet);
