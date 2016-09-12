@@ -5,6 +5,7 @@ var fs = require('fs');
     var DC = exports.DC = {};
     var dataSet = null;
     var featureSources = null;
+    var postProcessSources = null;
     var classSource = null;
 
     /**
@@ -17,6 +18,7 @@ var fs = require('fs');
         var json_data = removeIncompleteData(json_data_raw);
         var config = fileToJson(configPath);
         featureSources = [];
+        postProcessSources = [];
         classSource = null;
 
         // extract the configured features and load the required modules
@@ -39,12 +41,19 @@ var fs = require('fs');
                 });
 
                 if (features.length > 0) {
-                    featureSources.push({
+                    var featureSource = {
                         "module": module,
                         "name": source.name,
                         "features": features,
                         "featureKeys": featureKeys
-                    });
+                    };
+
+                    if (source.post_process === true) {
+                        postProcessSources.push(featureSource);
+                    }
+                    else {
+                        featureSources.push(featureSource);
+                    }
                 }
 
                 if (isClassKeySource === true) {
@@ -83,6 +92,11 @@ var fs = require('fs');
             dataSet.push(dataRow);
         });
 
+        // post processing on existing features
+        postProcessSources.forEach(function (postSource) {
+            postSource.module.addFeatures(postSource.featureKeys, dataSet);
+        });
+
         return dataSet;
     };
 
@@ -95,7 +109,7 @@ var fs = require('fs');
     */
     DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
         DC.createDataSet(configPath, json_data_raw);
-        storeArff(dataSet, featureSources, classSource, fileNamePath);
+        storeArff(fileNamePath);
     };
 
     /**
@@ -105,8 +119,9 @@ var fs = require('fs');
      * @param classSource the source for the class label
      * @param fileNamePath the path with filename where the .arff file should be stored
      */
-    function storeArff(dataSet, featureSources, classSource, fileNamePath) {
+    function storeArff(fileNamePath) {
         var arff = '@RELATION ' + fileNamePath + '\n\n';
+        var sourcesForHeader = featureSources.concat(postProcessSources);
 
         // add attributes for the configured features
         featureSources.forEach(function (source) {
