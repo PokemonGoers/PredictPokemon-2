@@ -1,17 +1,16 @@
-var forecast = require('forecast.io')
-APIKeys = ['4e9bb2e33940272eeea09e0210886de0']
-options = { APIKey: APIKeys[0]  }   //here possible to implement switching between keys, if more than 1000 requests/day are done. counter in parent "class" needed (to switch after, say, 950 requests)
-Forecast = new forecast(options);   //init API with API key
+//var util = require('util')
+var APIKeys = ['4e9bb2e33940272eeea09e0210886de0']//api keys will be stored here
 respond={"empty": "json file"};
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var xhr = new XMLHttpRequest;
 
 (function (exports) {
     var module = exports.module = {};
     module.getFeatures = function (keys, pokeEntry) {
-        var values = {} //values that will be returned in the end
-        var temp = "emptyyet"//temporary file used as buffer to avoid pointing on undefined array
-        var returnResponse = (function (keys, pokeEntry) {//functions that creates values variable
-            console.log("respond inside returnResponse: " + respond[pokeEntry["_id"]])//respond does have the right key, but it doesn't go to values
-
+        var values = {}
+        var temp = "emptyyet"
+        var returnResponse = (function (keys, pokeEntry) {
+            //console.log("respond inside returnResponse: " + respond[pokeEntry["_id"]])
             keys.forEach(function (key) {
                 if (key === "timezone") {
                     values[key] = respond[pokeEntry["_id"]][0];
@@ -32,27 +31,25 @@ respond={"empty": "json file"};
                 }
             })
         });
-
-        //respond check - if "_id" of the pokeEntry is in the "respond" list, then just read and return it; if not - calculate such
         if (!respond[pokeEntry["_id"]]) {
             var date = new Date(pokeEntry.appearedLocalTime)
             var timestamp = Math.round(date.getTime() / 1000)
-            Forecast.getAtTime(pokeEntry.latitude, pokeEntry.longitude, timestamp, function (err, res, data) {//calling API for forecast
-                if (err) throw err;
-                if (data){      //console.log(data)
-                    temp = [data.timezone, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),//temp remains empty!!!!!
-                        data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
-                    //console.log("temp: "+temp)
-                    respond[pokeEntry["_id"]] = temp
-                    console.log("respond inside API call: "+respond[pokeEntry["_id"]])
-                    returnResponse(keys, pokeEntry);//this is being jumped over
-                }
-            });
-        } else {
-            console.log("Api not called")//never gets called(
-            returnResponse(keys, pokeEntry);
-        }
-        console.log("Values: "+values.toString())
+            //switching between API Keys here
+            URL = 'https://api.forecast.io/forecast/'+APIKeys[0]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
+            xhr.open('GET', URL, false);
+            xhr.send();
+            if (xhr.status != 200) {
+                console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+            } else {
+                data = JSON.parse(xhr.responseText)
+                temp = [data.timezone, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
+                    data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
+            }
+            //console.log("API Called")
+            respond[pokeEntry["_id"]] = temp
+        } else console.log("Api not called")
+        returnResponse(keys, pokeEntry)
+        //console.log("returning values")
         return values
     }
 })('undefined' !== typeof module ? module.exports : window);

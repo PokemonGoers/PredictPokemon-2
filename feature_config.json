@@ -9,7 +9,7 @@
         {
           "key": "pokemonId",
           "type": "numeric",
-          "enabled": false
+          "enabled": true
         },
         {
           "key": "longitude",
@@ -46,7 +46,7 @@
     {
       "name": "S2 Features",
       "path": "./feature_sources/s2_features.js",
-      "enabled": false,
+      "enabled": true,
       "features": [
         {
           "key": "cellId_90m",
@@ -88,7 +88,7 @@
     {
       "name": "Time Features",
       "path": "./feature_sources/time_features.js",
-      "enabled": false,
+      "enabled": true,
       "features": [
         {
           "key": "appearedTimeOfDay",
@@ -130,7 +130,7 @@
     {
       "name": "Pokemon Type Features",
       "path": "./feature_sources/poketype_features.js",
-      "enabled": false,
+      "enabled": true,
       "features": [
         {
           "key": "typeSteel",
@@ -223,7 +223,7 @@
 
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
-      "enabled": false,
+      "enabled": true,
       "features": [
         {
           "key": "isPokemonId_16",
