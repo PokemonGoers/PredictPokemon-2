@@ -220,7 +220,6 @@
       ]
     },
     {
-
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
       "enabled": true,
@@ -244,11 +243,6 @@
         },
         {
           "key": "weather",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "precipType",
           "type": "nominal",
           "enabled": true
         },

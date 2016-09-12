@@ -1,6 +1,5 @@
-//var util = require('util')
-var APIKeys = ['4e9bb2e33940272eeea09e0210886de0']//api keys will be stored here
-respond={"empty": "json file"};
+var APIKeys = ['4e9bb2e33940272eeea09e0210886de0','49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0']//api keys will be stored here
+var respond={"empty": "json file"};
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest;
 
@@ -16,40 +15,46 @@ var xhr = new XMLHttpRequest;
                     values[key] = respond[pokeEntry["_id"]][0];
                 } else if (key === "weather") {
                     values[key] = respond[pokeEntry["_id"]][1]
-                } else if (key === "precipType") {
-                    values[key] = respond[pokeEntry["_id"]][2]
                 } else if (key === "temperature") {
-                    values[key] = respond[pokeEntry["_id"]][3]
+                    values[key] = respond[pokeEntry["_id"]][2]
                 } else if (key === "humidity") {
-                    values[key] = respond[pokeEntry["_id"]][4]
+                    values[key] = respond[pokeEntry["_id"]][3]
                 } else if (key === "windSpeed") {
-                    values[key] = respond[pokeEntry["_id"]][5]
+                    values[key] = respond[pokeEntry["_id"]][4]
                 } else if (key === "windBearing") {
-                    values[key] = respond[pokeEntry["_id"]][6]
+                    values[key] = respond[pokeEntry["_id"]][5]
                 } else if (key === "pressure") {
-                    values[key] = respond[pokeEntry["_id"]][7]
+                    values[key] = respond[pokeEntry["_id"]][6]
                 }
             })
         });
-        if (!respond[pokeEntry["_id"]]) {
+        var makeRequest = function () {
             var date = new Date(pokeEntry.appearedLocalTime)
             var timestamp = Math.round(date.getTime() / 1000)
             //switching between API Keys here
-            URL = 'https://api.forecast.io/forecast/'+APIKeys[0]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
+            var URL = 'https://api.forecast.io/forecast/'+APIKeys[WeatherApiKey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
             xhr.open('GET', URL, false);
             xhr.send();
             if (xhr.status != 200) {
                 console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
             } else {
-                data = JSON.parse(xhr.responseText)
-                temp = [data.timezone, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
-                    data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
-            }
-            //console.log("API Called")
+                if (xhr.responseText.substring(0,12) != '{"latitude":'&&WeatherApiKey<(APIKeys.length-1)) {//I don't know what it returns when requests limit is exceeded yet
+                    WeatherApiKey++;                            //so if first 12 symbold of response are not equal '{"latitude":', then API Key probably doesn't work anymore
+                    console.log("Changed API Key")
+                    makeRequest()
+                } else {
+                    //console.log(xhr.responseText)
+                    data = JSON.parse(xhr.responseText)
+                    temp = [data.timezone, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
+                        data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
+                }
+            }//console.log("API Called")
             respond[pokeEntry["_id"]] = temp
-        } else console.log("Api not called")
+        }
+
+        if (!respond[pokeEntry["_id"]]) makeRequest()
+        else console.log("Api not called")
         returnResponse(keys, pokeEntry)
-        //console.log("returning values")
         return values
     }
 })('undefined' !== typeof module ? module.exports : window);

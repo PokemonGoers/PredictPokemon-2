@@ -1,5 +1,6 @@
 var fs = require('fs');
 //var tzwhere = require('tzwhere');
+WeatherApiKey=0;// Identifies which API Key is used right now. Has to be here to be global
 
 (function (exports) {
     var DC = exports.DC = {};
