@@ -237,7 +237,12 @@
       "enabled": true,
       "features": [
         {
-          "key": "timezone",
+          "key": "city",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "continent",
           "type": "nominal",
           "enabled": true
         },

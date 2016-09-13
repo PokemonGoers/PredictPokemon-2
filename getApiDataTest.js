@@ -1,5 +1,17 @@
 var fs = require('fs');
 var DS = require('./dataSet_creator.js').DC;
+var SOMEDATA = [
+    {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f01","source":"POKESNIPER","appearedOn":"2016-09-02T07:52:57.000Z","__v":0,"pokemonId":122,"location":{"coordinates":[22.411684,40.791931],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f03","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:14.000Z","__v":0,"pokemonId":97,"location":{"coordinates":[14.030339,50.684582],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f05","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:24.000Z","__v":0,"pokemonId":143,"location":{"coordinates":[151.207102,-33.859318],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f06","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:38.000Z","__v":0,"pokemonId":117,"location":{"coordinates":[-74.007198,40.718725],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f07","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:47.000Z","__v":0,"pokemonId":18,"location":{"coordinates":[-119.029218,35.426861],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f08","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:09.000Z","__v":0,"pokemonId":138,"location":{"coordinates":[-99.199814,19.411314],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f09","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:16.000Z","__v":0,"pokemonId":33,"location":{"coordinates":[-83.92087,9.857945],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f02","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:04.000Z","__v":0,"pokemonId":99,"location":{"coordinates":[-122.441549,37.775157],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f0c","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:34.000Z","__v":0,"pokemonId":30,"location":{"coordinates":[-73.98507,40.761295],"type":"Point"}}
+    ]
 var SOMEBIGDATA=[
     {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
     {"_id":"57c92f926ffa1ace02c48f01","source":"POKESNIPER","appearedOn":"2016-09-02T07:52:57.000Z","__v":0,"pokemonId":122,"location":{"coordinates":[22.411684,40.791931],"type":"Point"}},
@@ -101,19 +113,7 @@ var SOMEBIGDATA=[
     {"_id":"57c92fac691d56d302ad09d2","appearedOn":"2016-09-02T07:39:06.000Z","source":"POKERADAR","__v":0,"pokemonId":10,"location":{"coordinates":[-157.876959,21.333066],"type":"Point"}},
     {"_id":"57c92fac691d56d302ad09d0","appearedOn":"2016-09-02T07:41:07.000Z","source":"POKERADAR","__v":0,"pokemonId":46,"location":{"coordinates":[-157.856,21.305945],"type":"Point"}},
     {"_id":"57c92fac691d56d302ad09d1","appearedOn":"2016-09-02T07:44:11.000Z","source":"POKERADAR","__v":0,"pokemonId":15,"location":{"coordinates":[-157.855814,21.307065],"type":"Point"}}
-];
-var SOMEDATA = [
-    {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f01","source":"POKESNIPER","appearedOn":"2016-09-02T07:52:57.000Z","__v":0,"pokemonId":122,"location":{"coordinates":[22.411684,40.791931],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f03","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:14.000Z","__v":0,"pokemonId":97,"location":{"coordinates":[14.030339,50.684582],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f05","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:24.000Z","__v":0,"pokemonId":143,"location":{"coordinates":[151.207102,-33.859318],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f06","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:38.000Z","__v":0,"pokemonId":117,"location":{"coordinates":[-74.007198,40.718725],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f07","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:47.000Z","__v":0,"pokemonId":18,"location":{"coordinates":[-119.029218,35.426861],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f08","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:09.000Z","__v":0,"pokemonId":138,"location":{"coordinates":[-99.199814,19.411314],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f09","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:16.000Z","__v":0,"pokemonId":33,"location":{"coordinates":[-83.92087,9.857945],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f02","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:04.000Z","__v":0,"pokemonId":99,"location":{"coordinates":[-122.441549,37.775157],"type":"Point"}},
-    {"_id":"57c92f926ffa1ace02c48f0c","source":"POKESNIPER","appearedOn":"2016-09-02T07:54:34.000Z","__v":0,"pokemonId":30,"location":{"coordinates":[-73.98507,40.761295],"type":"Point"}}
-    ]
+]
 var EVENMOREDATA = [
     {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
     {"_id":"57c92f926ffa1ace02c48f01","source":"POKESNIPER","appearedOn":"2016-09-02T07:52:57.000Z","__v":0,"pokemonId":122,"location":{"coordinates":[22.411684,40.791931],"type":"Point"}},
