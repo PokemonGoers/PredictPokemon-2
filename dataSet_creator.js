@@ -91,7 +91,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     };
 
     var saveOldWeather = (function(path){//save already retrieved from API data to external JSON file
-        fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses), 'utf8');//////works? not tested
+        fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses), 'utf8');
     });
 
     /**
