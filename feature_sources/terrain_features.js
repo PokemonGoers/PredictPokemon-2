@@ -1,4 +1,5 @@
 var fs = require('fs');
+
 (function (exports) {
     var module = exports.module = {};
 
