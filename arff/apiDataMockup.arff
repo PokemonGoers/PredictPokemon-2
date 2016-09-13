@@ -1,0 +1,71 @@
+@RELATION arff/apiDataMockup.arff
+
+@ATTRIBUTE pokemonId numeric
+@ATTRIBUTE longitude numeric
+@ATTRIBUTE latitude numeric
+@ATTRIBUTE appearedLocalTime string
+@ATTRIBUTE _id string
+@ATTRIBUTE source {POKESNIPER}
+@ATTRIBUTE cellId_90m numeric
+@ATTRIBUTE cellId_180m numeric
+@ATTRIBUTE cellId_370m numeric
+@ATTRIBUTE cellId_730m numeric
+@ATTRIBUTE cellId_1460m numeric
+@ATTRIBUTE cellId_2920m numeric
+@ATTRIBUTE cellId_5850m numeric
+@ATTRIBUTE appearedTimeOfDay {morning}
+@ATTRIBUTE appearedHour numeric
+@ATTRIBUTE appearedMinute numeric
+@ATTRIBUTE appearedDayOfWeek {Tuesday}
+@ATTRIBUTE appearedDay numeric
+@ATTRIBUTE appearedMonth numeric
+@ATTRIBUTE appearedYear numeric
+@ATTRIBUTE typeSteel {false}
+@ATTRIBUTE typeGhost {false}
+@ATTRIBUTE typeElectric {false}
+@ATTRIBUTE typeIce {false}
+@ATTRIBUTE typeNormal {false, true}
+@ATTRIBUTE typeFire {false}
+@ATTRIBUTE typePsychic {false, true}
+@ATTRIBUTE typeFlying {false, true}
+@ATTRIBUTE typePoison {true, false}
+@ATTRIBUTE typeDragon {false}
+@ATTRIBUTE typeWater {true, false}
+@ATTRIBUTE typeFighting {false}
+@ATTRIBUTE typeRock {false, true}
+@ATTRIBUTE typeFairy {false, true}
+@ATTRIBUTE typeGrass {false}
+@ATTRIBUTE typeBug {false}
+@ATTRIBUTE typeGround {false}
+@ATTRIBUTE terrainType numeric
+@ATTRIBUTE closeToWater {true, false}
+@ATTRIBUTE city {Sydney, Athens, Prague, New_York, Los_Angeles, Mexico_City, Costa_Rica}
+@ATTRIBUTE continent {Australia, Europe, America}
+@ATTRIBUTE weather {LightRain, MostlyCloudy, PartlyCloudy, Clear}
+@ATTRIBUTE temperature numeric
+@ATTRIBUTE humidity numeric
+@ATTRIBUTE windSpeed numeric
+@ATTRIBUTE windBearing numeric
+@ATTRIBUTE pressure numeric
+@ATTRIBUTE weatherIcon {rain, partly-cloudy-day, clear-night, partly-cloudy-night}
+@ATTRIBUTE sunriseMinutesMidnight numeric
+@ATTRIBUTE sunriseHour numeric
+@ATTRIBUTE sunriseMinute numeric
+@ATTRIBUTE sunriseMinutesSince numeric
+@ATTRIBUTE sunsetMinutesMidnight numeric
+@ATTRIBUTE sunsetHour numeric
+@ATTRIBUTE sunsetMinute numeric
+@ATTRIBUTE sunsetMinutesBefore numeric
+@ATTRIBUTE class {otherId}
+
+@DATA
+73,151.199544,-33.871224,2016-09-02T07:53:21.000Z,57c92f926ffa1ace02c48f04,POKESNIPER,7715420675569090560,7715420675501981696,7715420674696675328,7715420671475449856,7715420684360351744,7715420632820744192,7715420701540220928,morning,9,53,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,true,false,true,false,false,false,false,false,false,13,true,Sydney,Australia,LightRain,15.6,0.95,4.77,101,1004.1,rain,373,6,13,700,1059,17,39,-14,otherId
+122,22.411684,40.791931,2016-09-02T07:52:57.000Z,57c92f926ffa1ace02c48f01,POKESNIPER,1393811247782166528,1393811247715057664,1393811246909751296,1393811243688525824,1393811256573427712,1393811239393558528,1393811033235128320,morning,9,52,Tuesday,2,8,2016,false,false,false,false,false,false,true,false,false,false,false,false,false,true,false,false,false,12,false,Athens,Europe,MostlyCloudy,24.0,0.57,3.53,356,1017.44,partly-cloudy-day,419,6,59,233,1203,20,3,551,otherId
+97,14.030339,50.684582,2016-09-02T07:53:14.000Z,57c92f926ffa1ace02c48f03,POKESNIPER,5118793148046245888,5118793148247572480,5118793147442266112,5118793146368524288,5118793133483622400,5118793081944014848,5118793150663491584,morning,9,53,Tuesday,2,8,2016,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,14,false,Prague,Europe,PartlyCloudy,18.9,0.66,3.11,342,1021.3,partly-cloudy-day,381,6,21,212,1188,19,48,595,otherId
+143,151.207102,-33.859318,2016-09-02T07:53:24.000Z,57c92f926ffa1ace02c48f05,POKESNIPER,7715420714894884864,7715420714693558272,7715420715498864640,7715420714425122816,7715420718720090112,7715420770259697664,7715420701540220928,morning,9,53,Tuesday,2,8,2016,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,false,false,13,true,Sydney,Australia,LightRain,15.7,0.94,4.77,100,1004.1,rain,373,6,13,700,1059,17,39,-14,otherId
+117,-74.007198,40.718725,2016-09-02T07:53:38.000Z,57c92f926ffa1ace02c48f06,POKESNIPER,9926595622096338944,9926595621895012352,9926595621089705984,9926595617868480512,9926595604983578624,9926595553443971072,9926595759602401280,morning,9,53,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,13,true,New_York,America,Clear,19.7,0.7,8.58,345,1014.71,clear-night,385,6,25,-152,1168,19,28,935,otherId
+18,-119.029218,35.426861,2016-09-02T07:53:47.000Z,57c92f926ffa1ace02c48f07,POKESNIPER,9289351796164132864,9289351796097024000,9289351795828588544,9289351792607363072,9289351788312395776,9289351736772788224,9289351805492264960,morning,9,53,Tuesday,2,8,2016,false,false,false,false,true,false,false,true,false,false,false,false,false,false,false,false,false,7,false,Los_Angeles,America,Clear,20.6,0.48,1.38,337,1011.96,clear-night,391,6,31,-338,1163,19,23,1110,otherId
+138,-99.199814,19.411314,2016-09-02T07:54:09.000Z,57c92f926ffa1ace02c48f08,POKESNIPER,9642771839843303424,9642771839776194560,9642771840581500928,9642771843802726400,9642771830917824512,9642771882457432064,9642771676299001856,morning,9,54,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,false,false,true,false,true,false,false,false,false,13,false,Mexico_City,America,MostlyCloudy,12.2,0.96,4.73,356,1017.12,partly-cloudy-night,443,7,23,-269,1192,19,52,1018,otherId
+33,-83.92087,9.857945,2016-09-02T07:54:16.000Z,57c92f926ffa1ace02c48f09,POKESNIPER,10349518165649653760,10349518165850980352,10349518166656286720,10349518169877512192,10349518182762414080,10349518165582544896,10349517959424114688,morning,9,54,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,2,false,Costa_Rica,America,MostlyCloudy,16.8,0.96,0.26,68,1014.3,partly-cloudy-night,327,5,27,-213,1065,17,45,951,otherId
+99,-122.441549,37.775157,2016-09-02T07:53:04.000Z,57c92f926ffa1ace02c48f02,POKESNIPER,9260949710816935936,9260949711018262528,9260949711823568896,9260949715044794368,9260949719339761664,9260949702159892480,9260949770879369216,morning,9,53,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,13,true,Los_Angeles,America,PartlyCloudy,13.9,0.88,4.55,242,1013.13,partly-cloudy-night,402,6,42,-349,1178,19,38,1125,otherId
+30,-73.98507,40.761295,2016-09-02T07:54:34.000Z,57c92f926ffa1ace02c48f0c,POKESNIPER,9926593656880365568,9926593656947474432,9926593656142168064,9926593659363393536,9926593646478491648,9926593629298622464,9926593560579145728,morning,9,54,Tuesday,2,8,2016,false,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,13,false,New_York,America,PartlyCloudy,19.4,0.72,7.81,341,1014.82,partly-cloudy-night,385,6,25,-151,1168,19,28,934,otherId

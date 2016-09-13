@@ -1,21 +1,36 @@
 (function (exports) {
     var module = exports.module = {};
 
-    module.addFeatures = function (keys, dataSet) {
+    module.getFeatureKeysForGroup = function (groupKey) {
+        var keys = [];
+
+        for (var i=1; i<=151; i += 1) {
+            keys.push(groupKey + i);
+        }
+
+        return keys;
+    };
+
+    module.addFeatures = function (groupKeys, dataSet) {
         var cellGroups = cellIdGroups(dataSet);
 
         dataSet.forEach(function (dataRow) {
-            var pokeIdSet = pokemonIdsInCellForDate(cellGroups[dataRow.cellId_90m], dateFromDataRow(dataRow), dataRow.pokemonId);
+            var pokeIdSet90m = pokemonIdsInCellForDate(cellGroups[dataRow.cellId_90m], dateFromDataRow(dataRow), dataRow.pokemonId);
 
-            for (var i=1; i<=151; i += 1) {
-                var co_occurrence = pokeIdSet.has(i);
+            groupKeys.forEach(function (groupKey) {
+                if (groupKey === 'co-occ90m_Id') {
+                    var i = 0;
+                    module.getFeatureKeysForGroup(groupKey).forEach(function (key) {
+                        var co_occurrence = pokeIdSet90m.has(++i);
 
-                if (co_occurrence) {
-                    pokeIdSet.delete(i);
+                        if (co_occurrence) {
+                            pokeIdSet90m.delete(i);
+                        }
+
+                        dataRow[key] = co_occurrence;
+                    });
                 }
-
-                dataRow['co-occ90m_Id' + i] = co_occurrence;
-            }
+            });
         });
 
         return dataSet;

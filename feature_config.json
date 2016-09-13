@@ -220,7 +220,6 @@
       ]
     },
     {
-
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
       "enabled": true,
@@ -233,764 +232,122 @@
       ]
     },
     {
-
+      "name": "Terrain Type Feature",
+      "path": "./feature_sources/terrain_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "terrainType",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "closeToWater",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Weather Features",
+      "path": "./feature_sources/weather_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "city",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "continent",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "weather",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "temperature",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "humidity",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windSpeed",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windBearing",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "pressure",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "weatherIcon",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinutesMidnight",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseHour",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinute",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinutesSince",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinutesMidnight",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetHour",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinute",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinutesBefore",
+          "type": "numeric",
+          "enabled": true
+        }
+      ]
+    },
+    {
       "name": "Co-occurrence Features",
       "path": "./feature_sources/co-occurrence_post-features.js",
       "enabled": true,
       "post_process": true,
       "features": [
         {
-          "key": "co-occ90m_Id1",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id2",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id3",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id4",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id5",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id6",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id7",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id8",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id9",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id10",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id11",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id12",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id13",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id14",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id15",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id16",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id17",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id18",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id19",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id20",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id21",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id22",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id23",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id24",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id25",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id26",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id27",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id28",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id29",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id30",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id31",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id32",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id33",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id34",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id35",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id36",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id37",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id38",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id39",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id40",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id41",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id42",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id43",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id44",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id45",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id46",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id47",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id48",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id49",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id50",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id51",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id52",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id53",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id54",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id55",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id56",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id57",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id58",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id59",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id60",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id61",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id62",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id63",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id64",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id65",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id66",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id67",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id68",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id69",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id70",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id71",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id72",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id73",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id74",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id75",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id76",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id77",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id78",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id79",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id80",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id81",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id82",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id83",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id84",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id85",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id86",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id87",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id88",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id89",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id90",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id91",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id92",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id93",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id94",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id95",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id96",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id97",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id98",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id99",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id100",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id101",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id102",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id103",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id104",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id105",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id106",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id107",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id108",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id109",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id110",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id111",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id112",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id113",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id114",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id115",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id116",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id117",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id118",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id119",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id120",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id121",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id122",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id123",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id124",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id125",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id126",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id127",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id128",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id129",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id130",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id131",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id132",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id133",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id134",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id135",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id136",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id137",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id138",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id139",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id140",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id141",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id142",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id143",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id144",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id145",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id146",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id147",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id148",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id149",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id150",
-          "type": "nominal",
-          "enabled": true
-        },
-        {
-          "key": "co-occ90m_Id151",
+          "key": "co-occ90m_Id",
           "type": "nominal",
           "enabled": true
         }

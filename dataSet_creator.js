@@ -1,5 +1,7 @@
 var fs = require('fs');
 //var tzwhere = require('tzwhere');
+WeatherApiKey = 0;// Identifies which API Key is used right now. Has to be here to be global
+CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -17,6 +19,7 @@ var fs = require('fs');
     DC.createDataSet = function(configPath, json_data_raw) {
         var json_data = removeIncompleteData(json_data_raw);
         var config = fileToJson(configPath);
+        CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
         featureSources = [];
         postProcessSources = [];
         classSource = null;
@@ -41,18 +44,21 @@ var fs = require('fs');
                 });
 
                 if (features.length > 0) {
-                    var featureSource = {
-                        "module": module,
-                        "name": source.name,
-                        "features": features,
-                        "featureKeys": featureKeys
-                    };
-
                     if (source.post_process === true) {
-                        postProcessSources.push(featureSource);
+                        postProcessSources.push({
+                            "module": module,
+                            "name": source.name,
+                            "featureGroups": features,
+                            "featureGroupKeys": featureKeys
+                        });
                     }
                     else {
-                        featureSources.push(featureSource);
+                        featureSources.push({
+                            "module": module,
+                            "name": source.name,
+                            "features": features,
+                            "featureKeys": featureKeys
+                        });
                     }
                 }
 
@@ -92,9 +98,12 @@ var fs = require('fs');
             classLables.push(classLabel[classSource.classKey]);
         });
 
+        // save weather data before other processing is done - this way we keep the data if the script crashes below
+        saveOldWeather('json/CachedWeatherRequests.json');
+
         // post processing on existing features
         postProcessSources.forEach(function (postSource) {
-            dataSet = postSource.module.addFeatures(postSource.featureKeys, dataSet);
+            dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
         // add the class label to the data row
@@ -105,6 +114,10 @@ var fs = require('fs');
 
         return dataSet;
     };
+
+    var saveOldWeather = (function(path){//save already retrieved from API data to external JSON file
+        fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses, null, 4), 'utf8');
+    });
 
     /**
      * parse the given JSON data and create an .arff file with all features
@@ -120,24 +133,33 @@ var fs = require('fs');
 
     /**
      * convert the data set to an .arff file and store it in the arff/ directory with the given filename
-     * @param dataSet the data to be stored
-     * @param featureSources the configured feature sources from the config
-     * @param classSource the source for the class label
      * @param fileNamePath the path with filename where the .arff file should be stored
      */
     function storeArff(fileNamePath) {
         var arff = '@RELATION ' + fileNamePath + '\n\n';
-        var sourcesForHeader = featureSources.concat(postProcessSources);
+
+        var addAttributes = function (featureKey, featureType) {
+            if (featureType === 'nominal') {
+                var nominalValues = allValuesForKeyInData(featureKey, dataSet);
+                arff += '@ATTRIBUTE ' + featureKey + ' {' + nominalValues.join(', ') + '}\n';
+            } else {
+                arff += '@ATTRIBUTE ' + featureKey + ' ' + featureType + '\n';
+            }
+        };
 
         // add attributes for the configured features
-        sourcesForHeader.forEach(function (source) {
+        featureSources.forEach(function (source) {
             source.features.forEach(function (feature) {
-                if (feature.type === 'nominal') {
-                    var nominalValues = allValuesForKeyInData(feature.key, dataSet);
-                    arff += '@ATTRIBUTE ' + feature.key + ' {' + nominalValues.join(', ') + '}\n';
-                } else {
-                    arff += '@ATTRIBUTE ' + feature.key + ' ' + feature.type + '\n';
-                }
+                addAttributes(feature.key, feature.type);
+            });
+        });
+
+        // add attributes for the configured post processing features
+        postProcessSources.forEach(function (postSource) {
+            postSource.featureGroups.forEach(function (group) {
+                postSource.module.getFeatureKeysForGroup(group.key).forEach(function (feature) {
+                    addAttributes(feature, group.type);
+                });
             });
         });
 
