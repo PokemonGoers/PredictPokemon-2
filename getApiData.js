@@ -11,7 +11,7 @@ function httpGetAsync(url, destination) {
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
-            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 81), destination);
+            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 91), destination);
         }
     };
     xmlHttp.open("GET", url, true);
