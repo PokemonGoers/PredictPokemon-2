@@ -18,7 +18,7 @@ To fix this modify the `package.json` of tzwhere, probably under the path `Predi
 ```
 
 - delete the timezone folder in `PredictPokemon\node_modules\tzwhere\node_modules`
-- cahnge directory to `PredictPokemon\node_modules\tzwhere`
+- change directory to `PredictPokemon\node_modules\tzwhere`
 - run `npm install`
 
 done :)
