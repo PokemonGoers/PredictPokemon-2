@@ -85,13 +85,12 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
             dataSet.push(dataRow);
         });
-
-        saveOldWeather('json/CachedWeatherRequests.json');
         return dataSet;
     };
 
-    var saveOldWeather = (function(path){//save already retrieved from API data to external JSON file
+    saveOldWeather = (function(path, consoleOutput){//save already retrieved from API data to external JSON file
         fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses, null, 4), 'utf8');
+        if (consoleOutput) console.log("Saved weather data")
     });
 
     /**

@@ -59,45 +59,87 @@ var moment = require('moment-timezone');
             xhr.open('GET', URL, false);
             xhr.send();
             if (xhr.status != 200) {
-                console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
+                console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
             } else {
-                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//I don't know what it returns when requests limit is exceeded yet
-                    WeatherApiKey++;                            //so if first 12 symbold of response are not equal '{"latitude":', then API Key probably doesn't work anymore
-                    if (consoleOn) console.log("Changed API Key");
+                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO save CachedWeatherResponses immidiately!
+                    WeatherApiKey++;                                                                                      //if API key gets blocked??
+                    if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
                     makeRequest()
                 } else {
                     if (consoleOn) console.log(xhr.responseText);
                     data = JSON.parse(xhr.responseText);
                     j = 0;
-                    for (i=0; i<data.timezone.length; i++){
-                        if (data.timezone.charAt(i)=='/') {
-                            j=i;
+                    if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||
+                        data.daily==undefined||data.daily.data[0]==undefined) {
+                        if (WeatherApiKey<(APIKeys.length-1)) {
+                            WeatherApiKey++;                                                                                      //if API key gets blocked??
+                            if (consoleOn) {
+                                console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");
+                                makeRequest() }
+                        } else {//data cannot be retrieved
+                            values="Error with request"
+                            return values
                         }
                     }
-                    var continent = data.timezone.substring(0,j);
-                    var city = data.timezone.substring(j+1);
-                    var city = data.timezone.substring(j+1);
-                    var sunrise = sunTimeFeatures(data.daily.data[0].sunriseTime, data.currently.time, data.timezone);
-                    var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
+                    if (values!="Error with request") {
+                        for (i = 0; i < data.timezone.length; i++) {
+                            if (data.timezone.charAt(i) == '/') {
+                                j = i;
+                            }
+                        }
+                        var continent = data.timezone.substring(0, j);
+                        var city = data.timezone.substring(j + 1);
+                        var sunrise = sunTimeFeatures(data.daily.data[0].sunriseTime, data.currently.time, data.timezone);
+                        var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
 
-                    temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
-                        ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
-                        data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
-                        sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
-                        sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
+                        temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
+                            ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
+                            data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
+                            sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
+                            sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
+                    }
                 }
             }
-            if (consoleOn)console.log("API Called");
-            CachedWeatherResponses[pokeEntry["_id"]] = temp
+            if (consoleOn)console.log("API Called with key No "+(WeatherApiKey+1));
+            if (values!="Error with request") CachedWeatherResponses[pokeEntry["_id"]] = temp
         });
+
 
         if (!CachedWeatherResponses[pokeEntry["_id"]]) {
             makeRequest()
+            if (values=="Error with request"){ //Error -> return empty respond and go on
+                WeatherApiKey=0;
+                console.log("Bad request answer, returning empty data and proceeding with further entries.")
+                values = {
+                    "city": "",
+                    "continent": "",
+                    "weather": "",
+                    "temperature": "",
+                    "humidity": "",
+                    "windSpeed": "",
+                    "windBearing": "",
+                    "pressure": "",
+                    "weatherIcon": "",
+                    "sunriseMinutesMidnight": "",
+                    "sunriseHour": "",
+                    "sunriseMinute": "",
+                    "sunriseMinutesSince": "",
+                    "sunsetMinutesMidnight": "",
+                    "sunsetHour": "",
+                    "sunsetMinute": "",
+                    "sunsetMinutesBefore": ""
+                }
+                return values
+            }
+            saveOldWeather('json/CachedWeatherRequests.json', consoleOn);//save after everz call so that in case of error nothing gets lost
         }
         else if (consoleOn) {
             console.log("Weather Api not called, loaded existing data");         
         }
+
+
         returnResponse(keys, pokeEntry);
+        //console.log(JSON.stringify(values))
         return values;
     };
 
