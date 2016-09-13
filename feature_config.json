@@ -232,6 +232,23 @@
       ]
     },
     {
+      "name": "Terrain Type Feature",
+      "path": "./feature_sources/terrain_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "terrainType",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "closeToWater",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
       "name": "Weather Features",
       "path": "./feature_sources/weather_features.js",
       "enabled": true,
