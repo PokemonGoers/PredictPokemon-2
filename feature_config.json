@@ -292,6 +292,51 @@
           "key": "pressure",
           "type": "numeric",
           "enabled": true
+        },
+        {
+          "key": "weatherIcon",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinutesMidnight",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseHour",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinute",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunriseMinutesSince",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinutesMidnight",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetHour",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinute",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "sunsetMinutesBefore",
+          "type": "numeric",
+          "enabled": true
         }
       ]
     }
