@@ -6,9 +6,10 @@ var xhr = new XMLHttpRequest;
     var module = exports.module = {};
 
     module.getFeatures = function (keys, pokeEntry) {
-        //console.log(CachedWeatherResponses)
         var values = {};
         var temp = "emptyyet";
+        var consoleOn = false;                                                                   //turns on/off console output
+
         var returnResponse = (function (keys, pokeEntry) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
             keys.forEach(function (key) {
@@ -43,10 +44,10 @@ var xhr = new XMLHttpRequest;
             } else {
                 if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//I don't know what it returns when requests limit is exceeded yet
                     WeatherApiKey++;                            //so if first 12 symbold of response are not equal '{"latitude":', then API Key probably doesn't work anymore
-                    console.log("Changed API Key");
+                    if (consoleOn) console.log("Changed API Key");
                     makeRequest()
                 } else {
-                    //console.log(xhr.responseText)
+                    if (consoleOn) console.log(xhr.responseText);
                     data = JSON.parse(xhr.responseText);
                     j = 0;
                     for (i=0; i<data.timezone.length; i++){
@@ -59,14 +60,18 @@ var xhr = new XMLHttpRequest;
                     temp = [city, continent, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
                         data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
                 }
-            }//console.log("API Called")
+            }
+            if (consoleOn)console.log("API Called");
             CachedWeatherResponses[pokeEntry["_id"]] = temp
         });
+
         if (!CachedWeatherResponses[pokeEntry["_id"]]) {
-            makeRequest();
+            makeRequest()
         }
-        //else console.log("Weather Api not called, loaded existing data")
+        else if (consoleOn) {
+            console.log("Weather Api not called, loaded existing data");         
+        }
         returnResponse(keys, pokeEntry);
-        return values
+        return values;
     }
 })('undefined' !== typeof module ? module.exports : window);
