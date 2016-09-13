@@ -1,5 +1,5 @@
 var fs = require('fs');
-//var tzwhere = require('tzwhere');
+var tzwhere = require('tzwhere');
 WeatherApiKey = 0;// Identifies which API Key is used right now. Has to be here to be global
 CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
@@ -18,6 +18,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      */
     DC.createDataSet = function(configPath, json_data_raw) {
         var json_data = removeIncompleteData(json_data_raw);
+        console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
         CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
         featureSources = [];
@@ -25,6 +26,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         classSource = null;
 
         // extract the configured features and load the required modules
+        console.log('parsing config...');
         config.feature_sources.forEach(function (source) {
             var features = [];
             var isClassKeySource = false;
@@ -75,10 +77,12 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        //tzwhere.init();
+        console.log('initialize tzwhere...');
+        tzwhere.init();
 
         var classLables = [];
 
+        console.log('creating features...');
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             addCoordinatesToPokeEntry(pokeEntry);
@@ -98,15 +102,18 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             classLables.push(classLabel[classSource.classKey]);
         });
 
-        // save weather data before other processing is done - this way we keep the data if the script crashes below
+        console.log('storing new weather data..');
         saveOldWeather('json/CachedWeatherRequests.json');
-
         // post processing on existing features
+
+        // save weather data before other processing is done - this way we keep the data if the script crashes below
+        console.log('creating post process features...');
         postProcessSources.forEach(function (postSource) {
             dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
         // add the class label to the data row
+        console.log('adding class labels...');
         classLables.reverse();
         dataSet.forEach(function (dataRow) {
             dataRow[classSource.classKey] = classLables.pop();
@@ -213,10 +220,10 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     function addLocalTime(_pokeEntry) {
         //If at some point a error tracks back to here, it might be that the data team changes Lat/Lon.
         //In this case just exchange the ...[1] and ...[0] in the next line
-        //var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
+        var offset = tzwhere.tzOffsetAt(_pokeEntry["location"]["coordinates"][1],_pokeEntry["location"]["coordinates"][0]);
         //add the offset (milliseconds) to date
         var newDate = new Date(_pokeEntry.appearedOn);
-        //newDate = new Date(newDate.getTime() + offset);
+        newDate = new Date(newDate.getTime() + offset);
         _pokeEntry.appearedLocalTime = newDate.toJSON();
     }
 

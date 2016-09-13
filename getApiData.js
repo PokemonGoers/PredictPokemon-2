@@ -7,11 +7,13 @@ var destination = 'arff/apiDataExtended.arff';
 httpGetAsync(url, destination);
 
 function httpGetAsync(url, destination) {
+    console.log('requesting ' +url);
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
-            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 91), destination);
+            console.log('downloaded ' +apiData.data.length + ' sightings from API');
+            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 121), destination);
         }
     };
     xmlHttp.open("GET", url, true);

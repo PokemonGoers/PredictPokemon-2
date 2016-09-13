@@ -3,6 +3,25 @@
 [![Join the chat at https://gitter.im/pokemongoers/PredictPokemon-2](https://badges.gitter.im/pokemongoers/PredictPokemon-2.svg)](https://gitter.im/pokemongoers/PredictPokemon-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 In this project we will apply machine learning to establish the TLN (Time, Location and Name - that is where pokemons will appear, at what date and time, and which Pokemon will it be) prediction in Pokemon Go.
 
+## Setup
+#### tzwhere bug
+If you are running windows the script might get stuck in the `require('tzwhere')` call, due to an old version of *timezone* [tzwhere#13](https://github.com/mattbornski/tzwhere/issues/13).
+To fix this modify the `package.json` of tzwhere, probably under the path `PredictPokemon\node_modules\tzwhere\package.json`.
+- Set the timezone version under dependencies to `0.0.48`
+
+```
+  "dependencies": {
+    ...
+    "timezone": "0.0.48"
+    ...
+}
+```
+
+- delete the timezone folder in `PredictPokemon\node_modules\tzwhere\node_modules`
+- cahnge directory to `PredictPokemon\node_modules\tzwhere`
+- run `npm install`
+
+done :)
 
 ## Implementation
 ### Data Set
