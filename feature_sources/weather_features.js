@@ -74,12 +74,12 @@ var moment = require('moment-timezone');
                         if (WeatherApiKey<(APIKeys.length-1)) {
                             WeatherApiKey++;                                                                                      //if API key gets blocked??
                             if (consoleOn) {
-                                console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");
-                                makeRequest() }
+                                console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");}
                         } else {//data cannot be retrieved
                             values="Error with request"
                             return values
                         }
+                        makeRequest()
                     }
                     if (values!="Error with request") {
                         for (i = 0; i < data.timezone.length; i++) {
@@ -109,7 +109,7 @@ var moment = require('moment-timezone');
             makeRequest()
             if (values=="Error with request"){ //Error -> return empty respond and go on
                 WeatherApiKey=0;
-                console.log("Bad request answer, returning empty data and proceeding with further entries.")
+                console.log("Bad server respond, returning empty data and proceeding with further entries.")
                 values = {
                     "city": "",
                     "continent": "",
