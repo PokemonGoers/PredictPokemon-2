@@ -9,7 +9,7 @@
         {
           "key": "pokemonId",
           "type": "numeric",
-          "enabled": false
+          "enabled": true
         },
         {
           "key": "longitude",
@@ -34,7 +34,7 @@
         {
           "key": "_id",
           "type": "string",
-          "enabled": false
+          "enabled": true
         },
         {
           "key": "source",
@@ -244,6 +244,53 @@
         {
           "key": "closeToWater",
           "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Weather Features",
+      "path": "./feature_sources/weather_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "city",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "continent",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "weather",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "temperature",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "humidity",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windSpeed",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "windBearing",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "pressure",
+          "type": "numeric",
           "enabled": true
         }
       ]
