@@ -1,32 +1,32 @@
 var APIKeys = ['4e9bb2e33940272eeea09e0210886de0','49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0']//api keys will be stored here
-var respond={"empty": "json file"};
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest;
 
 (function (exports) {
     var module = exports.module = {};
     module.getFeatures = function (keys, pokeEntry) {
+        //console.log(OldAPIrequests)
         var values = {}
         var temp = "emptyyet"
         var returnResponse = (function (keys, pokeEntry) {
-            //console.log("respond inside returnResponse: " + respond[pokeEntry["_id"]])
+            //console.log("respond inside returnResponse: " + OldAPIrequests[pokeEntry["_id"]])
             keys.forEach(function (key) {
                 if (key === "city") {
-                    values[key] = respond[pokeEntry["_id"]][0];
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][0];
                 } else if (key === "continent") {
-                    values[key] = respond[pokeEntry["_id"]][1];
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][1];
                 } else if (key === "weather") {
-                    values[key] = respond[pokeEntry["_id"]][2]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][2]
                 } else if (key === "temperature") {
-                    values[key] = respond[pokeEntry["_id"]][3]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][3]
                 } else if (key === "humidity") {
-                    values[key] = respond[pokeEntry["_id"]][4]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][4]
                 } else if (key === "windSpeed") {
-                    values[key] = respond[pokeEntry["_id"]][5]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][5]
                 } else if (key === "windBearing") {
-                    values[key] = respond[pokeEntry["_id"]][6]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][6]
                 } else if (key === "pressure") {
-                    values[key] = respond[pokeEntry["_id"]][7]
+                    values[key] = OldAPIrequests[pokeEntry["_id"]][7]
                 }
             })
         });
@@ -56,10 +56,10 @@ var xhr = new XMLHttpRequest;
                         data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
                 }
             }//console.log("API Called")
-            respond[pokeEntry["_id"]] = temp
+            OldAPIrequests[pokeEntry["_id"]] = temp
         });
-        if (!respond[pokeEntry["_id"]]) makeRequest()
-        else console.log("Api not called")
+        if (!OldAPIrequests[pokeEntry["_id"]]) makeRequest()
+        //else console.log("Weather Api not called, loaded existing data")
         returnResponse(keys, pokeEntry)
         return values
     }

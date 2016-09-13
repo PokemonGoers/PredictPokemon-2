@@ -1,6 +1,7 @@
 var fs = require('fs');
 //var tzwhere = require('tzwhere');
 WeatherApiKey=0;// Identifies which API Key is used right now. Has to be here to be global
+OldAPIrequests = {"empty":"json file"};//for API Request results storage
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -17,6 +18,7 @@ WeatherApiKey=0;// Identifies which API Key is used right now. Has to be here to
     DC.createDataSet = function(configPath, json_data_raw) {
         var json_data = removeIncompleteData(json_data_raw);
         var config = fileToJson(configPath);
+        OldAPIrequests = fileToJson('OldAPIrequests.json')
         featureSources = [];
         classSource = null;
 
@@ -83,10 +85,12 @@ WeatherApiKey=0;// Identifies which API Key is used right now. Has to be here to
 
             dataSet.push(dataRow);
         });
-
         return dataSet;
     };
 
+    var saveOldWeather = (function(path){//save already retrieved from API data to external JSON file
+        fs.writeFileSync(path, JSON.stringify(OldAPIrequests), 'utf8');//////works? not tested
+    });
     /**
      * parse the given JSON data and create an .arff file with all features
      * which are specified in the config for all data entries.
@@ -97,6 +101,7 @@ WeatherApiKey=0;// Identifies which API Key is used right now. Has to be here to
     DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
         DC.createDataSet(configPath, json_data_raw);
         storeArff(dataSet, featureSources, classSource, fileNamePath);
+        saveOldWeather('OldAPIrequests.json')
     };
 
     /**
