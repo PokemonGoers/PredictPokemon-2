@@ -1,6 +1,7 @@
 var APIKeys = ['4e9bb2e33940272eeea09e0210886de0','49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0']//api keys will be stored here
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest;
+var moment = require('moment-timezone');
 
 (function (exports) {
     var module = exports.module = {};
@@ -29,6 +30,24 @@ var xhr = new XMLHttpRequest;
                     values[key] = CachedWeatherResponses[pokeEntry["_id"]][6];
                 } else if (key === "pressure") {
                     values[key] = CachedWeatherResponses[pokeEntry["_id"]][7];
+                } else if (key === "weatherIcon") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][8];
+                } else if (key === "sunriseMinutesMidnight") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][9];
+                } else if (key === "sunriseHour") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][10];
+                } else if (key === "sunriseMinute") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][11];
+                } else if (key === "sunriseMinutesSince") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][12];
+                } else if (key === "sunsetMinutesMidnight") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][13];
+                } else if (key === "sunsetHour") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][14];
+                } else if (key === "sunsetMinute") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][15];
+                } else if (key === "sunsetMinutesBefore") {
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][16];
                 }
             })
         });
@@ -57,8 +76,15 @@ var xhr = new XMLHttpRequest;
                     }
                     var continent = data.timezone.substring(0,j);
                     var city = data.timezone.substring(j+1);
-                    temp = [city, continent, data.currently.summary.replace(/\s+/g, ''), ((data.currently.temperature - 32) / 1.8).toFixed(1),
-                        data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
+                    var city = data.timezone.substring(j+1);
+                    var sunrise = sunTimeFeatures(data.daily.data[0].sunriseTime, data.currently.time, data.timezone);
+                    var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
+
+                    temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
+                        ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
+                        data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
+                        sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
+                        sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
                 }
             }
             if (consoleOn)console.log("API Called");
@@ -73,5 +99,23 @@ var xhr = new XMLHttpRequest;
         }
         returnResponse(keys, pokeEntry);
         return values;
+    };
+
+    /**
+     * time features relating to the sunrise and sunset time
+     **/
+    function sunTimeFeatures(sunTimestamp, currentTimestamp, timezone) {
+        var sunDate = moment.unix(sunTimestamp).tz(timezone);
+        var currentDate = moment.unix(currentTimestamp).tz(timezone);
+        return {
+            "minutesSinceMidnight": minutesSinceMidnight(sunDate),
+            "hour": sunDate.hours(),
+            "minute": sunDate.minutes(),
+            "minutesSince": minutesSinceMidnight(currentDate) - minutesSinceMidnight(sunDate)
+            };
+    }
+
+    function minutesSinceMidnight(momentDate) {
+        return momentDate.hours()*60 + momentDate.minutes()
     }
 })('undefined' !== typeof module ? module.exports : window);
