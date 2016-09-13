@@ -18,17 +18,17 @@ var xhr = new XMLHttpRequest;
                 } else if (key === "continent") {
                     values[key] = CachedWeatherResponses[pokeEntry["_id"]][1];
                 } else if (key === "weather") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][2]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][2];
                 } else if (key === "temperature") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][3]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][3];
                 } else if (key === "humidity") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][4]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][4];
                 } else if (key === "windSpeed") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][5]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][5];
                 } else if (key === "windBearing") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][6]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][6];
                 } else if (key === "pressure") {
-                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][7]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][7];
                 }
             })
         });
@@ -55,9 +55,9 @@ var xhr = new XMLHttpRequest;
                             j=i;
                         }
                     }
-                    continent = data.timezone.substring(0,j);
-                    city = data.timezone.substring(j+1);
-                    temp = [city, continent, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
+                    var continent = data.timezone.substring(0,j);
+                    var city = data.timezone.substring(j+1);
+                    temp = [city, continent, data.currently.summary.replace(/\s+/g, ''), ((data.currently.temperature - 32) / 1.8).toFixed(1),
                         data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
                 }
             }

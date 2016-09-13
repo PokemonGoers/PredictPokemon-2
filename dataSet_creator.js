@@ -18,7 +18,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     DC.createDataSet = function(configPath, json_data_raw) {
         var json_data = removeIncompleteData(json_data_raw);
         var config = fileToJson(configPath);
-        CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json')
+        CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
         featureSources = [];
         classSource = null;
 
