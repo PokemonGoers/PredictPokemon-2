@@ -4,36 +4,37 @@ var xhr = new XMLHttpRequest;
 
 (function (exports) {
     var module = exports.module = {};
+
     module.getFeatures = function (keys, pokeEntry) {
-        //console.log(OldAPIrequests)
-        var values = {}
-        var temp = "emptyyet"
+        var values = {};
+        var temp = "emptyyet";
         var consoleOn = false;                                                                   //turns on/off console output
+
         var returnResponse = (function (keys, pokeEntry) {
-            //console.log("respond inside returnResponse: " + OldAPIrequests[pokeEntry["_id"]])
+            //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
             keys.forEach(function (key) {
                 if (key === "city") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][0];
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][0];
                 } else if (key === "continent") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][1];
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][1];
                 } else if (key === "weather") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][2]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][2];
                 } else if (key === "temperature") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][3]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][3];
                 } else if (key === "humidity") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][4]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][4];
                 } else if (key === "windSpeed") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][5]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][5];
                 } else if (key === "windBearing") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][6]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][6];
                 } else if (key === "pressure") {
-                    values[key] = OldAPIrequests[pokeEntry["_id"]][7]
+                    values[key] = CachedWeatherResponses[pokeEntry["_id"]][7];
                 }
             })
         });
         var makeRequest = (function () {
-            var date = new Date(pokeEntry.appearedLocalTime)
-            var timestamp = Math.round(date.getTime() / 1000)
+            var date = new Date(pokeEntry.appearedLocalTime);
+            var timestamp = Math.round(date.getTime() / 1000);
             //switching between API Keys here
             var URL = 'https://api.forecast.io/forecast/'+APIKeys[WeatherApiKey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
             xhr.open('GET', URL, false);
@@ -41,27 +42,36 @@ var xhr = new XMLHttpRequest;
             if (xhr.status != 200) {
                 console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // пример вывода: 404: Not Found
             } else {
-                if (xhr.responseText.substring(0,12) != '{"latitude":'&&WeatherApiKey<(APIKeys.length-1)) {//I don't know what it returns when requests limit is exceeded yet
+                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//I don't know what it returns when requests limit is exceeded yet
                     WeatherApiKey++;                            //so if first 12 symbold of response are not equal '{"latitude":', then API Key probably doesn't work anymore
-                    if (consoleOn) console.log("Changed API Key")
+                    if (consoleOn) console.log("Changed API Key");
                     makeRequest()
                 } else {
-                    if (consoleOn) console.log(xhr.responseText)
-                    data = JSON.parse(xhr.responseText)
+                    if (consoleOn) console.log(xhr.responseText);
+                    data = JSON.parse(xhr.responseText);
                     j = 0;
                     for (i=0; i<data.timezone.length; i++){
-                        if (data.timezone.charAt(i)=='/') j=i;}
-                    continent = data.timezone.substring(0,j)
-                    city = data.timezone.substring(j+1)
-                    temp = [city, continent, data.currently.summary, data.currently.precipType, ((data.currently.temperature - 32) / 1.8).toFixed(1),
+                        if (data.timezone.charAt(i)=='/') {
+                            j=i;
+                        }
+                    }
+                    var continent = data.timezone.substring(0,j);
+                    var city = data.timezone.substring(j+1);
+                    temp = [city, continent, data.currently.summary.replace(/\s+/g, ''), ((data.currently.temperature - 32) / 1.8).toFixed(1),
                         data.currently.humidity, data.currently.windSpeed, data.currently.windBearing, data.currently.pressure];
                 }
-            }if (consoleOn)console.log("API Called")
-            OldAPIrequests[pokeEntry["_id"]] = temp
+            }
+            if (consoleOn)console.log("API Called");
+            CachedWeatherResponses[pokeEntry["_id"]] = temp
         });
-        if (!OldAPIrequests[pokeEntry["_id"]]) makeRequest()
-        else if (consoleOn)console.log("Weather Api not called, loaded existing data")
-        returnResponse(keys, pokeEntry)
-        return values
+
+        if (!CachedWeatherResponses[pokeEntry["_id"]]) {
+            makeRequest()
+        }
+        else if (consoleOn) {
+            console.log("Weather Api not called, loaded existing data");         
+        }
+        returnResponse(keys, pokeEntry);
+        return values;
     }
 })('undefined' !== typeof module ? module.exports : window);
