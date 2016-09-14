@@ -34,7 +34,7 @@
         {
           "key": "_id",
           "type": "string",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "source",
@@ -336,6 +336,19 @@
         {
           "key": "sunsetMinutesBefore",
           "type": "numeric",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Co-occurrence Features",
+      "path": "./feature_sources/co-occurrence_post-features.js",
+      "enabled": true,
+      "post_process": true,
+      "features": [
+        {
+          "key": "co-occ90m_Id",
+          "type": "nominal",
           "enabled": true
         }
       ]
