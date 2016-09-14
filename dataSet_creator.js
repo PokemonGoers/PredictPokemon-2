@@ -101,9 +101,6 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
         });
-
-        console.log('storing new weather data..');
-        saveOldWeather('json/CachedWeatherRequests.json');
         // post processing on existing features
 
         // save weather data before other processing is done - this way we keep the data if the script crashes below
@@ -122,8 +119,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         return dataSet;
     };
 
-    var saveOldWeather = (function(path){//save already retrieved from API data to external JSON file
+    saveOldWeather = (function(path, consoleOutput){//save already retrieved from API data to external JSON file
         fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses, null, 4), 'utf8');
+        if (consoleOutput) console.log("Saved weather data")
     });
 
     /**
