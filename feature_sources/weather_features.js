@@ -9,7 +9,7 @@ var moment = require('moment-timezone');
     module.getFeatures = function (keys, pokeEntry) {
         var values = {};
         var temp = "emptyyet";
-        var consoleOn = false;                                                                   //turns on/off console output
+        var consoleOn = true;                                                                   //turns on/off console output
 
         var returnResponse = (function (keys, pokeEntry) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])

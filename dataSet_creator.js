@@ -9,6 +9,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     var featureSources = null;
     var postProcessSources = null;
     var classSource = null;
+    var consoleOn = false;
 
     /**
      * parse the given JSON data and create all features which are specified in the config for all data entries.
@@ -18,7 +19,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      */
     DC.createDataSet = function(configPath, json_data_raw) {
         var json_data = removeIncompleteData(json_data_raw);
-        console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
+        if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
         CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
         featureSources = [];
@@ -26,7 +27,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         classSource = null;
 
         // extract the configured features and load the required modules
-        console.log('parsing config...');
+        if (consoleOn) console.log('parsing config...');
         config.feature_sources.forEach(function (source) {
             var features = [];
             var isClassKeySource = false;
@@ -77,12 +78,12 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        console.log('initialize tzwhere...');
+        if (consoleOn) console.log('initialize tzwhere...');
         tzwhere.init();
 
         var classLables = [];
 
-        console.log('creating features...');
+        if (consoleOn) console.log('creating features...');
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             addCoordinatesToPokeEntry(pokeEntry);
@@ -104,13 +105,13 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         // post processing on existing features
 
         // save weather data before other processing is done - this way we keep the data if the script crashes below
-        console.log('creating post process features...');
+        if (consoleOn) console.log('creating post process features...');
         postProcessSources.forEach(function (postSource) {
             dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
         // add the class label to the data row
-        console.log('adding class labels...');
+        if (consoleOn) console.log('adding class labels...');
         classLables.reverse();
         dataSet.forEach(function (dataRow) {
             dataRow[classSource.classKey] = classLables.pop();
