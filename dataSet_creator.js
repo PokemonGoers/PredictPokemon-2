@@ -92,12 +92,13 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
-
-                source.features.forEach(function (feature) {
-                    dataRow[feature.key] = values[feature.key];
-                });
+                if (values!="Error with request") {
+                    source.features.forEach(function (feature) {
+                        dataRow[feature.key] = values[feature.key];
+                    });
+                } else dataRow=null;
             });
-            dataSet.push(dataRow);
+            if (dataRow!=null)dataSet.push(dataRow);
 
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);

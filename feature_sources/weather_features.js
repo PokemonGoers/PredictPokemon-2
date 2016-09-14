@@ -9,7 +9,7 @@ var moment = require('moment-timezone');
     module.getFeatures = function (keys, pokeEntry) {
         var values = {};
         var temp = "emptyyet";
-        var consoleOn = true;                                                                   //turns on/off console output
+        var consoleOn = false;                                                                   //turns on/off console output
 
         var returnResponse = (function (keys, pokeEntry) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
@@ -69,8 +69,9 @@ var moment = require('moment-timezone');
                     if (consoleOn) console.log(xhr.responseText);
                     data = JSON.parse(xhr.responseText);
                     j = 0;
-                    if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||
-                        data.daily==undefined||data.daily.data[0]==undefined) {
+                    if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
+                        data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||data.currently.humidity==undefined||
+                        data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
                         if (WeatherApiKey<(APIKeys.length-1)) {
                             WeatherApiKey++;                                                                                      //if API key gets blocked??
                             if (consoleOn) {
@@ -100,7 +101,7 @@ var moment = require('moment-timezone');
                     }
                 }
             }
-            if (consoleOn)console.log("API Called with key No "+(WeatherApiKey+1));
+            if (consoleOn)console.log("Weather API Called with key No "+(WeatherApiKey+1));
             if (values!="Error with request") CachedWeatherResponses[pokeEntry["_id"]] = temp
         });
 
@@ -110,25 +111,6 @@ var moment = require('moment-timezone');
             if (values=="Error with request"){ //Error -> return empty respond and go on
                 WeatherApiKey=0;
                 console.log("Bad server respond, returning empty data and proceeding with further entries.")
-                values = {
-                    "city": "",
-                    "continent": "",
-                    "weather": "",
-                    "temperature": "",
-                    "humidity": "",
-                    "windSpeed": "",
-                    "windBearing": "",
-                    "pressure": "",
-                    "weatherIcon": "",
-                    "sunriseMinutesMidnight": "",
-                    "sunriseHour": "",
-                    "sunriseMinute": "",
-                    "sunriseMinutesSince": "",
-                    "sunsetMinutesMidnight": "",
-                    "sunsetHour": "",
-                    "sunsetMinute": "",
-                    "sunsetMinutesBefore": ""
-                }
                 return values
             }
             saveOldWeather('json/CachedWeatherRequests.json', consoleOn);//save after everz call so that in case of error nothing gets lost

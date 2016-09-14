@@ -34,7 +34,7 @@
         {
           "key": "_id",
           "type": "string",
-          "enabled": false
+          "enabled": true
         },
         {
           "key": "source",
