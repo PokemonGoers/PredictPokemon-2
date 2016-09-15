@@ -13,7 +13,10 @@
         var date = new Date(pokeEntry.appearedLocalTime);
 
         keys.forEach(function (key) {
-            if (key === "appearedTimeOfDay") {
+            if (key==="appearedLocalTime") {
+                values[key]= pokeEntry.appearedLocalTime;
+            }
+            else if (key === "appearedTimeOfDay") {
                 values[key] = addTimeOfDay(date);
             }
             else if (key === "appearedHour") {

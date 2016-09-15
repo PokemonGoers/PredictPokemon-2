@@ -21,6 +21,9 @@
             else if (hasOwnProperty.call(pokeEntry, key)) {
                 values[key] = pokeEntry[key];
             }
+            else if(key === "appearedOn") {
+                console.log("HOW THE FUCK DO YOU GET IN HERE?");
+            }
             else {
                 console.log("The key " + key + " is not in the raw API data.");
                 throw "UnknownFeatureKey";

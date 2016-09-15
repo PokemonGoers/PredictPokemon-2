@@ -2,7 +2,7 @@ var fs = require('fs');
 var DS = require('./dataSet_creator.js').DC;
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
-var destination = 'arff/apiDataExtended.arff';
+var destination = 'arff/z.arff';
 
 httpGetAsync(url, destination);
 

@@ -17,11 +17,11 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      * @param json_data_raw the raw JSON data received from the API
      * @return {Array} array which contains all the configured features for the provided data
      */
-    DC.createDataSet = function(configPath, json_data_raw) {
+    DC.createDataSet = function(configPath, json_data_raw, fileNamePath) {
         var json_data = removeIncompleteData(json_data_raw);
         if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
-        CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
+        //CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
         featureSources = [];
         postProcessSources = [];
         classSource = null;
@@ -33,18 +33,20 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             var isClassKeySource = false;
             source.features.forEach(function (feature) {
                 if (source.enabled === true && feature.enabled === true && feature.key !== config.classKey) {
+                    if (consoleOn) console.log(feature.key);
                     features.push(feature);
                 }
                 else if (feature.key === config.classKey) {
+                    if (consoleOn) console.log("class key: " + feature.key);
                     isClassKeySource = true;
                 }
             });
 
             if (features.length > 0 || isClassKeySource === true) {
                 var module = require(source.path).module;
-                var featureKeys = source.features.map(function (feature) {
-                    return feature.key;
-                });
+                var featureKeys= source.features.filter(function(feature) {
+                    return feature.enabled;
+                }).map(function(feature) { return feature.key; });
 
                 if (features.length > 0) {
                     if (source.post_process === true) {
@@ -78,47 +80,91 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        if (consoleOn) console.log('initialize tzwhere...');
-        tzwhere.init();
+        //if (consoleOn) console.log('initialize tzwhere...');
+        //tzwhere.init();
 
         var classLables = [];
-
+        var cnt = 0;
         if (consoleOn) console.log('creating features...');
+
+
+        storeArff(fileNamePath);
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
-            addCoordinatesToPokeEntry(pokeEntry);
-            addLocalTime(pokeEntry);
+            cnt++;
+            if(cnt%1000==0) console.log("Current tuple: " + cnt);
+            //addCoordinatesToPokeEntry(pokeEntry);
+            //addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
                 if (values!="Error with request") {
+
                     source.features.forEach(function (feature) {
                         dataRow[feature.key] = values[feature.key];
                     });
                 } else dataRow=null;
             });
             if (dataRow!=null)dataSet.push(dataRow);
-
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
-        });
-        // post processing on existing features
 
-        // save weather data before other processing is done - this way we keep the data if the script crashes below
-        if (consoleOn) console.log('creating post process features...');
-        postProcessSources.forEach(function (postSource) {
-            dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
-        });
+            if(cnt%20000 === 0 && cnt!==0){
+                // add the class label to the data row
+                if (consoleOn) console.log('adding class labels...');
+                classLables.reverse();
+                dataSet.forEach(function (dataRow) {
+                    dataRow[classSource.classKey] = classLables.pop();
+                });
+                var arff = "";
 
-        // add the class label to the data row
+                dataSet.forEach(function (dataRow) {
+                    var values = [];
+                    for (var key in dataRow) {
+                        values.push(dataRow[key])
+                    }
+                    arff += values.join(',') + '\n';
+                });
+                console.log("Writing...");
+                console.log(arff.length);
+                fs.appendFileSync(fileNamePath, arff, 'utf8');
+                dataSet = [];
+                console.log("" + cnt + " instances written.");
+            }
+        });
         if (consoleOn) console.log('adding class labels...');
         classLables.reverse();
         dataSet.forEach(function (dataRow) {
             dataRow[classSource.classKey] = classLables.pop();
         });
+        var arff = "";
+        dataSet.forEach(function (dataRow) {
+            var values = [];
+            for (var key in dataRow) {
+                values.push(dataRow[key])
+            }
+            arff += values.join(',') + '\n';
+        });
+        console.log("Writing...");
+        fs.appendFileSync(fileNamePath, arff, 'utf8');
+        dataSet = [];
+        console.log("" + cnt + " instances written.");
 
-        return dataSet;
+
+
+        // post processing on existing features
+
+        // save weather data before other processing is done - this way we keep the data if the script crashes below
+        //if (consoleOn) console.log('creating post process features...');
+        //postProcessSources.forEach(function (postSource) {
+        //    dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
+        //});
+
+
+
+
+
     };
 
     saveOldWeather = (function(path, consoleOutput){//save already retrieved from API data to external JSON file
@@ -132,10 +178,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      * @param configPath path to the feature configuration file
      * @param json_data_raw the raw JSON data received from the API
      * @param fileNamePath the path with filename where the .arff file should be stored
-    */
+     */
     DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
-        DC.createDataSet(configPath, json_data_raw);
-        storeArff(fileNamePath);
+        DC.createDataSet(configPath, json_data_raw, fileNamePath);
     };
 
     /**
@@ -176,16 +221,11 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
         // add the data
         arff += '@DATA\n';
-        dataSet.forEach(function (dataRow) {
-            var values = [];
-            for (var key in dataRow) {
-                values.push(dataRow[key])
-            }
-            arff += values.join(',') + '\n';
-        });
 
         fs.writeFileSync(fileNamePath, arff, 'utf8');
     }
+
+
 
     /**
      * get all distinct values for the specified key in the provided data array

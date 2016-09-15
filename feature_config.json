@@ -1,5 +1,5 @@
 {
-  "classKey": "isPokemonId_16",
+  "classKey": "pokemonId",
   "feature_sources": [
     {
       "name": "API Features",
@@ -39,7 +39,7 @@
         {
           "key": "source",
           "type": "nominal",
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -222,7 +222,7 @@
     {
       "name": "Is Pokemon id Features",
       "path": "./feature_sources/isPokemonId_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "isPokemonId_16",
@@ -251,7 +251,7 @@
     {
       "name": "Weather Features",
       "path": "./feature_sources/weather_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "city",
@@ -266,37 +266,37 @@
         {
           "key": "weather",
           "type": "nominal",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "temperature",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "humidity",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "windSpeed",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "windBearing",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "pressure",
           "type": "numeric",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "weatherIcon",
           "type": "nominal",
-          "enabled": true
+          "enabled": false
         },
         {
           "key": "sunriseMinutesMidnight",
@@ -343,7 +343,7 @@
     {
       "name": "Co-occurrence Features",
       "path": "./feature_sources/co-occurrence_post-features.js",
-      "enabled": true,
+      "enabled": false,
       "post_process": true,
       "features": [
         {
