@@ -55,29 +55,14 @@ function getPopulation(place) {
 
 function extractNumber(str) {
     var offset = str.search('City</th>\n<td>');
-    console.log(offset);
-    for (var i = 0; i < 25; i++) {
-        console.log(str[offset+i]);
-    }
-    var input = '';
-    var spaces = 0;
+    var splitted = str.split('City</th>\n<td>');
     var i = 0;
-    while (spaces < 2) {
-        if (str[offset+13+i] === ' ') {
-            spaces++;
-        }
-        input += str[offset+13+i];
+    var number_string = '';
+    while (splitted[2][i] !== '<') {
+        number_string += splitted[2][i];
         i++;
     }
-    var population_string = '';
-    i = 0;
-    while (input[i] !== ' ') {
-        population_string += input[i];
-        i++;
-    }
-    var population = parseFloat(population_string);
-    if (input.indexOf('million') > -1) {
-        population = population * 1000000;
-    }
+    console.log(number_string);
+    var population = parseFloat(number_string);
     return population;
 }
