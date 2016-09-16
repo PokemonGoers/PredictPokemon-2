@@ -62,7 +62,6 @@ function extractNumber(str) {
         number_string += splitted[2][i];
         i++;
     }
-    console.log(number_string);
-    var population = parseFloat(number_string);
-    return population;
+    number_string = number_string.replace(/,/g, '');
+    return parseInt(number_string);
 }
