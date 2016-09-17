@@ -4,8 +4,8 @@ var xhr = new XMLHttpRequest;
 var moment = require('moment-timezone');
 var S2 = require('s2-geometry').S2;
 var util = require('util')
-var consoleOn = true;     //turns on/off console output
-var showErrors = true;
+var consoleOn = false;     //turns on/off console output
+var showErrors = false;
 var values;
 var temp = "emptyyet";
 var CacheKey = "";
@@ -16,7 +16,7 @@ var CacheKey = "";
     module.getFeatures = function (keys, pokeEntry) {
         values = {};
         //S2_cell: level 11, time: 12 parts of the day
-        CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
+        var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
 
         var returnResponse = (function (keys, pokeEntry) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
@@ -111,17 +111,20 @@ var CacheKey = "";
             }
             if (consoleOn)console.log("Weather API Called with key No "+(WeatherApiKey+1));
             if (values!="Error with request") CachedWeather[CacheKey] = temp;
+            else  CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad request"
         });
 
         if (!CachedWeather[CacheKey]) {
-            makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
+            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)])
+                makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
+            else values="Error with request"
             if (values=="Error with request"){ //Error -> return empty respond and go on
                 WeatherApiKey=0;
                 if (showErrors) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", returning empty data and proceeding with further entries.")
+                saveOldWeather('json/CachedWeather.json', CachedWeather, consoleOn);//TODO here as well??
                 return values
             }
-            if (temp!=="emptyyet")
-                saveOldWeather('json/CachedWeather.json', CachedWeather, consoleOn);//TODO change cached file
+            saveOldWeather('json/CachedWeather.json', CachedWeather, consoleOn);
         }
         else if (consoleOn) {console.log("Weather Api not called, loaded existing data");}
         returnResponse(keys, pokeEntry);//how? give the method nothing?

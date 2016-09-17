@@ -445,9 +445,9 @@ var destination = 'arff/apiDataMockup.arff';
 t1 = new Date().getTime();
 
 //DS.storeArffFile("feature_config.json", ONEDATA, destination);             //1 entry
-//DS.storeArffFile("feature_config.json", SOMEDATA, destination);            //10 entries
+DS.storeArffFile("feature_config.json", SOMEDATA, destination);            //10 entries
 DS.storeArffFile("feature_config.json", SOMEBIGDATA, destination);         //100 entries
-//DS.storeArffFile("feature_config.json", EVENMOREDATA, destination);        //500 entries
+DS.storeArffFile("feature_config.json", EVENMOREDATA, destination);        //500 entries
 //DS.storeArffFile("feature_config.json", WHOLEDATA, destination);           //~2400 entries
 
 
