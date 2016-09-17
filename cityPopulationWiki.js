@@ -1,10 +1,10 @@
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xmlhttp = new XMLHttpRequest();
 
-var latitude = 48.148641;
-var longitude = 11.568721;
-
-console.log(getPopulation(latLonToCity(latitude, longitude)));
+console.log(getPopulation(latLonToCity(48.148641, 11.568721)));
+console.log(getPopulation(latLonToCity(49.112507, 9.737344)));
+console.log(getPopulation(latLonToCity(43.271147, 6.637755)));
+console.log(getPopulation(latLonToCity(35.685924, 139.757869)));
 
 function latLonToCity(latitude, longitude) {
     var url = 'http://nominatim.openstreetmap.org/reverse?format=json'
@@ -26,16 +26,21 @@ function latLonToCity(latitude, longitude) {
 }
 
 function getCity(data) {
+    var city;
     if (data['address']['city'] !== undefined) {
-        return data['address']['city'];
+        city = data['address']['city'];
     }
     if (data['address']['town'] !== undefined) {
-        return data['address']['town'];
+        city = data['address']['town'];
     }
     if (data['address']['village'] !== undefined) {
-        return data['address']['village'];
+        city = data['address']['village'];
     }
-    return 'failure\n' + data;
+    city = city.replace(/ /g, '_');
+    city = city.replace(/ä/g, 'ae');
+    city = city.replace(/ü/g, 'ue');
+    city = city.replace(/ö/g, 'oe');
+    return city;
 }
 
 function getPopulation(place) {
@@ -54,10 +59,15 @@ function getPopulation(place) {
 }
 
 function extractNumber(str) {
-    var offset = str.search('City</th>\n<td>');
-    var splitted = str.split('City</th>\n<td>');
     var i = 0;
     var number_string = '';
+    var splitted = str.split('City</th>\n<td>');
+    if (splitted.length < 3) {
+        splitted = str.split('Total</th>\n<td>');
+    }
+    if (splitted.length < 3) {
+        return -1;
+    }
     while (splitted[2][i] !== '<') {
         number_string += splitted[2][i];
         i++;
