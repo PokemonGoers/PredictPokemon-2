@@ -1,7 +1,7 @@
 var fs = require('fs');
 var tzwhere = require('tzwhere');
 WeatherApiKey = 0;// Identifies which API Key is used right now. Has to be here to be global
-CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
+CachedWeather= {"Aye aye,":"captain"};
 
 (function (exports) {
     var DC = exports.DC = {};
@@ -21,7 +21,8 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         var json_data = removeIncompleteData(json_data_raw);
         if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
-        CachedWeatherResponses = fileToJson('json/CachedWeatherRequests.json');
+        CachedWeather = fileToJson('json/CachedWeather.json');
+
         featureSources = [];
         postProcessSources = [];
         classSource = null;
@@ -121,8 +122,8 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         return dataSet;
     };
 
-    saveOldWeather = (function(path, consoleOutput){//save already retrieved from API data to external JSON file
-        fs.writeFileSync(path, JSON.stringify(CachedWeatherResponses, null, 4), 'utf8');
+    saveOldWeather = (function(path, what, consoleOutput){//save already retrieved from API data to external JSON file
+        fs.writeFileSync(path, JSON.stringify(what, null, 4), 'utf8');
         if (consoleOutput) console.log("Saved weather data")
     });
 

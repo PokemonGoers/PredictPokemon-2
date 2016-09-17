@@ -250,7 +250,7 @@
     },
     {
       "name": "Weather Features",
-      "path": "./feature_sources/weather_features.js",
+      "path": "./feature_sources/weather_clean.js",
       "enabled": true,
       "features": [
         {

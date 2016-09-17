@@ -1,7 +1,8 @@
 var fs = require('fs');
 var DS = require('./dataSet_creator.js').DC;
 var ONEDATA = [
-    {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}}
+    {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
+    {"_id":"57c92f926ffa1ace02c48f02","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:04.000Z","__v":0,"pokemonId":99,"location":{"coordinates":[-122.441549,37.775157],"type":"Point"}}
 ]
 var SOMEDATA = [
     {"_id":"57c92f926ffa1ace02c48f04","source":"POKESNIPER","appearedOn":"2016-09-02T07:53:21.000Z","__v":0,"pokemonId":73,"location":{"coordinates":[151.199544,-33.871224],"type":"Point"}},
@@ -445,9 +446,9 @@ t1 = new Date().getTime();
 
 //DS.storeArffFile("feature_config.json", ONEDATA, destination);             //1 entry
 //DS.storeArffFile("feature_config.json", SOMEDATA, destination);            //10 entries
-//DS.storeArffFile("feature_config.json", SOMEBIGDATA, destination);         //100 entries
+DS.storeArffFile("feature_config.json", SOMEBIGDATA, destination);         //100 entries
 //DS.storeArffFile("feature_config.json", EVENMOREDATA, destination);        //500 entries
-DS.storeArffFile("feature_config.json", WHOLEDATA, destination);           //~2400 entries
+//DS.storeArffFile("feature_config.json", WHOLEDATA, destination);           //~2400 entries
 
 
 t2 = new Date().getTime();
