@@ -2,23 +2,27 @@
  * Created by matt on 15.09.16.
  */
 var fs = require('fs');
-var source = "json/Data_with_hour/Data_50000_control_set/Data_with_hour.json";
-var destination1 = "json/Data_with_hour/Data_50000_control_set/Data_with_hour2.json";
-var destination2 = "json/Data_with_hour/Data_50000_control_set/Data_with_hour3.json";
+var source = "json/Data_with_hour/Data_with_hour.json";
+var destination1 = "json/temp/pok2.json";
+var destination2 = "json/temp/pok3.json";
 var destination3 = "json/Data_with_hour/Data_50000_control_set/Data_with_hour_final/";
 
 //cooc_json1(source, destination1);
-//cooc_json2(destination1, destination2);
+//console.log("Completed cooc_json1");
+//"json/Data_with_hour/Data_with_hour2.json"
+cooc_json2(destination1, destination2);
 //cooc_json3(destination2, destination3, 50000);
 //evaluate(destination2, destination3);
-cheap_convert_arff("json/Data_with_hour/Data_50000_control_set/Data_with_hour_final/cooc_final_1.json", "json/Data_with_hour/Data_50000_control_set/Data_with_hour_final/cooc_final_1.arff");
+//cheap_convert_arff("json/Data_with_hour/Data_50000_control_set/Data_with_hour_final/cooc_final_1.json", "json/Data_with_hour/Data_50000_control_set/Data_with_hour_final/cooc_final_1.arff");
 
 
 //adds 5 "Integers" to the json data. This will be the storage for information.
 function cooc_json1 (filePathName, destination) {
     var raw_data = fs.readFileSync(filePathName, 'utf8');
     var data = JSON.parse(raw_data);
+    data = data.slice(0,10000);
     console.log("data length : " + data.length);
+    //console.log(data);
     var out = '[';
     var count = 0;
     data.forEach(function(row){
@@ -35,13 +39,15 @@ function cooc_json1 (filePathName, destination) {
         new_row[name + "64"]=0;
         new_row[name + "96"]=0;
         new_row[name + "128"]=+0;
+
         var new_row_string = JSON.stringify(new_row);
+        //console.log(new_row_string);
         out = out + new_row_string + ',\n';
         //console.log(new_row);
         count ++;
-        if(count%50000===0){
+        if(count%5000===0){
             console.log(count + " files processed.");
-            if(count==50000){
+            if(count==5000){
                 fs.writeFileSync(destination, out, 'utf8');
                 out = "";
             } else {

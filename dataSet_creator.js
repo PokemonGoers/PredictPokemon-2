@@ -39,6 +39,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 else if (feature.key === config.classKey) {
                     if (consoleOn) console.log("class key: " + feature.key);
                     isClassKeySource = true;
+                    features.push(feature);
                 }
             });
 
@@ -76,33 +77,26 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 }
             }
         });
-
+        //console.log(featureSources);
         dataSet = [];
-
-        //Initialize the script to convert UTC to local time
-        //if (consoleOn) console.log('initialize tzwhere...');
-        //tzwhere.init();
 
         var classLables = [];
         var cnt = 0;
         if (consoleOn) console.log('creating features...');
 
-
         storeArff(fileNamePath);
-
 
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             cnt++;
             if(cnt%1000==0) console.log("Current tuple: " + cnt);
-            //addCoordinatesToPokeEntry(pokeEntry);
-            //addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
+                //console.log(source.featureKeys);
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
-                if (values!="Error with request") {
 
+                if (values!="Error with request") {
                     source.features.forEach(function (feature) {
                         dataRow[feature.key] = values[feature.key];
                     });
@@ -111,7 +105,6 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             if (dataRow!=null)dataSet.push(dataRow);
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
-
             // add the class label to the data row
             if (consoleOn) console.log('adding class labels...');
             classLables.reverse();
@@ -121,9 +114,11 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
         })
         console.log("The var dataSet contains " + dataSet.length + " entries.")
-        //console.log(dataSet);
+
         //compute co-occurence
-        var cooc = initCoocs(dataSet);
+        //console.log(dataSet);
+        var cooc = [];
+        cooc = initCoocs(dataSet);
         computeCooc(cooc);
 
         var iter = 0;
@@ -338,18 +333,23 @@ function initCoocs (_data){
 
 function computeCooc (_data){
     var count_cooc=0;
+    var count_cell=0;
     var sum = (_data.length+1)*_data.length/2;
     for(var i = 0;i <_data.length; i++){
         if(i%100 == 0){
-            var current_count = 100*(sum - (_data.length -i+1)*(_data.length-i)/2)/(sum);
-            console.log("Roughly at " + current_count.toFixed(2) + "% of co-occurence computations with " + count_cooc + " co-occurrences.");
+            var current = i*100/_data.length;
+            console.log("Roughly at " + current.toFixed(2) + "% of co-occurence computations with " + count_cooc +
+                " co-occurrences in "+ count_cell + " cell hits.");
         }
-        for(var j = i+1; j<_data.length; j ++){
-            if(_data[i].cellId_90m === _data[j].cellId_90m){
-                if(within24(_data[i], _data[j])) {
-                    if (_data[i].pokemonId !== _data[j].pokemonId) {
-                        insert_id_to_int(_data[i], _data[j]);
-                        count_cooc++;
+        for(var j = 0; j<_data.length; j++){
+            if(i!=j) {
+                if (_data[i].cellId_90m === _data[j].cellId_90m) {
+                    count_cell++;
+                    if (within24(_data[i], _data[j])) {
+                        if (_data[i].pokemonId !== _data[j].pokemonId) {
+                            insert_id_to_int(_data[i], _data[j]);
+                            count_cooc++;
+                        }
                     }
                 }
             }
@@ -357,13 +357,13 @@ function computeCooc (_data){
     }
 }
 
-//returns whether or not the sighting data2 was within 24 hours before data1
+//returns whether or not the sighting data2 was within the hour before data1
 function within24(data1, data2){
-    var date1 = new Date(2016, data1.appearedMonth, data1.appearedDay, data1.appearedHour);
-    var date2 = new Date(2016, data2.appearedMonth, data2.appearedDay, data2.appearedHour);
-    //console.log(date1 + " and " + date2);
-    //86400000 milliseconds = 24 hours.
-    if(date1 < date2 && date1.getTime()-date2.getTime() < 86400000){
+    //console.log(data1.appearedHour + " and " + data2.appearedHour + " and "
+    //    +data1.class + " and " + data2.class);
+    if(data1.appearedHour==data2.appearedHour
+        ||(data1.appearedHour-1)==data2.appearedHour
+        ||(data1.appearedHour==0&&data2.appearedHour==23)){
         return true;
     } else {
         return false;

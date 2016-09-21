@@ -24,6 +24,10 @@
             else if(key === "appearedOn") {
                 console.log("HOW THE FUCK DO YOU GET IN HERE?");
             }
+            else if (key === "pokemonId") {
+                console.log(pokeEntry[key]);
+                values[key] = pokeEntry[key];
+            }
             else {
                 console.log("The key " + key + " is not in the raw API data.");
                 throw "UnknownFeatureKey";
