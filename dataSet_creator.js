@@ -89,6 +89,8 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
 
         storeArff(fileNamePath);
+
+
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             cnt++;
@@ -110,39 +112,59 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
 
-            if(cnt%20000 === 0 && cnt!==0){
-                // add the class label to the data row
-                if (consoleOn) console.log('adding class labels...');
-                classLables.reverse();
-                dataSet.forEach(function (dataRow) {
-                    dataRow[classSource.classKey] = classLables.pop();
-                });
+            // add the class label to the data row
+            if (consoleOn) console.log('adding class labels...');
+            classLables.reverse();
+            dataSet.forEach(function (dataRow) {
+                dataRow[classSource.classKey] = classLables.pop();
+            });
+
+        })
+        console.log("The var dataSet contains " + dataSet.length + " entries.")
+        //console.log(dataSet);
+        //compute co-occurence
+        var cooc = initCoocs(dataSet);
+        computeCooc(cooc);
+
+        var iter = 0;
+        var finalData = [];
+        dataSet.forEach(function (pokeEntry) {
+            var dataRow = pokeEntry;
+            for(var i = 1; i <=151; i++){
+                dataRow['cooc_' + i] = (cooc[iter]["cooccurCellId90_" + (32*Math.floor(i/32))] & (1<<(i%32)))!==0;
+            }
+            finalData.push(dataRow)
+            iter++;
+
+            if(iter%5000==0){
                 var arff = "";
 
-                dataSet.forEach(function (dataRow) {
+                finalData.forEach(function (data) {
                     var values = [];
-                    for (var key in dataRow) {
-                        values.push(dataRow[key])
+                    for (var key in data) {
+                        values.push(data[key])
                     }
                     arff += values.join(',') + '\n';
                 });
                 console.log("Writing...");
                 console.log(arff.length);
                 fs.appendFileSync(fileNamePath, arff, 'utf8');
-                dataSet = [];
-                console.log("" + cnt + " instances written.");
+                finalData = [];
+                console.log("" + iter + " instances written.");
             }
         });
+
+
         if (consoleOn) console.log('adding class labels...');
         classLables.reverse();
-        dataSet.forEach(function (dataRow) {
-            dataRow[classSource.classKey] = classLables.pop();
+        finalData.forEach(function (data) {
+            data[classSource.classKey] = classLables.pop();
         });
         var arff = "";
-        dataSet.forEach(function (dataRow) {
+        finalData.forEach(function (data) {
             var values = [];
-            for (var key in dataRow) {
-                values.push(dataRow[key])
+            for (var key in data) {
+                values.push(data[key])
             }
             arff += values.join(',') + '\n';
         });
@@ -151,8 +173,6 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
         console.log("" + cnt + " instances written.");
 
-
-
         // post processing on existing features
 
         // save weather data before other processing is done - this way we keep the data if the script crashes below
@@ -160,9 +180,6 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         //postProcessSources.forEach(function (postSource) {
         //    dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         //});
-
-
-
 
 
     };
@@ -296,3 +313,68 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         return JSON.parse(data);
     }
 })('undefined' !== typeof module ? module.exports : window);
+
+function initCoocs (_data){
+    var coocData = [];
+    _data.forEach(function(row) {
+        var name = "cooccurCellId90_";
+        var new_row = {};
+        new_row['_id'] = row['_id'];
+        new_row['cellId_90m'] = row['cellId_90m'];
+        new_row['appearedHour'] = row['appearedHour'];
+        new_row['appearedDay'] = row['appearedDay'];
+        new_row['appearedMonth'] = row['appearedMonth'];
+        new_row['pokemonId'] = row['pokemonId'];
+        new_row[name + "0"] = 0;
+        new_row[name + "32"] = 0;
+        new_row[name + "64"] = 0;
+        new_row[name + "96"] = 0;
+        new_row[name + "128"] = 0;
+        coocData.push(new_row);
+    });
+    console.log("Initialized cooc var with " + coocData.length + " rows.");
+    return coocData;
+}
+
+function computeCooc (_data){
+    var count_cooc=0;
+    var sum = (_data.length+1)*_data.length/2;
+    for(var i = 0;i <_data.length; i++){
+        if(i%100 == 0){
+            var current_count = 100*(sum - (_data.length -i+1)*(_data.length-i)/2)/(sum);
+            console.log("Roughly at " + current_count.toFixed(2) + "% of co-occurence computations with " + count_cooc + " co-occurrences.");
+        }
+        for(var j = i+1; j<_data.length; j ++){
+            if(_data[i].cellId_90m === _data[j].cellId_90m){
+                if(within24(_data[i], _data[j])) {
+                    if (_data[i].pokemonId !== _data[j].pokemonId) {
+                        insert_id_to_int(_data[i], _data[j]);
+                        count_cooc++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//returns whether or not the sighting data2 was within 24 hours before data1
+function within24(data1, data2){
+    var date1 = new Date(2016, data1.appearedMonth, data1.appearedDay, data1.appearedHour);
+    var date2 = new Date(2016, data2.appearedMonth, data2.appearedDay, data2.appearedHour);
+    //console.log(date1 + " and " + date2);
+    //86400000 milliseconds = 24 hours.
+    if(date1 < date2 && date1.getTime()-date2.getTime() < 86400000){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+//Magic. Do not touch.
+function insert_id_to_int(data_1, data_2){
+    var str = 'cooccurCellId90_';
+    var int_1 = Math.floor(data_1.class/32);
+    var int_2 = Math.floor(data_2.class/32);
+    data_2[str + (int_1*32)] = data_2[str + (int_1*32)] | (1<<(data_1.class%32));
+    data_1[str + (int_2*32)] = data_1[str + (int_2*32)] | (1<<(data_2.class%32));
+}
