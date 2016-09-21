@@ -130,7 +130,7 @@
     {
       "name": "Pokemon Type Features",
       "path": "./feature_sources/poketype_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "typeSteel",
