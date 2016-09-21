@@ -7,6 +7,12 @@ function parseCSV(path) {
     for (var i = 0; i < array.length; i++) {
         array[i] = array[i].split(',');
     }
+
+    for (var i = 0; i < array.length; i++) {
+        for (var j = 0; j < array[i].length; j++) {
+            array[i][j] = parseInt(array[i][j]);
+        }
+    }
     return array;
 }
 
