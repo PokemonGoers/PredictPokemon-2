@@ -9,7 +9,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     var featureSources = null;
     var postProcessSources = null;
     var classSource = null;
+    var classLables = null;
     var consoleOn = false;
+    var addCooccurence = true;
 
     /**
      * parse the given JSON data and create all features which are specified in the config for all data entries.
@@ -81,7 +83,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         if (consoleOn) console.log('initialize tzwhere...');
         tzwhere.init();
 
-        var classLables = [];
+        classLables = [];
 
         if (consoleOn) console.log('creating features...');
         json_data.forEach(function (pokeEntry) {
@@ -92,13 +94,13 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
-                if (values!="Error with request") {
+                if (values != "Error with request") {
                     source.features.forEach(function (feature) {
                         dataRow[feature.key] = values[feature.key];
                     });
-                } else dataRow=null;
+                } else dataRow = null;
             });
-            if (dataRow!=null)dataSet.push(dataRow);
+            if (dataRow != null)dataSet.push(dataRow);
 
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
@@ -111,12 +113,14 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
-        // add the class label to the data row
-        if (consoleOn) console.log('adding class labels...');
-        classLables.reverse();
-        dataSet.forEach(function (dataRow) {
-            dataRow[classSource.classKey] = classLables.pop();
-        });
+        if (!addCooccurence) {
+            // add the class label to the data row
+            if (consoleOn) console.log('adding class labels...');
+            classLables.reverse();
+            dataSet.forEach(function (dataRow) {
+                dataRow[classSource.classKey] = classLables.pop();
+            });
+        }
 
         return dataSet;
     };
@@ -132,7 +136,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      * @param configPath path to the feature configuration file
      * @param json_data_raw the raw JSON data received from the API
      * @param fileNamePath the path with filename where the .arff file should be stored
-    */
+     */
     DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
         DC.createDataSet(configPath, json_data_raw);
         storeArff(fileNamePath);
@@ -169,6 +173,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 });
             });
         });
+        
 
         // add the class label
         var classLabels = allValuesForKeyInData(classSource.classKey, dataSet);
