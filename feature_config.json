@@ -12,12 +12,12 @@
           "enabled": true
         },
         {
-          "key": "longitude",
+          "key": "latitude",
           "type": "numeric",
           "enabled": true
         },
         {
-          "key": "latitude",
+          "key": "longitude",
           "type": "numeric",
           "enabled": true
         },
@@ -348,6 +348,38 @@
       "features": [
         {
           "key": "co-occ90m_Id",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "population density",
+      "path": "./feature_sources/population_density.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "population_density",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "urban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "suburban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "midurban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "rural",
           "type": "nominal",
           "enabled": true
         }
