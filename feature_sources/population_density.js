@@ -1,12 +1,15 @@
 (function (exports) {
     var module = exports.module = {};
+    var density = parseCSV('../population_density.csv');
 
     module.getFeatures = function (keys, pokeEntry) {
         var values = {};
-        var density = parseCSV('../population_density.csv');
 
         keys.forEach(function (key) {
-            if (key === "rural") {
+            if (key === "population_density") {
+                values[key] = getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude);
+            }
+            else if (key === "rural") {
                 values[key] = isRural(getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude));
             }
             else if (key === "midurban") {
@@ -82,6 +85,9 @@
         for (var i = 0; i < array.length; i++) {
             for (var j = 0; j < array[i].length; j++) {
                 array[i][j] = parseFloat(array[i][j]);
+                if (array[i][j] === 99999) {
+                    array[i][j] = 0;
+                }
             }
         }
         return array;
