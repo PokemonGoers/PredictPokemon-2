@@ -5,16 +5,18 @@ var moment = require('moment-timezone');
 var S2 = require('s2-geometry').S2;
 var util = require('util')
 var consoleOn = false;     //turns on/off console output
-var showErrors = false;
+var showErrors = true;
 var values;
 var temp = "emptyyet";
-var CacheKey = "";
+var saveBad = false;       //save bad request answers not to repeat them
+var showSaveMessage = true;
 
 (function (exports) {
     var module = exports.module = {};
 
     module.getFeatures = function (keys, pokeEntry) {
         values = {};
+        var readBadRequest = false;
         //S2_cell: level 11, time: 12 parts of the day
         var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
 
@@ -63,68 +65,78 @@ var CacheKey = "";
             var date = new Date(pokeEntry.appearedLocalTime);
             var timestamp = Math.round(date.getTime() / 1000);
             //switching between API Keys here
-            var URL = 'https://api.forecast.io/forecast/'+APIKeys[WeatherApiKey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
+            var URL = 'https://api.darksky.net/forecast/'+APIKeys[WeatherApiKey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
             xhr.open('GET', URL, false);
+            xhr.timeout=1500;
+            xhr.onTimeout = function(){                                                                     //TODO make timeout resend
+                xhr.responseText="Timeout"
+            }
             xhr.send();
             if (xhr.status != 200) {
                 console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
             } else {
-                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO save CachedWeatherResponses immidiately!
+                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO timeout reaction here
                     WeatherApiKey++;                                                                                      //if API key gets blocked??
                     if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
                     makeRequest()
                 } else {
                     if (consoleOn) console.log(xhr.responseText);
-                    data = JSON.parse(xhr.responseText);
+                    var data = JSON.parse(xhr.responseText);
                     j = 0;
                     if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
                         data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||data.currently.humidity==undefined||
                         data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
+                        var missing = []
+                        if (data.currently==undefined) missing.push("currently")
+                        if (data.timezone==undefined) missing.push("timezone")
+                        if (data.currently.summary==undefined) missing.push("currently.summary")
+                        if (data.currently.windSpeed==undefined) missing.push("currently.windSpeed")
+                        if (data.daily==undefined) missing.push("daily")
+                        if (data.daily.data[0]==undefined) missing.push("daily.data")
+                        if (data.currently.temperature==undefined) missing.push("temperature")
+                        if (data.currently.humidity==undefined) missing.push("currently.humidity")
+                        if (data.currently.windBearing==undefined) missing.push("currently.windBearing")
+                        if (data.currently.pressure==undefined) missing.push("currently.pressure")
+                        if (data.currently.icon==undefined) missing.push("currently.icon")
+                        if (tryToReparseXMLRespond(data, missing)==true) {
+                            parseXMLRespond(data);
+                            return values;
+                        }
+
                         if (WeatherApiKey<(APIKeys.length-1)) {
                             WeatherApiKey++;                                                                                      //if API key gets blocked??
                             if (consoleOn) {
                                 console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");}
                         } else {//data cannot be retrieved
+                            //console.log(xhr.responseText)
                             values="Error with request"
                             return values
                         }
                         makeRequest()
                     }
-                    if (values!="Error with request") {
-                        for (i = 0; i < data.timezone.length; i++) {
-                            if (data.timezone.charAt(i) == '/') {
-                                j = i;
-                            }
-                        }
-                        var continent = data.timezone.substring(0, j);
-                        var city = data.timezone.substring(j + 1);
-                        var sunrise = sunTimeFeatures(data.daily.data[0].sunriseTime, data.currently.time, data.timezone);
-                        var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
-
-                        temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
-                            ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
-                            data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
-                            sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
-                            sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
-                    }
+                    parseXMLRespond(data);
                 }
             }
             if (consoleOn)console.log("Weather API Called with key No "+(WeatherApiKey+1));
             if (values!="Error with request") CachedWeather[CacheKey] = temp;
-            else  CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad request"
+            else  if (saveBad) CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond"
         });
 
         if (!CachedWeather[CacheKey]) {
-            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)])
+            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
                 makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
-            else values="Error with request"
+            } else {
+                readBadRequest = true
+                values = "Error with request"
+                if (consoleOn) console.log("Weather Api not called, loaded existing (bad) data")
+            }
             if (values=="Error with request"){ //Error -> return empty respond and go on
                 WeatherApiKey=0;
-                if (showErrors) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", returning empty data and proceeding with further entries.")
-                saveOldWeather('json/CachedWeather.json', CachedWeather, consoleOn);//TODO here as well??
+                if (showErrors&&!readBadRequest) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", returning empty data and proceeding with further entries.")
+                if (saveBad&&(readBadRequest==false))saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
                 return values
             }
-            saveOldWeather('json/CachedWeather.json', CachedWeather, consoleOn);
+            else saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);//not needed?
         }
         else if (consoleOn) {console.log("Weather Api not called, loaded existing data");}
         returnResponse(keys, pokeEntry);//how? give the method nothing?
@@ -133,8 +145,32 @@ var CacheKey = "";
 
 
 
+    var parseXMLRespond = (function(data){
+        if (values!="Error with request") {
+            for (i = 0; i < data.timezone.length; i++) {
+                if (data.timezone.charAt(i) == '/') {
+                    j = i;
+                }
+            }
+            var continent = data.timezone.substring(0, j);
+            var city = data.timezone.substring(j + 1);
+            var sunrise = sunTimeFeatures(data.daily.data[0].sunriseTime, data.currently.time, data.timezone);
+            var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
 
+            temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
+                ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
+                data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
+                sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
+                sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
+        }
+    });
+    var tryToReparseXMLRespond = (function (data, missing){
+        missing.forEach(function(missed){
 
+        })
+        //TODO find replacement data
+        return false;
+    });
     /**time features relating to the sunrise and sunset time*/
     var sunTimeFeatures = (function (sunTimestamp, currentTimestamp, timezone) {
         var sunDate = moment.unix(sunTimestamp).tz(timezone);
