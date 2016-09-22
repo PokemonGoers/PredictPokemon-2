@@ -6,16 +6,16 @@
         var density = parseCSV('../population_density.csv');
 
         keys.forEach(function (key) {
-            if (key === "rural") { // 0-199
+            if (key === "rural") {
                 values[key] = isRural(getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude));
             }
-            else if (key === "midurban") { // 200-399
+            else if (key === "midurban") {
                 values[key] = isMidurban(getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude));
             }
-            else if (key === "suburban") { // 400-799
+            else if (key === "suburban") {
                 values[key] = isSuburban(getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude));
             }
-            else if (key === "urban") { // >=800
+            else if (key === "urban") {
                 values[key] = isUrban(getPopulationDensity(density, pokeEntry.latitude, pokeEntry.longitude));
             }
             else {
