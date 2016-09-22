@@ -20,6 +20,7 @@
             }
             else if (hasOwnProperty.call(pokeEntry, key)) {
                 values[key] = pokeEntry[key];
+
             }
             else {
                 console.log("The key " + key + " is not in the raw API data.");
