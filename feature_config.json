@@ -352,6 +352,33 @@
           "enabled": true
         }
       ]
+    },
+    {
+      "name": "population density",
+      "path": "./feature_sources/population_density.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "urban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "suburban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "midurban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "rural",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
     }
   ]
 }
