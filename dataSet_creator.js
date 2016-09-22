@@ -102,6 +102,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                     });
                 } else dataRow = null;
             });
+
             if (dataRow != null)dataSet.push(dataRow);
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
@@ -113,7 +114,6 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             dataRow[classSource.classKey] = classLables.pop();
         });
 
-
         console.log("The var dataSet contains " + dataSet.length + " entries.")
 
         //compute co-occurence
@@ -123,28 +123,25 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         computeCooc(cooc);
 
         var iter = 0;
-        var finalData = [];
         var arff="";
-        classLables.reverse();
-        dataSet.forEach(function (pokeEntry) {
-            var dataRow = pokeEntry;
+        var len = dataSet.length;
+        for(iter;iter<len;iter++){
+            var dataRow = dataSet.shift();
             for(var i = 1; i <=151; i++){
                 dataRow['cooc_' + i] = (cooc[iter]["cooccurCellId90_" + (32*Math.floor(i/32))] & (1<<(i%32)))!==0;
             }
-            dataRow[classSource.classKey] = classLables.pop();
             var values = [];
             for (var key in dataRow) {
                 values.push(dataRow[key])
             }
             arff += values.join(',') + '\n';
-            iter++;
-            if(iter%5000===0){
+            if(iter%5000===0||iter===(len-1)){
                 console.log("Writing...");
                 fs.appendFileSync(fileNamePath, arff, 'utf8');
                 arff="";
                 console.log("" + iter + " instances written.");
             }
-        });
+        }
 
     };
 
@@ -195,6 +192,11 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 });
             });
         });
+
+        //add cooc labels
+        for(var i = 1; i <=151; i++){
+            arff+="@ATTRIBUTE cooc_" + i + " {false, true}\n";
+        }
 
         // add the class label
         var classLabels = allValuesForKeyInData(classSource.classKey, dataSet);
@@ -342,8 +344,8 @@ function within24(data1, data2){
 //Magic. Do not touch.
 function insert_id_to_int(data_1, data_2){
     var str = 'cooccurCellId90_';
-    var int_1 = Math.floor(data_1.class/32);
-    var int_2 = Math.floor(data_2.class/32);
-    data_2[str + (int_1*32)] = data_2[str + (int_1*32)] | (1<<(data_1.class%32));
-    data_1[str + (int_2*32)] = data_1[str + (int_2*32)] | (1<<(data_2.class%32));
+    var int_1 = Math.floor(data_1.pokemonId/32);
+    var int_2 = Math.floor(data_2.pokemonId/32);
+    data_2[str + (int_1*32)] = data_2[str + (int_1*32)] | (1<<(data_1.pokemonID%32));
+    data_1[str + (int_2*32)] = data_1[str + (int_2*32)] | (1<<(data_2.pokemonId%32));
 }
