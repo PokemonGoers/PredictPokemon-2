@@ -79,7 +79,7 @@ var S2 = require('s2-geometry').S2;
 
     function getDistanceToPlace(lat, lon, placeArray) {
         var distances = placeArray.map(function (place) {
-            latLonDistanceInKm(place.latitude, place.longitude, lat, lon);
+            return latLonDistanceInKm(place.latitude, place.longitude, lat, lon);
         });
         return Math.min(distances);
     }
