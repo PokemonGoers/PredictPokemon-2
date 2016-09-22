@@ -10,7 +10,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     var postProcessSources = null;
     var classSource = null;
     var classLables = null;
-    var consoleOn = false;
+    var consoleOn = true;
     var addCooccurence = true;
 
     /**
@@ -38,15 +38,16 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                     features.push(feature);
                 }
                 else if (feature.key === config.classKey) {
+                    features.push(feature);
                     isClassKeySource = true;
                 }
             });
 
             if (features.length > 0 || isClassKeySource === true) {
                 var module = require(source.path).module;
-                var featureKeys = source.features.map(function (feature) {
-                    return feature.key;
-                });
+                var featureKeys= source.features.filter(function(feature) {
+                    return feature.enabled;
+                }).map(function(feature) { return feature.key; });
 
                 if (features.length > 0) {
                     if (source.post_process === true) {
@@ -80,16 +81,20 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        if (consoleOn) console.log('initialize tzwhere...');
-        tzwhere.init();
+        //if (consoleOn) console.log('initialize tzwhere...');
+        //tzwhere.init();
 
         classLables = [];
 
         if (consoleOn) console.log('creating features...');
+        var cnt = 0;
         json_data.forEach(function (pokeEntry) {
+
             var dataRow = {};
-            addCoordinatesToPokeEntry(pokeEntry);
-            addLocalTime(pokeEntry);
+
+            //uncomment this if you are working on API data
+            //addCoordinatesToPokeEntry(pokeEntry);
+            //addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
@@ -104,6 +109,10 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
+            if(consoleOn && ((cnt%1000) ===0)){
+                console.log("At tuple # " + cnt);
+            }
+            cnt++;
         });
         // post processing on existing features
 
@@ -150,7 +159,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         var arff = '@RELATION ' + fileNamePath + '\n\n';
 
         var addAttributes = function (featureKey, featureType) {
-            if (featureType === 'nominal') {
+            if (featureType == 'nominal') {
                 var nominalValues = allValuesForKeyInData(featureKey, dataSet);
                 arff += '@ATTRIBUTE ' + featureKey + ' {' + nominalValues.join(', ') + '}\n';
             } else {
@@ -186,7 +195,10 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             computeCooc(cooc);
         }
         // add the class label
-        var classLabels = allValuesForKeyInData(classSource.classKey, dataSet);
+        var classLabels = allValuesForKeyInData(classSource.classKey, dataSet).sort(
+            function sortNumber(a,b) {
+            return a - b;
+        });
         arff += '@ATTRIBUTE class {' + classLabels.join(', ') + '}\n\n';
 
         // add the data
@@ -204,6 +216,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             fs.writeFileSync(fileNamePath, arff, 'utf8');
         } else {
             fs.writeFileSync(fileNamePath, arff, 'utf8');
+            arff="";
             if(consoleOn) console.log("Wrote the header.");
             var len = dataSet.length;
             var values = [];
@@ -213,18 +226,19 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 //all the features
                 row = dataSet.shift();
                 //cooccurences
-                for(var i = 1; i <=151; i++){
-                    row['cooc_' + i] = (cooc[iter]["cooccurCellId90_" + (32*Math.floor(i/32))] & (1<<(i%32)))!==0;
+                for(var j = 1; j <=151; j++){
+                    row['cooc_' + j] = (cooc[i]["cooccurCellId90_" + (32*Math.floor(j/32))] & (1<<(j%32)))!==0;
                 }
                 //class labels
-                row[classSource.classKey] = classLables.shift();
+                //this is hardcoded, because cooccurence needs the pokemonId, but Weka prefers the class in the end
+                row["class"] = classLables.shift();
 
                 //extract values
                 for (var key in row) {
                     values.push(row[key])
                 }
                 arff += values.join(',') + '\n';
-                if(i%5000===0||iter===(len-1)){
+                if(i%5000===0||i===(len-1)){
                     console.log("Writing...");
                     if (i===(len-1)){
                         arff=arff.slice(0,-2);
@@ -247,11 +261,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      */
     function allValuesForKeyInData(key, json_data) {
         var valueSet = new Set();
-
         json_data.forEach(function (row) {
             valueSet.add(row[key]);
         });
-
         return Array.from(valueSet);
     }
 
