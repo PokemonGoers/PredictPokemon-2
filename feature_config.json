@@ -251,7 +251,7 @@
     {
       "name": "Weather Features",
       "path": "./feature_sources/weather_features.js",
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "key": "city",
