@@ -384,6 +384,48 @@
           "enabled": true
         }
       ]
+    },
+    {
+      "name": "Place features for gyms",
+      "path": "./feature_sources/place_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "gymDistanceKm",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "gymIn100m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn250m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn500m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn1000m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn2500m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn5000m",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
     }
   ]
 }
