@@ -9,7 +9,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
     var featureSources = null;
     var postProcessSources = null;
     var classSource = null;
-    var consoleOn = false;
+    var classLables = null;
+    var consoleOn = true;
+    var addCooccurence = true;
 
     /**
      * parse the given JSON data and create all features which are specified in the config for all data entries.
@@ -36,15 +38,16 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                     features.push(feature);
                 }
                 else if (feature.key === config.classKey) {
+                    features.push(feature);
                     isClassKeySource = true;
                 }
             });
 
             if (features.length > 0 || isClassKeySource === true) {
                 var module = require(source.path).module;
-                var featureKeys = source.features.map(function (feature) {
-                    return feature.key;
-                });
+                var featureKeys= source.features.filter(function(feature) {
+                    return feature.enabled;
+                }).map(function(feature) { return feature.key; });
 
                 if (features.length > 0) {
                     if (source.post_process === true) {
@@ -78,30 +81,38 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        if (consoleOn) console.log('initialize tzwhere...');
-        tzwhere.init();
+        //if (consoleOn) console.log('initialize tzwhere...');
+        //tzwhere.init();
 
-        var classLables = [];
+        classLables = [];
 
         if (consoleOn) console.log('creating features...');
+        var cnt = 0;
         json_data.forEach(function (pokeEntry) {
+
             var dataRow = {};
-            addCoordinatesToPokeEntry(pokeEntry);
-            addLocalTime(pokeEntry);
+
+            //uncomment this if you are working on API data
+            //addCoordinatesToPokeEntry(pokeEntry);
+            //addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
-                if (values!="Error with request") {
+                if (values != "Error with request") {
                     source.features.forEach(function (feature) {
                         dataRow[feature.key] = values[feature.key];
                     });
-                } else dataRow=null;
+                } else dataRow = null;
             });
-            if (dataRow!=null)dataSet.push(dataRow);
+            if (dataRow != null)dataSet.push(dataRow);
 
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
+            if(consoleOn && ((cnt%1000) ===0)){
+                console.log("At tuple # " + cnt);
+            }
+            cnt++;
         });
         // post processing on existing features
 
@@ -111,12 +122,14 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
-        // add the class label to the data row
-        if (consoleOn) console.log('adding class labels...');
-        classLables.reverse();
-        dataSet.forEach(function (dataRow) {
-            dataRow[classSource.classKey] = classLables.pop();
-        });
+        if (!addCooccurence) {
+            // add the class label to the data row
+            if (consoleOn) console.log('adding class labels...');
+            classLables.reverse();
+            dataSet.forEach(function (dataRow) {
+                dataRow[classSource.classKey] = classLables.pop();
+            });
+        }
 
         return dataSet;
     };
@@ -132,7 +145,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      * @param configPath path to the feature configuration file
      * @param json_data_raw the raw JSON data received from the API
      * @param fileNamePath the path with filename where the .arff file should be stored
-    */
+     */
     DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
         DC.createDataSet(configPath, json_data_raw);
         storeArff(fileNamePath);
@@ -146,7 +159,7 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         var arff = '@RELATION ' + fileNamePath + '\n\n';
 
         var addAttributes = function (featureKey, featureType) {
-            if (featureType === 'nominal') {
+            if (featureType == 'nominal') {
                 var nominalValues = allValuesForKeyInData(featureKey, dataSet);
                 arff += '@ATTRIBUTE ' + featureKey + ' {' + nominalValues.join(', ') + '}\n';
             } else {
@@ -169,22 +182,75 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
                 });
             });
         });
+        if (addCooccurence) {
+            //add cooc labels
+            for (var i = 1; i <= 151; i++) {
+                arff += "@ATTRIBUTE cooc_" + i + " {false, true}\n";
+            }
 
+            //init the datastructure for cooc
+            var cooc = [];
+            cooc = initCoocs(dataSet);
+            //compute the cooccurence
+            computeCooc(cooc);
+        }
         // add the class label
-        var classLabels = allValuesForKeyInData(classSource.classKey, dataSet);
+        var classLabels = allValuesForKeyInData(classSource.classKey, dataSet).sort(
+            function sortNumber(a,b) {
+            return a - b;
+        });
         arff += '@ATTRIBUTE class {' + classLabels.join(', ') + '}\n\n';
 
         // add the data
         arff += '@DATA\n';
-        dataSet.forEach(function (dataRow) {
-            var values = [];
-            for (var key in dataRow) {
-                values.push(dataRow[key])
-            }
-            arff += values.join(',') + '\n';
-        });
 
-        fs.writeFileSync(fileNamePath, arff, 'utf8');
+        if(!addCooccurence) {
+            dataSet.forEach(function (dataRow) {
+                var values = [];
+                for (var key in dataRow) {
+                    values.push(dataRow[key])
+                }
+                arff += values.join(',') + '\n';
+            });
+
+            fs.writeFileSync(fileNamePath, arff, 'utf8');
+        } else {
+            fs.writeFileSync(fileNamePath, arff, 'utf8');
+            arff="";
+            if(consoleOn) console.log("Wrote the header.");
+            var len = dataSet.length;
+            var values = [];
+            var row = null;
+            for(var i=0; i<len;i++){
+                values = [];
+                //all the features
+                row = dataSet.shift();
+                //cooccurences
+                for(var j = 1; j <=151; j++){
+                    row['cooc_' + j] = (cooc[i]["cooccurCellId90_" + (32*Math.floor(j/32))] & (1<<(j%32)))!==0;
+                }
+                //class labels
+                //this is hardcoded, because cooccurence needs the pokemonId, but Weka prefers the class in the end
+                row["class"] = classLables.shift();
+
+                //extract values
+                for (var key in row) {
+                    values.push(row[key])
+                }
+                arff += values.join(',') + '\n';
+                if(i%5000===0||i===(len-1)){
+                    console.log("Writing...");
+                    if (i===(len-1)){
+                        arff=arff.slice(0,-2);
+                        fs.appendFileSync(fileNamePath, arff, 'utf8');
+                    } else {
+                        fs.appendFileSync(fileNamePath, arff, 'utf8');
+                        arff = "";
+                    }
+                    if(consoleOn) console.log("" + i + " instances written.");
+                }
+            }
+        }
     }
 
     /**
@@ -195,11 +261,9 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
      */
     function allValuesForKeyInData(key, json_data) {
         var valueSet = new Set();
-
         json_data.forEach(function (row) {
             valueSet.add(row[key]);
         });
-
         return Array.from(valueSet);
     }
 
@@ -255,4 +319,101 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         var data = fs.readFileSync(file, 'utf8');
         return JSON.parse(data);
     }
+
+
+    /**
+     * Initializes the data structure for the cooccurence to work on
+     * that is: 5 Integers to hold the "boolean" values
+     * @param _data The data for which the cooccurence is added
+     * @returns {Array} data struc for cooccurence
+     */
+    function initCoocs (_data){
+        var coocData = [];
+        //iter to run along the forEach loop and fethc the labels.
+        var iter = 0;
+        _data.forEach(function(row) {
+            var name = "cooccurCellId90_";
+            var new_row = {};
+            new_row['_id'] = row['_id'];
+            new_row['cellId_90m'] = row['cellId_90m'];
+            new_row['appearedHour'] = row['appearedHour'];
+            new_row['appearedDay'] = row['appearedDay'];
+            new_row['appearedMonth'] = row['appearedMonth'];
+            new_row['pokemonId'] = classLables[iter];
+            new_row[name + "0"] = 0;
+            new_row[name + "32"] = 0;
+            new_row[name + "64"] = 0;
+            new_row[name + "96"] = 0;
+            new_row[name + "128"] = 0;
+            coocData.push(new_row);
+            iter ++;
+        });
+        console.log("Initialized cooc var with " + coocData.length + " rows.");
+        return coocData;
+    }
+
+    /**
+     * traverses the data and adds cooccurence, if the sighting was in the same cell
+     * and in the same timeframe
+     * @param _data the cooc-structure to work on
+     */
+    function computeCooc (_data){
+        var count_cooc=0;
+        var count_cell=0;
+        var sum = (_data.length+1)*_data.length/2;
+        for(var i = 0;i <_data.length; i++){
+            if(i%100 == 0){
+                var current = i*100/_data.length;
+                console.log("Roughly at " + current.toFixed(2) + "% of co-occurence computations with " + count_cooc +
+                    " co-occurrences in "+ count_cell + " cell hits.");
+            }
+            for(var j = 0; j<_data.length; j++){
+                if(i!=j) {
+                    if (_data[i].cellId_90m === _data[j].cellId_90m) {
+                        count_cell++;
+                        if (within24(_data[i], _data[j])) {
+                            if (_data[i].pokemonId !== _data[j].pokemonId) {
+                                insert_id_to_int(_data[i], _data[j]);
+                                count_cooc++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**returns whether or not the sighting data2 was within the hour before data1
+     *
+     * @param The tuple the cooccurence will be inserted in
+     * @param The tuple, which is in the same cell.
+     * @returns {boolean} whether the occurence was within the same hour / hour before
+     */
+    function within24(data1, data2){
+        //console.log(data1.appearedHour + " and " + data2.appearedHour + " and "
+        //    +data1.class + " and " + data2.class);
+        if(data1.appearedHour==data2.appearedHour
+            ||(data1.appearedHour-1)==data2.appearedHour
+            ||(data1.appearedHour==0&&data2.appearedHour==23)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Magic. Do not touch.
+     *
+     * @param data_1 The tuple the information is stored in
+     * @param data_2 The tuple that contains the cooccurence
+     */
+    function insert_id_to_int(data_1, data_2){
+        var str = 'cooccurCellId90_';
+        var int_1 = Math.floor(data_1.pokemonId/32);
+        var int_2 = Math.floor(data_2.pokemonId/32);
+        data_2[str + (int_1*32)] = data_2[str + (int_1*32)] | (1<<(data_1.pokemonID%32));
+        data_1[str + (int_2*32)] = data_1[str + (int_2*32)] | (1<<(data_2.pokemonId%32));
+    }
+
 })('undefined' !== typeof module ? module.exports : window);
