@@ -12,12 +12,12 @@
           "enabled": true
         },
         {
-          "key": "longitude",
+          "key": "latitude",
           "type": "numeric",
           "enabled": true
         },
         {
-          "key": "latitude",
+          "key": "longitude",
           "type": "numeric",
           "enabled": true
         },
@@ -358,6 +358,11 @@
       "path": "./feature_sources/population_density.js",
       "enabled": true,
       "features": [
+        {
+          "key": "population_density",
+          "type": "numeric",
+          "enabled": true
+        },
         {
           "key": "urban",
           "type": "nominal",
