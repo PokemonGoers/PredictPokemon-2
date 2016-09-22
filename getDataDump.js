@@ -3,7 +3,7 @@ var DS = require('./dataSet_creator.js').DC;
 var source = 'json/pokeDump_2.json';
 var destination = 'arff/dataDump_50k_training.arff';
 
-processDump(source, 0, 10000);
+processDump(source, 0, 50000);
 
 function processDump(_source, from_line, number_lines) {
     var data;

@@ -89,30 +89,31 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
         json_data.forEach(function (pokeEntry) {
             var dataRow = {};
             cnt++;
-            if(cnt%1000==0) console.log("Current tuple: " + cnt);
+            if (cnt % 1000 == 0) console.log("Current tuple: " + cnt);
 
             // add features for the configured feature sources
             featureSources.forEach(function (source) {
                 //console.log(source.featureKeys);
                 var values = source.module.getFeatures(source.featureKeys, pokeEntry);
 
-                if (values!="Error with request") {
+                if (values != "Error with request") {
                     source.features.forEach(function (feature) {
                         dataRow[feature.key] = values[feature.key];
                     });
-                } else dataRow=null;
+                } else dataRow = null;
             });
-            if (dataRow!=null)dataSet.push(dataRow);
+            if (dataRow != null)dataSet.push(dataRow);
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
-            // add the class label to the data row
-            if (consoleOn) console.log('adding class labels...');
-            classLables.reverse();
-            dataSet.forEach(function (dataRow) {
-                dataRow[classSource.classKey] = classLables.pop();
-            });
+        });
+        // add the class label to the data row
+        if (consoleOn) console.log('adding class labels...');
+        classLables.reverse();
+        dataSet.forEach(function (dataRow) {
+            dataRow[classSource.classKey] = classLables.pop();
+        });
 
-        })
+
         console.log("The var dataSet contains " + dataSet.length + " entries.")
 
         //compute co-occurence
@@ -156,25 +157,21 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             data[classSource.classKey] = classLables.pop();
         });
         var arff = "";
+        cnt = 0;
         finalData.forEach(function (data) {
             var values = [];
             for (var key in data) {
                 values.push(data[key])
             }
             arff += values.join(',') + '\n';
+            cnt++;
+            if(cnt%5000){
+                console.log("Writing...");
+                fs.appendFileSync(fileNamePath, arff, 'utf8');
+                arff="";
+                console.log("" + cnt + " instances written.");
+            }
         });
-        console.log("Writing...");
-        fs.appendFileSync(fileNamePath, arff, 'utf8');
-        dataSet = [];
-        console.log("" + cnt + " instances written.");
-
-        // post processing on existing features
-
-        // save weather data before other processing is done - this way we keep the data if the script crashes below
-        //if (consoleOn) console.log('creating post process features...');
-        //postProcessSources.forEach(function (postSource) {
-        //    dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
-        //});
 
 
     };
