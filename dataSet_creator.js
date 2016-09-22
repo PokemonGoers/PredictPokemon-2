@@ -124,55 +124,27 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
 
         var iter = 0;
         var finalData = [];
+        var arff="";
+        classLables.reverse();
         dataSet.forEach(function (pokeEntry) {
             var dataRow = pokeEntry;
             for(var i = 1; i <=151; i++){
                 dataRow['cooc_' + i] = (cooc[iter]["cooccurCellId90_" + (32*Math.floor(i/32))] & (1<<(i%32)))!==0;
             }
-            finalData.push(dataRow)
-            iter++;
-
-            if(iter%5000==0){
-                var arff = "";
-
-                finalData.forEach(function (data) {
-                    var values = [];
-                    for (var key in data) {
-                        values.push(data[key])
-                    }
-                    arff += values.join(',') + '\n';
-                });
-                console.log("Writing...");
-                console.log(arff.length);
-                fs.appendFileSync(fileNamePath, arff, 'utf8');
-                finalData = [];
-                console.log("" + iter + " instances written.");
-            }
-        });
-
-
-        if (consoleOn) console.log('adding class labels...');
-        classLables.reverse();
-        finalData.forEach(function (data) {
-            data[classSource.classKey] = classLables.pop();
-        });
-        var arff = "";
-        cnt = 0;
-        finalData.forEach(function (data) {
+            dataRow[classSource.classKey] = classLables.pop();
             var values = [];
-            for (var key in data) {
-                values.push(data[key])
+            for (var key in dataRow) {
+                values.push(dataRow[key])
             }
             arff += values.join(',') + '\n';
-            cnt++;
-            if(cnt%5000){
+            iter++;
+            if(iter%5000===0){
                 console.log("Writing...");
                 fs.appendFileSync(fileNamePath, arff, 'utf8');
                 arff="";
-                console.log("" + cnt + " instances written.");
+                console.log("" + iter + " instances written.");
             }
         });
-
 
     };
 
