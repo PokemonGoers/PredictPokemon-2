@@ -44,3 +44,5 @@ jspm_packages
 data_analysis/world.png
 json/pokestop_groups.json
 json/pokestops.json
+json/pokeDump_2_sorted.json
+arff/dataDump_50k_sorted.arff
