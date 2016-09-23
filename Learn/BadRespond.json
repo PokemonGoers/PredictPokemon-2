@@ -1,0 +1,46 @@
+
+{
+  "latitude":9.857945,
+  "longitude":-83.92087,
+  "timezone":"America/Costa_Rica",
+  "offset":-6,
+  "currently":
+  {
+    "time":1472781256,
+    "summary":"Clear",
+    "icon":"clear-night",
+    "precipType":"rain",
+    "temperature":66,
+    "apparentTemperature":66,
+    "dewPoint":63.91,
+    "humidity":0.93,
+    "windSpeed":5.09,
+    "windBearing":309,
+    "visibility":6.2
+  },
+  "hourly":{
+    "summary":"Clear throughout the day.",
+    "icon":"clear-day",
+    "data":[
+      {
+        "time":1472709600,
+        "summary":"Partly Cloudy",
+        "icon":"partly-cloudy-night",
+        "precipType":"rain",
+        "temperature":68,
+        "apparentTemperature":68,
+        "dewPoint":63.98,
+        "humidity":0.87,
+        "windSpeed":5,
+        "windBearing":350,
+        "visibility":6.2,
+        "cloudCover":0.31,
+        "pressure":1013.4
+      },{
+        "time":1472713200,
+        "summary":"Clear",
+        "icon":"clear-night",
+        "precipType":"rain","temperature":68,"apparentTemperature":68,"dewPoint":63.98,"humidity":0.87,"windSpeed":3,"windBearing":140,"visibility":6.2},{"time":1472716800,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":68,"apparentTemperature":68,"dewPoint":63.98,"humidity":0.87,"windSpeed":5,"windBearing":30},{"time":1472720400,"summary":"Partly Cloudy","icon":"partly-cloudy-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":63.91,"humidity":0.93,"windSpeed":3,"windBearing":100,"visibility":10,"cloudCover":0.31,"pressure":1012.4},{"time":1472724000,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":63.91,"humidity":0.93,"windSpeed":3,"windBearing":120},{"time":1472727600,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":62.98,"humidity":0.9,"windSpeed":5,"windBearing":10},{"time":1472731200,"summary":"Mostly Cloudy","icon":"partly-cloudy-day","precipType":"rain","temperature":66.14,"apparentTemperature":66.14,"dewPoint":64.33,"humidity":0.94,"windSpeed":1.29,"windBearing":192,"visibility":6.6,"cloudCover":0.61,"pressure":1012.89},{"time":1472734800,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":70.34,"apparentTemperature":70.34,"dewPoint":65.34,"humidity":0.84,"windSpeed":2,"windBearing":90,"visibility":6.2},{"time":1472738400,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":75.14,"apparentTemperature":75.14,"dewPoint":66.37,"humidity":0.74,"windSpeed":1.65,"windBearing":34,"visibility":6.2},{"time":1472742000,"summary":"Mostly Cloudy","icon":"partly-cloudy-day","precipType":"rain","temperature":79.62,"apparentTemperature":79.62,"dewPoint":66.1,"humidity":0.63,"windSpeed":2.56,"windBearing":168,"visibility":6.2,"cloudCover":0.78,"pressure":1012.88},{"time":1472745600,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":77.5,"apparentTemperature":77.5,"dewPoint":67.48,"humidity":0.71,"windSpeed":6.98,"windBearing":255,"visibility":6.2},{"time":1472749200,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":77.42,"apparentTemperature":77.42,"dewPoint":68.24,"humidity":0.73,"windSpeed":8.7,"windBearing":269,"visibility":6.2},{"time":1472752800,"summary":"Mostly Cloudy","icon":"partly-cloudy-day","precipType":"rain","temperature":75.14,"apparentTemperature":75.14,"dewPoint":66.37,"humidity":0.74,"windSpeed":8.74,"windBearing":246,"visibility":6.6,"cloudCover":0.78,"pressure":1011.93},{"time":1472756400,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":72.76,"apparentTemperature":72.76,"dewPoint":67.57,"humidity":0.84,"windSpeed":4.86,"windBearing":272,"visibility":4.47},{"time":1472760000,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":72.76,"apparentTemperature":72.76,"dewPoint":68.16,"humidity":0.86,"windSpeed":3.16,"windBearing":294,"visibility":4.47},{"time":1472763600,"summary":"Overcast","icon":"cloudy","precipType":"rain","temperature":72.76,"apparentTemperature":72.76,"dewPoint":69.14,"humidity":0.88,"windSpeed":4.49,"windBearing":261,"visibility":5.09,"cloudCover":0.97,"pressure":1011.67},{"time":1472767200,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":72.76,"apparentTemperature":72.76,"dewPoint":67.14,"humidity":0.83,"windSpeed":5.16,"windBearing":294,"visibility":5.53},{"time":1472770800,"summary":"Clear","icon":"clear-day","precipType":"rain","temperature":68.23,"apparentTemperature":68.23,"dewPoint":65.43,"humidity":0.91,"windSpeed":5.8,"windBearing":239,"visibility":2.17},{"time":1472774400,"summary":"Overcast","icon":"cloudy","precipType":"rain","temperature":67.99,"apparentTemperature":67.99,"dewPoint":65.57,"humidity":0.92,"windSpeed":2.93,"windBearing":330,"visibility":2.45,"cloudCover":1,"pressure":1014.72},{"time":1472778000,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":63.91,"humidity":0.93,"windSpeed":6,"windBearing":300,"visibility":6.2},{"time":1472781600,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":63.91,"humidity":0.93,"windSpeed":5,"windBearing":310,"visibility":6.2},{"time":1472785200,"summary":"Partly Cloudy","icon":"partly-cloudy-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":63.91,"humidity":0.93,"visibility":6.2,"cloudCover":0.31,"pressure":1016.8},{"time":1472788800,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":62.98,"humidity":0.9,"windSpeed":3,"windBearing":130,"visibility":6.2},{"time":1472792400,"summary":"Clear","icon":"clear-night","precipType":"rain","temperature":66,"apparentTemperature":66,"dewPoint":62.98,"humidity":0.9,"windSpeed":6,"windBearing":70}]
+  },
+  "daily":{
+    "data":[{"time":1472709600,"summary":"Clear throughout the day.","icon":"clear-day","sunriseTime":1472729279,"sunsetTime":1472773564,"moonPhase":0.02,"precipType":"rain","temperatureMin":66,"temperatureMinTime":1472792400,"temperatureMax":79.62,"temperatureMaxTime":1472742000,"apparentTemperatureMin":66,"apparentTemperatureMinTime":1472792400,"apparentTemperatureMax":79.62,"apparentTemperatureMaxTime":1472742000,"dewPoint":65.32,"humidity":0.86,"windSpeed":1.58,"windBearing":287,"visibility":5.78,"cloudCover":0.63,"pressure":1013.34}]},"flags":{"sources":["isd"],"isd-stations":["787620-99999","787640-99999","787670-99999","787935-99999","787945-99999"],"units":"us"}}

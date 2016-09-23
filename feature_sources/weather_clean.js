@@ -1,4 +1,4 @@
-var APIKeys = ['4e9bb2e33940272eeea09e0210886de0','49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0']//api keys will be stored here
+var APIKeys = ['4e9bb2e33940272eeea09e0210886de0']//api keys will be stored here//'49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0'
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest;
 var moment = require('moment-timezone');
@@ -8,16 +8,23 @@ var consoleOn = false;     //turns on/off console output
 var showErrors = true;
 var values;
 var temp = "emptyyet";
-var saveBad = false;       //save bad request answers not to repeat them
-var showSaveMessage = true;
+var saveBad = false;       //save bad request answers not to repeat them. by default true
+var saveGood = true;       //by default true
+var showSaveMessage = false;
+var reparseMsg = true;
+var showWhenNotCalled = true;//shows when API not called and cached data retrieved
+        //TODO ////////////////// What's with returned time? currentTime = local, forecast - UTC???//////////// odd
 
 (function (exports) {
     var module = exports.module = {};
-
+    var APIkey = WeatherApiKey;
+    var S2Level =          10;  //10 by def. 10.level is about 10*10km, 8 is about 48*48km, 23 is 1.4*1.4m(meters!)
+    var TimeFrameDividor = 2;   //2 by def. Divides 24h of the day by that number to get part of the day (timeFrame)
     module.getFeatures = function (keys, pokeEntry) {
+        var missing = [];
         values = {};
         var readBadRequest = false;
-        //S2_cell: level 11, time: 12 parts of the day
+        //S2_cell: level 10, time: 12 parts of the day
         var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
 
         var returnResponse = (function (keys, pokeEntry) {
@@ -65,61 +72,76 @@ var showSaveMessage = true;
             var date = new Date(pokeEntry.appearedLocalTime);
             var timestamp = Math.round(date.getTime() / 1000);
             //switching between API Keys here
-            var URL = 'https://api.darksky.net/forecast/'+APIKeys[WeatherApiKey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
+            var URL = 'https://api.darksky.net/forecast/'+APIKeys[APIkey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
             xhr.open('GET', URL, false);
             xhr.timeout=1500;
-            xhr.onTimeout = function(){                                                                     //TODO make timeout resend
+            xhr.onTimeout = function(){                                   //TODO make timeout resend
                 xhr.responseText="Timeout"
             }
             xhr.send();
             if (xhr.status != 200) {
-                console.log( "Error occured when making http request. /n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
+                console.log( "Error occured when making http request. \n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
             } else {
-                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO timeout reaction here
+                /*if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO timeout reaction here
                     WeatherApiKey++;                                                                                      //if API key gets blocked??
                     if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
                     makeRequest()
-                } else {
+                } else */ {
                     if (consoleOn) console.log(xhr.responseText);
                     var data = JSON.parse(xhr.responseText);
-                    j = 0;
+                    if (data.currently!=undefined&&data.timezone!=undefined&&data.currently.summary==undefined&&data.currently.windSpeed==undefined&&
+                        data.daily==undefined&&data.currently.temperature==undefined&&data.currently.humidity==undefined&&
+                        data.currently.windBearing==undefined&&data.currently.pressure==undefined&&data.currently.icon==undefined){
+                        if (APIkey<(APIKeys.length-1)) {
+                            APIkey++;                                                                                      //if API key gets blocked??
+                            console.log("Changed API Key to key No " + (APIkey + 1) + ". ");
+                            makeRequest()
+                        } else {
+                            values="Error with request";
+                            return values;
+                        }
+                    } /*else console.log(data.currently!=undefined+", "+data.timezone!=undefined+", "+data.currently.summary==undefined+", "+data.currently.windSpeed&&undefined+", "+
+                        data.daily==undefined+", "+data.currently.temperature==undefined+", "+data.currently.humidity==undefined+", "+
+                        data.currently.windBearing==undefined+", "+data.currently.pressure==undefined+", "+data.currently.icon==undefined)*/
+
+
                     if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
                         data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||data.currently.humidity==undefined||
                         data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
-                        var missing = []
-                        if (data.currently==undefined) missing.push("currently")
-                        if (data.timezone==undefined) missing.push("timezone")
-                        if (data.currently.summary==undefined) missing.push("currently.summary")
-                        if (data.currently.windSpeed==undefined) missing.push("currently.windSpeed")
-                        if (data.daily==undefined) missing.push("daily")
-                        if (data.daily.data[0]==undefined) missing.push("daily.data")
-                        if (data.currently.temperature==undefined) missing.push("temperature")
-                        if (data.currently.humidity==undefined) missing.push("currently.humidity")
-                        if (data.currently.windBearing==undefined) missing.push("currently.windBearing")
-                        if (data.currently.pressure==undefined) missing.push("currently.pressure")
-                        if (data.currently.icon==undefined) missing.push("currently.icon")
-                        if (tryToReparseXMLRespond(data, missing)==true) {
-                            parseXMLRespond(data);
-                            return values;
+                        missing = [];
+                        if (data.timezone == undefined) missing.push("timezone");
+                        if (data.currently == undefined) missing.push("currently");
+                        else {
+                            if (data.currently.summary == undefined) missing.push("currently.summary");
+                            if (data.currently.windSpeed == undefined) missing.push("currently.windSpeed");
+                            if (data.currently.temperature == undefined) missing.push("temperature");
+                            if (data.currently.humidity == undefined) missing.push("currently.humidity");
+                            if (data.currently.windBearing == undefined) missing.push("currently.windBearing");
+                            if (data.currently.pressure == undefined) missing.push("currently.pressure");
+                            if (data.currently.icon == undefined) missing.push("currently.icon");
                         }
+                        if (data.daily==undefined) missing.push("daily");
+                        else if (data.daily.data[0]==undefined) missing.push("daily.data");
 
-                        if (WeatherApiKey<(APIKeys.length-1)) {
-                            WeatherApiKey++;                                                                                      //if API key gets blocked??
-                            if (consoleOn) {
-                                console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");}
-                        } else {//data cannot be retrieved
-                            //console.log(xhr.responseText)
-                            values="Error with request"
-                            return values
+                        var tempData=tryToReparseXMLRespond(data, missing);
+                        if (tempData!=false) {
+                            if (reparseMsg) console.log("Reparsed data for " + missing + " successfully.")
+                            data = tempData;
+                            values = "gotReplacementData"
+                        } else {
+                            values="Error with request";
                         }
-                        makeRequest()
                     }
                     parseXMLRespond(data);
+                    //saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
                 }
             }
-            if (consoleOn)console.log("Weather API Called with key No "+(WeatherApiKey+1));
+            if (consoleOn)console.log("Weather API Called with key No "+(APIkey+1));
             if (values!="Error with request") CachedWeather[CacheKey] = temp;
-            else  if (saveBad) CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond"
+            else  if (saveBad) {
+                CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond"
+                BadServerResponds[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]=data;
+            }
         });
 
         if (!CachedWeather[CacheKey]) {
@@ -128,18 +150,22 @@ var showSaveMessage = true;
             } else {
                 readBadRequest = true
                 values = "Error with request"
-                if (consoleOn) console.log("Weather Api not called, loaded existing (bad) data")
+                if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
             }
             if (values=="Error with request"){ //Error -> return empty respond and go on
-                WeatherApiKey=0;
-                if (showErrors&&!readBadRequest) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", returning empty data and proceeding with further entries.")
-                if (saveBad&&(readBadRequest==false))saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+                APIkey=WeatherApiKey;
+                if (showErrors&&(readBadRequest==false)) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", failed to reparse bad respond, "+missing+" is missing.")
+                if (saveBad&&(readBadRequest==false)){
+                    //saveOldWeather('json/BadResponds.json', BadServerResponds, showSaveMessage);
+                    if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+                }
                 return values
             }
-            else saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);//not needed?
+            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
         }
-        else if (consoleOn) {console.log("Weather Api not called, loaded existing data");}
+        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
         returnResponse(keys, pokeEntry);//how? give the method nothing?
+        if (saveGood==false) CachedWeather={"":""}
         return values;
     };
 
@@ -164,12 +190,314 @@ var showSaveMessage = true;
                 sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
         }
     });
+    /**Try to find missing data in yet unused text from xhr.responseText*/
     var tryToReparseXMLRespond = (function (data, missing){
+        var error = false;
+        var summary, temperature, humidity, windSpeed, windBearing, pressure, icon, sunrise, sunset;
         missing.forEach(function(missed){
-
+            switch(missed){
+                case "timezone":{
+                    error = true;
+                    return false;//nowhere else to get data from
+                }
+                case "daily":{
+                    error = true;
+                    return false;//same
+                }
+                case "daily.data":{
+                    error = true;
+                    return false;//same
+                }
+                case "currently":{
+                    //for summary
+                    {
+                        if (data.hourly&&data.hourly.data) {
+                            for (var i = 0; i < data.hourly.data.length; i++) {
+                                if (data.hourly.data[i].summary)
+                                    summary = data.hourly.data[i].summary;
+                            }
+                        }
+                        if (summary==undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].summary)
+                                summary = data.daily.data[0].summary
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.summary=summary;
+                    }
+                    //for temperature
+                    {
+                        if (data.hourly&&data.hourly.data) {
+                            for (var i = 0; i < data.hourly.data.length; i++) {
+                                if (data.hourly.data[i].temperature)
+                                    temperature = data.hourly.data[i].temperature;
+                            }
+                        }
+                        if (temperature == undefined) {//data.hourly.data is missing as well or was empty
+                            if (data.daily && data.daily.data && data.daily.data.temperature) {
+                                temperature = daily.data.temperature;
+                            } else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.temperature=temperature;
+                    }
+                    //for humidity
+                    {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].humidity) {
+                                    humidity = data.hourly.data[i].humidity;
+                                    break;
+                                }
+                            }
+                        }
+                        if (humidity == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].humidity)
+                                humidity = data.daily.data[0].humidity;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.humidity=humidity;
+                    }
+                    //for windSpeed
+                    {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].windSpeed) {
+                                    windSpeed = data.hourly.data[i].windSpeed;
+                                    break;
+                                }
+                            }
+                        }
+                        if (windSpeed == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windSpeed)
+                                windSpeed = data.daily.data[0].windSpeed;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.windSpeed=windSpeed;
+                    }
+                    //for windBearing
+                    {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].windBearing) {
+                                    windBearing = data.hourly.data[i].windBearing;
+                                    break;
+                                }
+                            }
+                        }
+                        if (windBearing == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windBearing)
+                                windBearing = data.daily.data[0].windBearing;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.windBearing=windBearing;
+                    }
+                    //for pressure
+                    {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].pressure) {
+                                    pressure = data.hourly.data[i].pressure;
+                                    break;
+                                }
+                            }
+                        }
+                        if (pressure == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].pressure)
+                                pressure = data.daily.data[0].pressure;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.pressure=pressure;
+                    }
+                    //for icon
+                    {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].icon) {
+                                    icon = data.hourly.data[i].icon;
+                                    break;
+                                }
+                            }
+                        }
+                        if (icon == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].icon)
+                                icon = data.daily.data[0].icon;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.icon=icon;
+                    }
+                }
+                ///////////////////
+                case "currently.summary":{
+                    if (summary==undefined){
+                        if (data.hourly&&data.hourly.data) {
+                            for (var i = 0; i < data.hourly.data.length; i++) {
+                                if (data.hourly.data[i].summary) {
+                                    summary = data.hourly.data[i].summary;
+                                    break;
+                                }
+                            }
+                        }
+                        if (summary==undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].summary)
+                                summary = data.daily.data[0].summary
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.summary=summary;
+                    }
+                }
+                case "currently.windSpeed":{
+                    if (windSpeed==undefined){
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].windSpeed) {
+                                    windSpeed = data.hourly.data[i].windSpeed;
+                                    break;
+                                }
+                            }
+                        }
+                        if (windSpeed == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windSpeed)
+                                windSpeed = data.daily.data[0].windSpeed;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.windSpeed=windSpeed;
+                    }
+                }
+                case "currently.windBearing":{
+                    if (windBearing==undefined){
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].windBearing) {
+                                    windBearing = data.hourly.data[i].windBearing;
+                                    break;
+                                }
+                            }
+                        }
+                        if (windBearing == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windBearing)
+                                windBearing = data.daily.data[0].windBearing;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.windBearing=windBearing;
+                    }
+                }
+                case "temperature":{
+                    if (temperature==undefined){
+                        if (data.hourly&&data.hourly.data) {
+                            for (var i = 0; i < data.hourly.data.length; i++) {
+                                if (data.hourly.data[i].temperature) {
+                                    temperature = data.hourly.data[i].temperature;
+                                    break;
+                                }
+                            }
+                        }
+                        if (temperature == undefined) {//data.hourly.data is missing as well or was empty
+                            if (data.daily && data.daily.data && data.daily.data.temperature) {
+                                temperature = daily.data.temperature;
+                            } else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.temperature=temperature;
+                    }
+                }
+                case "currently.humidity":{
+                    if (humidity==undefined){
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].humidity) {
+                                    humidity = data.hourly.data[i].humidity;
+                                    break;
+                                }
+                            }
+                        }
+                        if (humidity == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].humidity)
+                                humidity = data.daily.data[0].humidity;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.humidity=humidity;
+                    }
+                }
+                case "currently.pressure":{
+                    if (pressure==undefined) {
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].pressure) {
+                                    pressure = data.hourly.data[i].pressure;
+                                    break;
+                                }
+                            }
+                        }
+                        if (pressure == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].pressure)
+                                pressure = data.daily.data[0].pressure;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                    }
+                    data.currently.pressure=pressure;
+                }
+                case "currently.icon":{
+                    if (icon==undefined){
+                        if (data.hourly && data.hourly.data) {
+                            for (var i = 0; i < data.hourly.length; i++) {
+                                if (data.hourly.data[i].icon) {
+                                    icon = data.hourly.data[i].icon;
+                                    break;
+                                }
+                            }
+                        }
+                        if (icon == undefined) {
+                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].icon)
+                                icon = data.daily.data[0].icon;
+                            else {
+                                error = true;
+                                return false;
+                            }
+                        }
+                        data.currently.icon=icon;
+                    }
+                }
+            }
         })
-        //TODO find replacement data
-        return false;
+        if (error) return false;
+        return data;//return true later
     });
     /**time features relating to the sunrise and sunset time*/
     var sunTimeFeatures = (function (sunTimestamp, currentTimestamp, timezone) {
@@ -186,11 +514,11 @@ var showSaveMessage = true;
         return momentDate.hours()*60 + momentDate.minutes()
     });
     var getS2Cell = (function(latitude, longitude){
-        var key = S2.latLngToKey(latitude, longitude, 11);
+        var key = S2.latLngToKey(latitude, longitude, S2Level);
         return S2.keyToId(key);
     })
     var getTime = (function(data){// 12 parts je 2 hours
         var date = new Date(data);
-        return (date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay()+"-dayPart:"+(date.getHours()/2).toFixed(0));
+        return (date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay()+"-dayPart:"+(date.getHours()/TimeFrameDividor).toFixed(0));
     });
 })('undefined' !== typeof module ? module.exports : window);

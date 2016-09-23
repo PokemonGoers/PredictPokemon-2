@@ -1,0 +1,317 @@
+{
+    "latitude": 37.775157,
+    "longitude": -122.441549,
+    "timezone": "America/Los_Angeles",
+    "offset": -7,
+    "currently": {
+        "time": 1472777584,
+        "summary": "Clear",
+        "icon": "clear-day",
+        "precipType": "rain",
+        "temperature": 59.42,
+        "apparentTemperature": 59.42,
+        "windSpeed": 11.13,
+        "windBearing": 240,
+        "pressure": 1013.53
+    },
+    "hourly": {
+        "summary": "Clear throughout the day.",
+        "icon": "clear-day",
+        "data": [
+            {
+                "time": 1472713200,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 58,
+                "apparentTemperature": 58,
+                "windSpeed": 4.33,
+                "windBearing": 204,
+                "pressure": 1014.1
+            },
+            {
+                "time": 1472716800,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 58.42,
+                "apparentTemperature": 58.42,
+                "windSpeed": 6.65,
+                "windBearing": 226,
+                "pressure": 1014
+            },
+            {
+                "time": 1472720400,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 57.42,
+                "apparentTemperature": 57.42,
+                "windSpeed": 5.51,
+                "windBearing": 248,
+                "pressure": 1014.1
+            },
+            {
+                "time": 1472724000,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 57,
+                "apparentTemperature": 57,
+                "windSpeed": 7.85,
+                "windBearing": 244,
+                "pressure": 1013.9
+            },
+            {
+                "time": 1472727600,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 56.42,
+                "apparentTemperature": 56.42,
+                "windSpeed": 9.47,
+                "windBearing": 254,
+                "pressure": 1013.8
+            },
+            {
+                "time": 1472731200,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 56.42,
+                "apparentTemperature": 56.42,
+                "windSpeed": 4.63,
+                "windBearing": 259,
+                "pressure": 1013.8
+            },
+            {
+                "time": 1472734800,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 56,
+                "apparentTemperature": 56,
+                "windSpeed": 6.6,
+                "windBearing": 242,
+                "pressure": 1014
+            },
+            {
+                "time": 1472738400,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 56,
+                "apparentTemperature": 56,
+                "windSpeed": 4.73,
+                "windBearing": 238,
+                "pressure": 1014.6
+            },
+            {
+                "time": 1472742000,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 56,
+                "apparentTemperature": 56,
+                "windSpeed": 5.52,
+                "windBearing": 272,
+                "pressure": 1015
+            },
+            {
+                "time": 1472745600,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 55.42,
+                "apparentTemperature": 55.42,
+                "windSpeed": 6.58,
+                "windBearing": 245,
+                "pressure": 1015.4
+            },
+            {
+                "time": 1472749200,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 56.83,
+                "apparentTemperature": 56.83,
+                "windSpeed": 4.95,
+                "windBearing": 246,
+                "pressure": 1015.9
+            },
+            {
+                "time": 1472752800,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 57.42,
+                "apparentTemperature": 57.42,
+                "windSpeed": 4.65,
+                "windBearing": 241,
+                "pressure": 1016
+            },
+            {
+                "time": 1472756400,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 58.42,
+                "apparentTemperature": 58.42,
+                "windSpeed": 4.6,
+                "windBearing": 243,
+                "pressure": 1015.8
+            },
+            {
+                "time": 1472760000,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 58.42,
+                "apparentTemperature": 58.42,
+                "windSpeed": 6.73,
+                "windBearing": 262,
+                "pressure": 1015.5
+            },
+            {
+                "time": 1472763600,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 58.83,
+                "apparentTemperature": 58.83,
+                "windSpeed": 5.4,
+                "windBearing": 245,
+                "pressure": 1015.3
+            },
+            {
+                "time": 1472767200,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "windSpeed": 9.24,
+                "windBearing": 230
+            },
+            {
+                "time": 1472770800,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 60,
+                "apparentTemperature": 60,
+                "windSpeed": 12.02,
+                "windBearing": 248,
+                "pressure": 1014.1
+            },
+            {
+                "time": 1472774400,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 59.42,
+                "apparentTemperature": 59.42,
+                "windSpeed": 11.67,
+                "windBearing": 254,
+                "pressure": 1013.8
+            },
+            {
+                "time": 1472778000,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "windSpeed": 11.1,
+                "windBearing": 239,
+                "pressure": 1013.5
+            },
+            {
+                "time": 1472781600,
+                "summary": "Clear",
+                "icon": "clear-day",
+                "precipType": "rain",
+                "temperature": 59,
+                "apparentTemperature": 59,
+                "windSpeed": 9.56,
+                "windBearing": 238,
+                "pressure": 1013.3
+            },
+            {
+                "time": 1472785200,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 58.42,
+                "apparentTemperature": 58.42,
+                "windSpeed": 3.5,
+                "windBearing": 215,
+                "pressure": 1013.2
+            },
+            {
+                "time": 1472788800,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 58.42,
+                "apparentTemperature": 58.42,
+                "windSpeed": 4.29,
+                "windBearing": 192,
+                "pressure": 1013.3
+            },
+            {
+                "time": 1472792400,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 57.83,
+                "apparentTemperature": 57.83,
+                "windSpeed": 5.44,
+                "windBearing": 163,
+                "pressure": 1013.6
+            },
+            {
+                "time": 1472796000,
+                "summary": "Clear",
+                "icon": "clear-night",
+                "precipType": "rain",
+                "temperature": 57.42,
+                "apparentTemperature": 57.42,
+                "windSpeed": 7.37,
+                "windBearing": 155,
+                "pressure": 1014.2
+            }
+        ]
+    },
+    "daily": {
+        "data": [
+            {
+                "time": 1472713200,
+                "summary": "Clear throughout the day.",
+                "icon": "clear-day",
+                "sunriseTime": 1472737307,
+                "sunsetTime": 1472784022,
+                "moonPhase": 0.02,
+                "precipType": "rain",
+                "temperatureMin": 55.42,
+                "temperatureMinTime": 1472745600,
+                "temperatureMax": 60,
+                "temperatureMaxTime": 1472770800,
+                "apparentTemperatureMin": 55.42,
+                "apparentTemperatureMinTime": 1472745600,
+                "apparentTemperatureMax": 60,
+                "apparentTemperatureMaxTime": 1472770800,
+                "windSpeed": 6.09,
+                "windBearing": 237,
+                "pressure": 1014.36
+            }
+        ]
+    },
+    "flags": {
+        "sources": [
+            "isd"
+        ],
+        "isd-stations": [
+            "994016-99999",
+            "998197-99999",
+            "998476-99999",
+            "998479-99999",
+            "999999-23272"
+        ],
+        "units": "us"
+    }
+}
