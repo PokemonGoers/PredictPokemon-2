@@ -42,3 +42,5 @@ jspm_packages
 # WebStorm
 .idea/
 data_analysis/world.png
+json/pokestop_groups.json
+json/pokestops.json

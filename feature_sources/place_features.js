@@ -4,6 +4,7 @@ var S2 = require('s2-geometry').S2;
 (function (exports) {
     var module = exports.module = {};
     var gymGroups = fileToJson('json/gym_groups.json').places;
+    var pokestopGroups = fileToJson('json/pokestop_groups.json').places;
 
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
@@ -13,30 +14,56 @@ var S2 = require('s2-geometry').S2;
      * @returns the values for the specified features by considering the given data.
      */
     module.getFeatures = function (keys, pokeEntry) {
+        var cellKey = S2.latLngToKey(pokeEntry.latitude, pokeEntry.longitude, 17);
+        var parts = cellKey.split('/');
+        var face = parseInt(parts[0]);
+        var position = parts[1];
+        var gymDistanceInKM = distanceToCell(pokeEntry.latitude, pokeEntry.longitude, face, position, gymGroups);
+        var pokestopDistanceInKM = distanceToCell(pokeEntry.latitude, pokeEntry.longitude, face, position, pokestopGroups);
         var values = {};
-        var distanceInKM = gymDistance(pokeEntry.latitude, pokeEntry.longitude);
 
         keys.forEach(function (key) {
             if(key === 'gymDistanceKm') {
-                values[key] = distanceInKM;
+                values[key] = gymDistanceInKM;
             }
             else if(key === 'gymIn100m') {
-                values[key] = distanceInKM <= 0.1;
+                values[key] = gymDistanceInKM <= 0.1;
             }
             else if(key === 'gymIn250m') {
-                values[key] = distanceInKM <= 0.25;
+                values[key] = gymDistanceInKM <= 0.25;
             }
             else if(key === 'gymIn500m') {
-                values[key] = distanceInKM <= 0.5;
+                values[key] = gymDistanceInKM <= 0.5;
             }
             else if(key === 'gymIn1000m') {
-                values[key] = distanceInKM <= 1.0;
+                values[key] = gymDistanceInKM <= 1.0;
             }
             else if(key === 'gymIn2500m') {
-                values[key] = distanceInKM <= 2.5;
+                values[key] = gymDistanceInKM <= 2.5;
             }
             else if(key === 'gymIn5000m') {
-                values[key] = distanceInKM <= 5.0;
+                values[key] = gymDistanceInKM <= 5.0;
+            }
+            else if(key === 'pokestopDistanceKm') {
+                values[key] = pokestopDistanceInKM;
+            }
+            else if(key === 'pokestopIn100m') {
+                values[key] = pokestopDistanceInKM <= 0.1;
+            }
+            else if(key === 'pokestopIn250m') {
+                values[key] = pokestopDistanceInKM <= 0.25;
+            }
+            else if(key === 'pokestopIn500m') {
+                values[key] = pokestopDistanceInKM <= 0.5;
+            }
+            else if(key === 'pokestopIn1000m') {
+                values[key] = pokestopDistanceInKM <= 1.0;
+            }
+            else if(key === 'pokestopIn2500m') {
+                values[key] = pokestopDistanceInKM <= 2.5;
+            }
+            else if(key === 'pokestopIn5000m') {
+                values[key] = pokestopDistanceInKM <= 5.0;
             }
             else {
                 console.log("The key " + key + " is not handled by the place feature source.");
@@ -47,20 +74,15 @@ var S2 = require('s2-geometry').S2;
         return values;
     };
 
-    function gymDistance(lat, lon) {
-        var cellKey = S2.latLngToKey(lat, lon, 17);
-        var parts = cellKey.split('/');
-        var face = parseInt(parts[0]);
-        var position = parts[1];
-        
-        if (!gymGroups.hasOwnProperty(face)) {
+    function distanceToCell(lat, lon, face, position, faces) {
+        if (!faces.hasOwnProperty(face)) {
             return 999999;
         }
-        
-        var placeArray = findPlaces(position, gymGroups[face], face, '');
+
+        var placeArray = findPlaces(position, faces[face], face, '');
         return getDistanceToPlace(lat, lon, placeArray);
     }
-    
+
     function findPlaces(testKeyPositions, cellGroup, face, cellParentPosition) {
         if (cellGroup.constructor === Array) {
             return cellGroup;

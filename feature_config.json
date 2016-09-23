@@ -424,6 +424,41 @@
           "key": "gymIn5000m",
           "type": "nominal",
           "enabled": true
+        },
+        {
+          "key": "pokestopDistanceKm",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn100m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn250m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn500m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn1000m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn2500m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn5000m",
+          "type": "nominal",
+          "enabled": true
         }
       ]
     }
