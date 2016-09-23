@@ -343,7 +343,7 @@
     {
       "name": "Co-occurrence Features",
       "path": "./feature_sources/co-occurrence_post-features.js",
-      "enabled": true,
+      "enabled": false,
       "post_process": true,
       "features": [
         {

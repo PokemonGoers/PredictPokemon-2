@@ -4,15 +4,15 @@ var xhr = new XMLHttpRequest;
 var moment = require('moment-timezone');
 var S2 = require('s2-geometry').S2;
 var util = require('util')
-var consoleOn = false;     //turns on/off console output
-var showErrors = true;
+var consoleOn = false;          //turns on/off console output
+var showSaveMessage = false;    //show msg when weather is being saved to external file
+var showErrors = true;          //obvious
+var showReparseMsg = true;      //show msg when corrupt respond was being reparsed
+var showWhenNotCalled = false;  //shows when API not called and cached data retrieved
+var saveBad = false;            //save bad request answers not to repeat them. by default true
+var saveGood = true;            //by default true
 var values;
 var temp = "emptyyet";
-var saveBad = false;       //save bad request answers not to repeat them. by default true
-var saveGood = true;       //by default true
-var showSaveMessage = false;
-var reparseMsg = true;
-var showWhenNotCalled = true;//shows when API not called and cached data retrieved
         //TODO ////////////////// What's with returned time? currentTime = local, forecast - UTC???//////////// odd
 
 (function (exports) {
@@ -27,7 +27,32 @@ var showWhenNotCalled = true;//shows when API not called and cached data retriev
         //S2_cell: level 10, time: 12 parts of the day
         var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
 
-        var returnResponse = (function (keys, pokeEntry) {
+        if (!CachedWeather[CacheKey]) {
+            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
+                makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
+            } else {
+                readBadRequest = true
+                values = "Error with request"
+                if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
+            }
+            if (values=="Error with request"){ //Error -> return empty respond and go on
+                APIkey=WeatherApiKey;
+                if (showErrors&&(readBadRequest==false)) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", failed to reparse bad respond, "+missing+" is missing.")
+                if (saveBad&&(readBadRequest==false)){
+                    //saveOldWeather('json/BadResponds.json', BadServerResponds, showSaveMessage);
+                    if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+                }
+                return values
+            }
+            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+        }
+        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
+        returnResponse(keys);//how? give the method nothing?
+        if (saveGood==false) CachedWeather={"":""}
+        return values;
+
+
+        var returnResponse = (function (keys) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
             keys.forEach(function (key) {
                 if (key === "city") {
@@ -83,28 +108,25 @@ var showWhenNotCalled = true;//shows when API not called and cached data retriev
                 console.log( "Error occured when making http request. \n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
             } else {
                 /*if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO timeout reaction here
-                    WeatherApiKey++;                                                                                      //if API key gets blocked??
-                    if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
-                    makeRequest()
-                } else */ {
+                 WeatherApiKey++;                                                                                      //if API key gets blocked??
+                 if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
+                 makeRequest()
+                 } else */ {
                     if (consoleOn) console.log(xhr.responseText);
                     var data = JSON.parse(xhr.responseText);
                     if (data.currently!=undefined&&data.timezone!=undefined&&data.currently.summary==undefined&&data.currently.windSpeed==undefined&&
                         data.daily==undefined&&data.currently.temperature==undefined&&data.currently.humidity==undefined&&
                         data.currently.windBearing==undefined&&data.currently.pressure==undefined&&data.currently.icon==undefined){
-                        if (APIkey<(APIKeys.length-1)) {
-                            APIkey++;                                                                                      //if API key gets blocked??
-                            console.log("Changed API Key to key No " + (APIkey + 1) + ". ");
-                            makeRequest()
-                        } else {
+                        if (showErrors) console.log("Respond from weather server contains no weather")
+                        /*if (APIkey<(APIKeys.length-1)) {
+                         APIkey++;                                                                  //happens seldomly
+                         console.log("Changed API Key to key No " + (APIkey + 1) + ". ");
+                         makeRequest()
+                         } else*/ {
                             values="Error with request";
                             return values;
                         }
-                    } /*else console.log(data.currently!=undefined+", "+data.timezone!=undefined+", "+data.currently.summary==undefined+", "+data.currently.windSpeed&&undefined+", "+
-                        data.daily==undefined+", "+data.currently.temperature==undefined+", "+data.currently.humidity==undefined+", "+
-                        data.currently.windBearing==undefined+", "+data.currently.pressure==undefined+", "+data.currently.icon==undefined)*/
-
-
+                    }
                     if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
                         data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||data.currently.humidity==undefined||
                         data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
@@ -125,7 +147,7 @@ var showWhenNotCalled = true;//shows when API not called and cached data retriev
 
                         var tempData=tryToReparseXMLRespond(data, missing);
                         if (tempData!=false) {
-                            if (reparseMsg) console.log("Reparsed data for " + missing + " successfully.")
+                            if (showReparseMsg) console.log("Reparsed data for " + missing + " successfully.")
                             data = tempData;
                             values = "gotReplacementData"
                         } else {
@@ -144,29 +166,7 @@ var showWhenNotCalled = true;//shows when API not called and cached data retriev
             }
         });
 
-        if (!CachedWeather[CacheKey]) {
-            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
-                makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
-            } else {
-                readBadRequest = true
-                values = "Error with request"
-                if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
-            }
-            if (values=="Error with request"){ //Error -> return empty respond and go on
-                APIkey=WeatherApiKey;
-                if (showErrors&&(readBadRequest==false)) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", failed to reparse bad respond, "+missing+" is missing.")
-                if (saveBad&&(readBadRequest==false)){
-                    //saveOldWeather('json/BadResponds.json', BadServerResponds, showSaveMessage);
-                    if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
-                }
-                return values
-            }
-            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
-        }
-        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
-        returnResponse(keys, pokeEntry);//how? give the method nothing?
-        if (saveGood==false) CachedWeather={"":""}
-        return values;
+
     };
 
 
