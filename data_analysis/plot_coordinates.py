@@ -12,8 +12,8 @@ def plot(lats, lons, title):
     plt.show()
 
 #filename = 'pokestops.json'
-filename = '../json/pokeDump_2.json'
-plotname = 'Pokemon in data dump'
+filename = '../json/pokestops.json'
+plotname = 'Pokestop'
 
 def extract_latlon(coordiantes):
     lats = [c['latitude'] for c in coordiantes]

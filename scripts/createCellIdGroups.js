@@ -6,7 +6,7 @@ var S2 = require('s2-geometry').S2;
 var fs = require('fs');
 
 // add two times 1 to handle face of s2 key separately from s2 key parts
-const s2levels = [1,1,2,3,4,6,8,10,12,13,14,17];
+const s2levels = [1,1,2,3,4,6,8,10,12,13,14,15,17];
 const lastLevel = s2levels[s2levels.length - 1];
 var s2levelIndices = s2levels.reduce(function(object, value, i) {
     object[i] = value;
@@ -83,10 +83,12 @@ function printCellCount(places, indent) {
     }
 }
 
-createCellIdGroups('../json/gyms.json', '../json/gym_groups.json');
+var src = '../json/pokestops.json';
+var out = '../json/pokestop_groups.json';
+createCellIdGroups(src, out);
 
 // create log file to see cell counts
-var file = fs.readFileSync('../json/gym_groups.json', 'utf8');
+var file = fs.readFileSync(out, 'utf8');
 var cellGroups = JSON.parse(file);
 var text = printCellCount(cellGroups.places, '');
-fs.writeFileSync('../json/cellGroup.log', text, 'utf8');
+fs.writeFileSync('../json/cellGroup-pokestop.log', text, 'utf8');
