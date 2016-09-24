@@ -10,7 +10,7 @@ var util = require('util')
 var consoleOn = false;          //turns on/off console output
 var showSaveMessage = false;    //show msg when weather is being saved to external file
 var showErrors = false;         //obvious
-var showReparseMsg = true;      //show msg when corrupt respond was being reparsed
+var showReparseMsg = false;     //show msg when corrupt respond was being reparsed
 var showWhenNotCalled = false;  //shows when API not called and cached data retrieved
 var saveBad = true;             //save bad request answers not to repeat them. by default true
 var saveGood = true;            //by default true
@@ -29,6 +29,7 @@ var temp = "emptyyet";
         var readBadRequest = false;
         //S2_cell: level 10, time: 12 parts of the day
         var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);
+
         var returnResponse = (function (keys) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
             keys.forEach(function (key) {
@@ -67,6 +68,7 @@ var temp = "emptyyet";
                 }
             })
         });
+
         var makeRequest = (function () {
             var date = new Date(pokeEntry.appearedLocalTime);
             var timestamp = Math.round(date.getTime() / 1000);
@@ -135,11 +137,12 @@ var temp = "emptyyet";
                             values = "gotReplacementData"
                         } else {
                             values="Error with request";
+        //saveOldWeather('json/BadRespond.json', data, true);//fur debugging
                             return values;
                         }
                     }
                     parseXMLRespond(data);
-                    saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
+                    //saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
                 }
             }
             if (consoleOn)console.log("Weather API Called with key No "+(APIkey+1));

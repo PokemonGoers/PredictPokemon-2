@@ -25,7 +25,6 @@ WeatherApiKeyCounter=0;
         if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
         CachedWeather = fileToJson('json/CachedWeather.json');
-
         featureSources = [];
         postProcessSources = [];
         classSource = null;
