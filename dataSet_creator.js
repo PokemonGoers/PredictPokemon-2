@@ -2,7 +2,7 @@ var fs = require('fs');
 var tzwhere = require('tzwhere');
 WeatherApiKey = 0;// Identifies which API Key is used right now. Has to be here to be global
 CachedWeather= {"Aye aye,":"captain"};
-BadServerResponds={"Hope it will ":"stay empty"};//TODO delete it after testing
+WeatherApiKeyCounter=0;
 
 (function (exports) {
     var DC = exports.DC = {};

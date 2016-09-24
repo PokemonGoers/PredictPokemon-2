@@ -1,4 +1,7 @@
-var APIKeys = ['4e9bb2e33940272eeea09e0210886de0']//api keys will be stored here//'49b8958cdb735261a244a5cb0edbf9a7','57e3c5edfc29d014491232d0ffb99aa0'
+var APIKeys = [
+    '49b8958cdb735261a244a5cb0edbf9a7',
+    '57e3c5edfc29d014491232d0ffb99aa0',
+    '4e9bb2e33940272eeea09e0210886de0']//api keys stored here//
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest;
 var moment = require('moment-timezone');
@@ -6,52 +9,26 @@ var S2 = require('s2-geometry').S2;
 var util = require('util')
 var consoleOn = false;          //turns on/off console output
 var showSaveMessage = false;    //show msg when weather is being saved to external file
-var showErrors = true;          //obvious
+var showErrors = false;         //obvious
 var showReparseMsg = true;      //show msg when corrupt respond was being reparsed
 var showWhenNotCalled = false;  //shows when API not called and cached data retrieved
-var saveBad = false;            //save bad request answers not to repeat them. by default true
+var saveBad = true;             //save bad request answers not to repeat them. by default true
 var saveGood = true;            //by default true
+var switchKeys = false;         //turns on/off switching keys after 1000 requests
 var values;
 var temp = "emptyyet";
-        //TODO ////////////////// What's with returned time? currentTime = local, forecast - UTC???//////////// odd
 
 (function (exports) {
     var module = exports.module = {};
     var APIkey = WeatherApiKey;
-    var S2Level =          10;  //10 by def. 10.level is about 10*10km, 8 is about 48*48km, 23 is 1.4*1.4m(meters!)
-    var TimeFrameDividor = 2;   //2 by def. Divides 24h of the day by that number to get part of the day (timeFrame)
+    var S2Level =          9;  //10 by def. 10.level is about 10*10km, 9 is 23*23km, 8 is 46*46km, 23 is 1.4*1.4m(meters!)
+    var TimeFrameDividor = 3;   //2 by def. Divides 24h of the day by that number to get part of the day (timeFrame)
     module.getFeatures = function (keys, pokeEntry) {
         var missing = [];
         values = {};
         var readBadRequest = false;
         //S2_cell: level 10, time: 12 parts of the day
-        var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);                                                            //turns on/off console output
-
-        if (!CachedWeather[CacheKey]) {
-            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
-                makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime); //TODO appearedOn or appearedlocaltime?
-            } else {
-                readBadRequest = true
-                values = "Error with request"
-                if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
-            }
-            if (values=="Error with request"){ //Error -> return empty respond and go on
-                APIkey=WeatherApiKey;
-                if (showErrors&&(readBadRequest==false)) console.log("Bad server respond for entry: "+pokeEntry["_id"]+", failed to reparse bad respond, "+missing+" is missing.")
-                if (saveBad&&(readBadRequest==false)){
-                    //saveOldWeather('json/BadResponds.json', BadServerResponds, showSaveMessage);
-                    if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
-                }
-                return values
-            }
-            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
-        }
-        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
-        returnResponse(keys);//how? give the method nothing?
-        if (saveGood==false) CachedWeather={"":""}
-        return values;
-
-
+        var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);
         var returnResponse = (function (keys) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
             keys.forEach(function (key) {
@@ -63,84 +40,90 @@ var temp = "emptyyet";
                     values[key] = CachedWeather[CacheKey][2];
                 } else if (key === "temperature") {
                     values[key] = CachedWeather[CacheKey][3];
-                } else if (key === "humidity") {
-                    values[key] = CachedWeather[CacheKey][4];
                 } else if (key === "windSpeed") {
-                    values[key] = CachedWeather[CacheKey][5];
+                    values[key] = CachedWeather[CacheKey][4];
                 } else if (key === "windBearing") {
-                    values[key] = CachedWeather[CacheKey][6];
+                    values[key] = CachedWeather[CacheKey][5];
                 } else if (key === "pressure") {
-                    values[key] = CachedWeather[CacheKey][7];
+                    values[key] = CachedWeather[CacheKey][6];
                 } else if (key === "weatherIcon") {
-                    values[key] = CachedWeather[CacheKey][8];
+                    values[key] = CachedWeather[CacheKey][7];
                 } else if (key === "sunriseMinutesMidnight") {
-                    values[key] = CachedWeather[CacheKey][9];
+                    values[key] = CachedWeather[CacheKey][8];
                 } else if (key === "sunriseHour") {
-                    values[key] = CachedWeather[CacheKey][10];
+                    values[key] = CachedWeather[CacheKey][9];
                 } else if (key === "sunriseMinute") {
-                    values[key] = CachedWeather[CacheKey][11];
+                    values[key] = CachedWeather[CacheKey][10];
                 } else if (key === "sunriseMinutesSince") {
-                    values[key] = CachedWeather[CacheKey][12];
+                    values[key] = CachedWeather[CacheKey][11];
                 } else if (key === "sunsetMinutesMidnight") {
-                    values[key] = CachedWeather[CacheKey][13];
+                    values[key] = CachedWeather[CacheKey][12];
                 } else if (key === "sunsetHour") {
-                    values[key] = CachedWeather[CacheKey][14];
+                    values[key] = CachedWeather[CacheKey][13];
                 } else if (key === "sunsetMinute") {
-                    values[key] = CachedWeather[CacheKey][15];
+                    values[key] = CachedWeather[CacheKey][14];
                 } else if (key === "sunsetMinutesBefore") {
-                    values[key] = CachedWeather[CacheKey][16];
+                    values[key] = CachedWeather[CacheKey][15];
                 }
             })
         });
-
         var makeRequest = (function () {
             var date = new Date(pokeEntry.appearedLocalTime);
             var timestamp = Math.round(date.getTime() / 1000);
             //switching between API Keys here
+            if (switchKeys) {
+                WeatherApiKeyCounter++;
+                if (WeatherApiKeyCounter > 1000) {
+                    WeatherApiKey++;
+                    if (WeatherApiKey < (APIKeys.length - 1)) { //if there is still unused key
+                        WeatherApiKeyCounter = 0;
+                    }
+                    else {                                  //if there is not, point on unexisting key
+                        showErrors = true;//so that you see when it happens
+                    }
+                }
+            }
             var URL = 'https://api.darksky.net/forecast/'+APIKeys[APIkey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
             xhr.open('GET', URL, false);
             xhr.timeout=1500;
-            xhr.onTimeout = function(){                                   //TODO make timeout resend
+            xhr.onTimeout = function(){
                 xhr.responseText="Timeout"
+                xhr.send()
             }
             xhr.send();
             if (xhr.status != 200) {
                 console.log( "Error occured when making http request. \n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
             } else {
-                /*if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) {//TODO timeout reaction here
-                 WeatherApiKey++;                                                                                      //if API key gets blocked??
-                 if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
-                 makeRequest()
-                 } else */ {
+                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) { //if API key gets blocked??
+                    WeatherApiKey++;
+                    if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
+                    makeRequest()
+                } else  {
                     if (consoleOn) console.log(xhr.responseText);
                     var data = JSON.parse(xhr.responseText);
-                    if (data.currently!=undefined&&data.timezone!=undefined&&data.currently.summary==undefined&&data.currently.windSpeed==undefined&&
-                        data.daily==undefined&&data.currently.temperature==undefined&&data.currently.humidity==undefined&&
-                        data.currently.windBearing==undefined&&data.currently.pressure==undefined&&data.currently.icon==undefined){
-                        if (showErrors) console.log("Respond from weather server contains no weather")
-                        /*if (APIkey<(APIKeys.length-1)) {
-                         APIkey++;                                                                  //happens seldomly
-                         console.log("Changed API Key to key No " + (APIkey + 1) + ". ");
-                         makeRequest()
-                         } else*/ {
-                            values="Error with request";
-                            return values;
+                    if (data.currently!=undefined&&data.timezone!=undefined&&data.currently.summary==undefined&&
+                        data.currently.windSpeed==undefined&&data.daily==undefined&&data.currently.temperature==undefined&&
+                        data.currently.windBearing==undefined&&data.currently.pressure==undefined&&data.currently.icon==undefined) {
+                        if (showErrors) {
+                            console.log("Respond from weather server contains no weather")
                         }
+                        values = "Error with request";
+                        missing.push("everything");
+                        return values;
                     }
                     if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
-                        data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||data.currently.humidity==undefined||
+                        data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||
                         data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
                         missing = [];
                         if (data.timezone == undefined) missing.push("timezone");
                         if (data.currently == undefined) missing.push("currently");
                         else {
-                            if (data.currently.summary == undefined) missing.push("currently.summary");
-                            if (data.currently.windSpeed == undefined) missing.push("currently.windSpeed");
+                            if (data.currently.summary == undefined) missing.push("summary");
+                            if (data.currently.windSpeed == undefined) missing.push("windSpeed");
                             if (data.currently.temperature == undefined) missing.push("temperature");
-                            if (data.currently.humidity == undefined) missing.push("currently.humidity");
-                            if (data.currently.windBearing == undefined) missing.push("currently.windBearing");
-                            if (data.currently.pressure == undefined) missing.push("currently.pressure");
-                            if (data.currently.icon == undefined) missing.push("currently.icon");
+                            if (data.currently.windBearing == undefined) missing.push("windBearing");
+                            if (data.currently.pressure == undefined) missing.push("pressure");
+                            if (data.currently.icon == undefined) missing.push("icon");
                         }
                         if (data.daily==undefined) missing.push("daily");
                         else if (data.daily.data[0]==undefined) missing.push("daily.data");
@@ -152,21 +135,49 @@ var temp = "emptyyet";
                             values = "gotReplacementData"
                         } else {
                             values="Error with request";
+                            return values;
                         }
                     }
                     parseXMLRespond(data);
-                    //saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
+                    saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
                 }
             }
             if (consoleOn)console.log("Weather API Called with key No "+(APIkey+1));
-            if (values!="Error with request") CachedWeather[CacheKey] = temp;
-            else  if (saveBad) {
-                CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond"
-                BadServerResponds[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]=data;
+            if (values!="Error with request") {
+                CachedWeather[CacheKey] = temp;
             }
         });
 
-
+        if (!CachedWeather[CacheKey]) {
+            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
+                makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime);
+            } else {
+                readBadRequest = true
+                values = "Error with request"
+                if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
+            }
+            if (values=="Error with request"&&saveBad) {
+                CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond, "+
+                    missing+" is missing."
+            }
+            if (values=="Error with request"){ //Error -> return empty respond and go on
+                APIkey=WeatherApiKey;
+                if (readBadRequest==false) {
+                    if (showErrors) {
+                        console.log("Bad server respond for entry: " + pokeEntry["_id"] + ", failed to reparse bad respond, " + missing + " is missing.")
+                    }
+                    if (saveBad) {
+                        saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+                    }
+                }
+                return values
+            }
+            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+        }
+        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
+        returnResponse(keys);//how? give the method nothing?
+        if (saveGood==false) CachedWeather={"":""}
+        return values;
     };
 
 
@@ -184,7 +195,7 @@ var temp = "emptyyet";
             var sunset = sunTimeFeatures(data.daily.data[0].sunsetTime, data.currently.time, data.timezone);
 
             temp = [city, continent, data.currently.summary.replace(/\s+/g, ''),
-                ((data.currently.temperature - 32) / 1.8).toFixed(1), data.currently.humidity,
+                ((data.currently.temperature - 32) / 1.8).toFixed(1),
                 data.currently.windSpeed, data.currently.windBearing, data.currently.pressure, data.currently.icon,
                 sunrise.minutesSinceMidnight, sunrise.hour, sunrise.minute, sunrise.minutesSince,
                 sunset.minutesSinceMidnight, sunset.hour, sunset.minute, -sunset.minutesSince/* -minutesSince to get the time before*/];
@@ -193,7 +204,7 @@ var temp = "emptyyet";
     /**Try to find missing data in yet unused text from xhr.responseText*/
     var tryToReparseXMLRespond = (function (data, missing){
         var error = false;
-        var summary, temperature, humidity, windSpeed, windBearing, pressure, icon, sunrise, sunset;
+        var summary, temperature, windSpeed, windBearing, pressure, icon;
         missing.forEach(function(missed){
             switch(missed){
                 case "timezone":{
@@ -244,26 +255,6 @@ var temp = "emptyyet";
                             }
                         }
                         data.currently.temperature=temperature;
-                    }
-                    //for humidity
-                    {
-                        if (data.hourly && data.hourly.data) {
-                            for (var i = 0; i < data.hourly.length; i++) {
-                                if (data.hourly.data[i].humidity) {
-                                    humidity = data.hourly.data[i].humidity;
-                                    break;
-                                }
-                            }
-                        }
-                        if (humidity == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].humidity)
-                                humidity = data.daily.data[0].humidity;
-                            else {
-                                error = true;
-                                return false;
-                            }
-                        }
-                        data.currently.humidity=humidity;
                     }
                     //for windSpeed
                     {
@@ -347,7 +338,7 @@ var temp = "emptyyet";
                     }
                 }
                 ///////////////////
-                case "currently.summary":{
+                case "summary":{
                     if (summary==undefined){
                         if (data.hourly&&data.hourly.data) {
                             for (var i = 0; i < data.hourly.data.length; i++) {
@@ -368,7 +359,7 @@ var temp = "emptyyet";
                         data.currently.summary=summary;
                     }
                 }
-                case "currently.windSpeed":{
+                case "windSpeed":{
                     if (windSpeed==undefined){
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
@@ -389,7 +380,7 @@ var temp = "emptyyet";
                         data.currently.windSpeed=windSpeed;
                     }
                 }
-                case "currently.windBearing":{
+                case "windBearing":{
                     if (windBearing==undefined){
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
@@ -431,28 +422,7 @@ var temp = "emptyyet";
                         data.currently.temperature=temperature;
                     }
                 }
-                case "currently.humidity":{
-                    if (humidity==undefined){
-                        if (data.hourly && data.hourly.data) {
-                            for (var i = 0; i < data.hourly.length; i++) {
-                                if (data.hourly.data[i].humidity) {
-                                    humidity = data.hourly.data[i].humidity;
-                                    break;
-                                }
-                            }
-                        }
-                        if (humidity == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].humidity)
-                                humidity = data.daily.data[0].humidity;
-                            else {
-                                error = true;
-                                return false;
-                            }
-                        }
-                        data.currently.humidity=humidity;
-                    }
-                }
-                case "currently.pressure":{
+                case "pressure":{
                     if (pressure==undefined) {
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
@@ -473,7 +443,7 @@ var temp = "emptyyet";
                     }
                     data.currently.pressure=pressure;
                 }
-                case "currently.icon":{
+                case "icon":{
                     if (icon==undefined){
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
@@ -497,7 +467,7 @@ var temp = "emptyyet";
             }
         })
         if (error) return false;
-        return data;//return true later
+        return data;
     });
     /**time features relating to the sunrise and sunset time*/
     var sunTimeFeatures = (function (sunTimestamp, currentTimestamp, timezone) {
@@ -517,8 +487,9 @@ var temp = "emptyyet";
         var key = S2.latLngToKey(latitude, longitude, S2Level);
         return S2.keyToId(key);
     })
-    var getTime = (function(data){// 12 parts je 2 hours
-        var date = new Date(data);
-        return (date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay()+"-dayPart:"+(date.getHours()/TimeFrameDividor).toFixed(0));
-    });
+    function getTime(time){
+        var newDate = new Date(time);
+        return (newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"-dayPart:"+
+        (newDate.getUTCHours()/TimeFrameDividor).toFixed(0));
+    }//TODO find out why I have to use (newDate.getMonth()+1) for month to be right
 })('undefined' !== typeof module ? module.exports : window);
