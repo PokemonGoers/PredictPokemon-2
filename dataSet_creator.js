@@ -97,15 +97,18 @@ CachedWeatherResponses = {"empty":"json file"};//for API Request results storage
             //addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
+            var errorFlag=false;
             featureSources.forEach(function (source) {
-                var values = source.module.getFeatures(source.featureKeys, pokeEntry);
-                if (values != "Error with request") {
-                    source.features.forEach(function (feature) {
-                        dataRow[feature.key] = values[feature.key];
-                    });
-                } else dataRow = null;
+                if(!errorFlag){
+                    var values = source.module.getFeatures(source.featureKeys, pokeEntry);
+                    if (values != "Error with request") {
+                        source.features.forEach(function (feature) {
+                            dataRow[feature.key] = values[feature.key];
+                        });
+                    } else errorFlag=true;
+                }
             });
-            if (dataRow != null)dataSet.push(dataRow);
+            if (!errorFlag)dataSet.push(dataRow);
 
             var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
             classLables.push(classLabel[classSource.classKey]);
