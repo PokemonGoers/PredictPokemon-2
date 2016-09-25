@@ -250,8 +250,8 @@
     },
     {
       "name": "Weather Features",
-      "path": "./feature_sources/weather_features.js",
-      "enabled": false,
+      "path": "./feature_sources/weather_clean.js",
+      "enabled": true,
       "features": [
         {
           "key": "city",
@@ -270,11 +270,6 @@
         },
         {
           "key": "temperature",
-          "type": "numeric",
-          "enabled": true
-        },
-        {
-          "key": "humidity",
           "type": "numeric",
           "enabled": true
         },
