@@ -41,6 +41,29 @@ function predict(lat, lon, timestamp) {
         return exec(cmd);
     }
 
+    /**
+     * parse the weka output and return an array of the predicted class label and the corresponding confidence
+     * for all entries in the tested data set
+     * @param wekaOutput
+     * @return {Array} array of prediction objects which contain the class label and the corresponding confidence
+     */
+    function parsePredictionOutput(wekaOutput) {
+        var predictions = [];
+
+        var lines = wekaOutput.split('\n');
+        if (lines.length > 5) {
+            lines.slice(5, -2).forEach(function (line) {
+                var components = line.split(',');
+                predictions.push({
+                    "classLabel": components[2].split(':')[1],
+                    "confidence": components[4]
+                });
+            });
+        }
+
+        return predictions;
+    }
+
     trainModel()
         .then(function (result) {
             console.log('-- training completed');
@@ -52,6 +75,10 @@ function predict(lat, lon, timestamp) {
             console.log('-- test completed');
             // console.log('-- test stderr: ' + result.stderr);
             console.log('-- test stdout: ' + result.stdout);
+            var predictions = parsePredictionOutput(result.stdout);
+            predictions.forEach(function (prediction) {
+                console.log('class: ' + prediction.classLabel + ', confidence: ' +prediction.confidence);
+            })
         })
         .catch(function (err) {
             console.error('ERROR: ', err);
