@@ -8,7 +8,7 @@
       "features": [
         {
           "key": "pokemonId",
-          "type": "numeric",
+          "type": "nominal",
           "enabled": true
         },
         {
