@@ -2,6 +2,7 @@
  * Created by Benjamin on 07.10.2016.
  */
 var exec = require('child-process-promise').exec;
+var S2 = require('s2-geometry').S2;
 
 predict(0, 0, 0);
 
@@ -63,6 +64,78 @@ function predict(lat, lon, timestamp) {
 
         return predictions;
     }
+
+    /**
+     * create coordinates for a 9x9 grid with the given coordinate in the center
+     * @param latitude
+     * @param longitude
+     */
+    function createGridLocation(latitude, longitude) {
+        const gridDistance = 0.25;  // 250m grid distance -> 2km for 9 grids from the center
+        var locations = [];
+
+        for(var dx = -4; i <= 4; i++) {
+            for(var dy = -4; i <= 4; i++) {
+                // from http://stackoverflow.com/a/7478827
+                var new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
+                var new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / cos(latitude * Math.PI/180);
+                locations.push({
+                    "latitude": new_latitude,
+                    "longitude": new_longitude
+                });
+            }
+        }
+
+        return locations;
+    }
+
+    function latLon(key) {
+        var latLon = S2.keyToLatLng(key);
+        return latLon.lat + ', ' + latLon.lng;
+    }
+
+    /**
+     * create an array of location coordinates around the query location which correspond to the center of cell id's
+     * according to the specifed S2 cell level
+     * @param latitude
+     * @param longitude
+     */
+    function createCellLocations(latitude, longitude, level) {
+        var key = S2.latLngToKey(latitude, longitude, level);
+        var n = S2.fromKey(key);
+        var neighbours = S2.S2Cell.FromLatLng({lat: latitude, lng: longitude}, level).getNeighbors();
+
+        neighbours.forEach(function (neighbour) {
+            var cellKeys = neighbour.getNeighbors().map(function (cell) {
+                return cell.toHilbertQuadkey();
+            });
+            console.log('neighbour: ' + neighbour.toHilbertQuadkey() + ', ' + latLon(neighbour.toHilbertQuadkey()));
+            cellKeys.forEach(function (key) {
+                console.log(key + ', ' + latLon(key));
+            });
+        });
+    }
+
+    function avgNieghbourDistnace(lat, lng, level) {
+        var neighborKeys = S2.latLngToNeighborKeys(lat, lng, level);
+        var latLongs = [];
+
+
+
+        for(var i=0; i<4; i+=1) {
+            latLongs[i] = S2.keyToLatLng(neighborKeys[i]);
+        }
+
+        var distance = latLonDistanceInKm(latLongs[0].lat, latLongs[0].lng, latLongs[1].lat, latLongs[1].lng);
+        distance += latLonDistanceInKm(latLongs[1].lat, latLongs[1].lng, latLongs[2].lat, latLongs[2].lng);
+        distance += latLonDistanceInKm(latLongs[2].lat, latLongs[2].lng, latLongs[3].lat, latLongs[3].lng);
+        distance += latLonDistanceInKm(latLongs[3].lat, latLongs[3].lng, latLongs[0].lat, latLongs[0].lng);
+        distance /= 4.0;
+
+        console.log("level " + level +", avg distance: " + distance.toFixed(6) +"km\t" + (distance*1000).toFixed(3) +"m");
+    }
+
+    createCellLocations(48.17711, 11.61785, 20);
 
     trainModel()
         .then(function (result) {
