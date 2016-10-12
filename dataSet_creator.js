@@ -82,8 +82,8 @@ WeatherApiKeyCounter=0;
         dataSet = [];
 
         //Initialize the script to convert UTC to local time
-        //if (consoleOn) console.log('initialize tzwhere...');
-        //tzwhere.init();
+        if (consoleOn) console.log('initialize tzwhere...');
+        tzwhere.init();
 
         classLables = [];
 
@@ -94,8 +94,8 @@ WeatherApiKeyCounter=0;
             var dataRow = {};
 
             //uncomment this if you are working on API data
-            //addCoordinatesToPokeEntry(pokeEntry);
-            //addLocalTime(pokeEntry);
+            addCoordinatesToPokeEntry(pokeEntry);
+            addLocalTime(pokeEntry);
 
             // add features for the configured feature sources
             var errorFlag=false;
@@ -109,10 +109,12 @@ WeatherApiKeyCounter=0;
                     } else errorFlag=true;
                 }
             });
-            if (!errorFlag)dataSet.push(dataRow);
+            if (!errorFlag) {
+                dataSet.push(dataRow);
+                var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
+                classLables.push(classLabel[classSource.classKey]);
+            }
 
-            var classLabel = classSource.module.getFeatures([classSource.classKey], pokeEntry);
-            classLables.push(classLabel[classSource.classKey]);
             if(consoleOn && ((cnt%1000) ===0)){
                 console.log("At tuple # " + cnt);
             }
@@ -199,11 +201,8 @@ WeatherApiKeyCounter=0;
             computeCooc(cooc);
         }
         // add the class label
-        var classLabels = allValuesForKeyInData(classSource.classKey, dataSet).sort(
-            function sortNumber(a,b) {
-            return a - b;
-        });
-        arff += '@ATTRIBUTE class {' + classLabels.join(', ') + '}\n\n';
+        var classLabelAttributes = allValuesForKeyInData(classSource.classKey, dataSet);
+        arff += '@ATTRIBUTE class {' + classLabelAttributes.join(', ') + '}\n\n';
 
         // add the data
         arff += '@DATA\n';
@@ -245,7 +244,6 @@ WeatherApiKeyCounter=0;
                 if(i%5000===0||i===(len-1)){
                     console.log("Writing...");
                     if (i===(len-1)){
-                        arff=arff.slice(0,-2);
                         fs.appendFileSync(fileNamePath, arff, 'utf8');
                     } else {
                         fs.appendFileSync(fileNamePath, arff, 'utf8');
@@ -268,7 +266,17 @@ WeatherApiKeyCounter=0;
         json_data.forEach(function (row) {
             valueSet.add(row[key]);
         });
-        return Array.from(valueSet);
+
+        var array = Array.from(valueSet);
+        // check if we have numbers as values, if so sort them
+        if (!isNaN(parseFloat(array[0]))) {
+            array.sort(
+                function sortNumber(a,b) {
+                    return a - b;
+            });
+        }
+
+        return array;
     }
 
     /**
