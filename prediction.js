@@ -2,11 +2,16 @@
  * Created by Benjamin on 07.10.2016.
  */
 var exec = require('child-process-promise').exec;
-var S2 = require('s2-geometry').S2;
+var DC = require('./dataSet_creator.js').DC;
 
-predict(0, 0, 0);
+predict(48.17711, 11.61785, 0);
 
-function predict(lat, lon, timestamp) {
+/*
+ * 1. create location grid for query location
+ * 2. create arff test file for every location with the same timestamp
+ */
+
+function predict(latitude, longitude, timestamp) {
     var wekaCmd = 'java -classpath ./data/weka.jar'; // add more RAM by option: -Xmx1024m
     var classifier = 'weka.classifiers.bayes.NaiveBayes';
     // no-cv: no cross-validation, v: no training data statistics
@@ -70,15 +75,15 @@ function predict(lat, lon, timestamp) {
      * @param latitude
      * @param longitude
      */
-    function createGridLocation(latitude, longitude) {
+    function createGridLocations(latitude, longitude) {
         const gridDistance = 0.25;  // 250m grid distance -> 2km for 9 grids from the center
         var locations = [];
 
-        for(var dx = -4; i <= 4; i++) {
-            for(var dy = -4; i <= 4; i++) {
+        for(var dx = -4; dx <= 4; dx++) {
+            for(var dy = -4; dy <= 4; dy++) {
                 // from http://stackoverflow.com/a/7478827
                 var new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
-                var new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / cos(latitude * Math.PI/180);
+                var new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / Math.cos(latitude * Math.PI/180);
                 locations.push({
                     "latitude": new_latitude,
                     "longitude": new_longitude
@@ -89,53 +94,28 @@ function predict(lat, lon, timestamp) {
         return locations;
     }
 
-    function latLon(key) {
-        var latLon = S2.keyToLatLng(key);
-        return latLon.lat + ', ' + latLon.lng;
+    function createPokeEntry(latitude, longitude, ts) {
+        return {
+            "pokemonId": 0,
+            "appearedLocalTime": ts,
+            "latitude": latitude,
+            "longitude": longitude
+        };
     }
 
-    /**
-     * create an array of location coordinates around the query location which correspond to the center of cell id's
-     * according to the specifed S2 cell level
-     * @param latitude
-     * @param longitude
-     */
-    function createCellLocations(latitude, longitude, level) {
-        var key = S2.latLngToKey(latitude, longitude, level);
-        var n = S2.fromKey(key);
-        var neighbours = S2.S2Cell.FromLatLng({lat: latitude, lng: longitude}, level).getNeighbors();
+    function createTestData(latitude, longitude, ts) {
+        var locationGrid = createGridLocations(latitude, longitude);
+        var pokeEntries = [];
 
-        neighbours.forEach(function (neighbour) {
-            var cellKeys = neighbour.getNeighbors().map(function (cell) {
-                return cell.toHilbertQuadkey();
-            });
-            console.log('neighbour: ' + neighbour.toHilbertQuadkey() + ', ' + latLon(neighbour.toHilbertQuadkey()));
-            cellKeys.forEach(function (key) {
-                console.log(key + ', ' + latLon(key));
-            });
+        locationGrid.forEach(function (location) {
+            pokeEntries.push(createPokeEntry(location.latitude, location.longitude, ts));
         });
+
+        DC.cooccClasses = [13, 16, 19, 96, 129];
+        DC.storeArffFile('prediction_feature_config.json', pokeEntries, testData, false);
     }
 
-    function avgNieghbourDistnace(lat, lng, level) {
-        var neighborKeys = S2.latLngToNeighborKeys(lat, lng, level);
-        var latLongs = [];
-
-
-
-        for(var i=0; i<4; i+=1) {
-            latLongs[i] = S2.keyToLatLng(neighborKeys[i]);
-        }
-
-        var distance = latLonDistanceInKm(latLongs[0].lat, latLongs[0].lng, latLongs[1].lat, latLongs[1].lng);
-        distance += latLonDistanceInKm(latLongs[1].lat, latLongs[1].lng, latLongs[2].lat, latLongs[2].lng);
-        distance += latLonDistanceInKm(latLongs[2].lat, latLongs[2].lng, latLongs[3].lat, latLongs[3].lng);
-        distance += latLonDistanceInKm(latLongs[3].lat, latLongs[3].lng, latLongs[0].lat, latLongs[0].lng);
-        distance /= 4.0;
-
-        console.log("level " + level +", avg distance: " + distance.toFixed(6) +"km\t" + (distance*1000).toFixed(3) +"m");
-    }
-
-    createCellLocations(48.17711, 11.61785, 20);
+    createTestData(longitude, latitude, new Date().toJSON());
 
     trainModel()
         .then(function (result) {
