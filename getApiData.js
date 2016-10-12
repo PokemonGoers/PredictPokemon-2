@@ -13,7 +13,7 @@ function httpGetAsync(url, destination) {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
             console.log('downloaded ' +apiData.data.length + ' sightings from API');
-            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 121), destination);
+            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 121), destination, true);
         }
     };
     xmlHttp.open("GET", url, true);

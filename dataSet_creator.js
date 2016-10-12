@@ -18,9 +18,13 @@ WeatherApiKeyCounter=0;
      * parse the given JSON data and create all features which are specified in the config for all data entries.
      * @param configPath path to the feature configuration file
      * @param json_data_raw the raw JSON data received from the API
-     * @return {Array} array which contains all the configured features for the provided data
+     * @param useApiData indicate if the raw json data is from the API or not
+     * @return {Array} array which contains all the configured features for the provided data. Default true.
      */
-    DC.createDataSet = function(configPath, json_data_raw) {
+    DC.createDataSet = function(configPath, json_data_raw, useApiData) {
+        if (useApiData === 'undefined' || useApiData === null) {
+            useApiData = true;
+        }
         var json_data = removeIncompleteData(json_data_raw);
         if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var config = fileToJson(configPath);
@@ -80,12 +84,13 @@ WeatherApiKeyCounter=0;
         });
 
         dataSet = [];
+        classLables = [];
 
         //Initialize the script to convert UTC to local time
-        if (consoleOn) console.log('initialize tzwhere...');
-        tzwhere.init();
-
-        classLables = [];
+        if (useApiData) {
+            if (consoleOn) console.log('initialize tzwhere...');
+            tzwhere.init();
+        }
 
         if (consoleOn) console.log('creating features...');
         var cnt = 0;
@@ -93,9 +98,10 @@ WeatherApiKeyCounter=0;
 
             var dataRow = {};
 
-            //uncomment this if you are working on API data
-            addCoordinatesToPokeEntry(pokeEntry);
-            addLocalTime(pokeEntry);
+            if (useApiData) {
+                addCoordinatesToPokeEntry(pokeEntry);
+                addLocalTime(pokeEntry);
+            }
 
             // add features for the configured feature sources
             var errorFlag=false;
@@ -151,9 +157,10 @@ WeatherApiKeyCounter=0;
      * @param configPath path to the feature configuration file
      * @param json_data_raw the raw JSON data received from the API
      * @param fileNamePath the path with filename where the .arff file should be stored
+     * @param useApiData indicate if the raw json data is from the API or not. Default true.
      */
-    DC.storeArffFile = function(configPath, json_data_raw, fileNamePath) {
-        DC.createDataSet(configPath, json_data_raw);
+    DC.storeArffFile = function(configPath, json_data_raw, fileNamePath, useApiData) {
+        DC.createDataSet(configPath, json_data_raw, useApiData);
         storeArff(fileNamePath);
     };
 
@@ -288,7 +295,6 @@ WeatherApiKeyCounter=0;
         pokeEntry.longitude = pokeEntry["location"]["coordinates"][0];
     }
 
-
     /**
      * add Local Time. Offset is based on coordinates
      * @param _pokeEntry the JSON object which is received from the API for a Pokemon sighting
@@ -302,8 +308,6 @@ WeatherApiKeyCounter=0;
         newDate = new Date(newDate.getTime() + offset);
         _pokeEntry.appearedLocalTime = newDate.toJSON();
     }
-
-
 
     /**
      * remove data entries which do not provided all required features
