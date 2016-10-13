@@ -184,9 +184,10 @@ WeatherApiKeyCounter=0;
     function createArffHeader(fileNamePath, coocTraingData) {
         var arff = '@RELATION ' + fileNamePath + '\n\n';
 
-        var addAttributes = function (featureKey, featureType) {
+        var addAttributes = function (source, featureKey, featureType) {
             if (featureType == 'nominal') {
-                var nominalValues = allValuesForKeyInData(featureKey, dataSet);
+                //var nominalValues = allValuesForKeyInData(featureKey, dataSet);
+                var nominalValues = source.module.getNominalValues(featureKey);
                 arff += '@ATTRIBUTE ' + featureKey + ' {' + nominalValues.join(', ') + '}\n';
             } else {
                 arff += '@ATTRIBUTE ' + featureKey + ' ' + featureType + '\n';
@@ -197,7 +198,7 @@ WeatherApiKeyCounter=0;
         featureSources.forEach(function (source) {
             source.features.forEach(function (feature) {
                 if (feature.key !== 'pokemonId') {
-                    addAttributes(feature.key, feature.type);
+                    addAttributes(source, feature.key, feature.type);
                 }
             });
         });
@@ -206,7 +207,7 @@ WeatherApiKeyCounter=0;
         postProcessSources.forEach(function (postSource) {
             postSource.featureGroups.forEach(function (group) {
                 postSource.module.getFeatureKeysForGroup(group.key).forEach(function (feature) {
-                    addAttributes(feature, group.type);
+                    addAttributes(postSource, feature, group.type);
                 });
             });
         });
@@ -218,7 +219,8 @@ WeatherApiKeyCounter=0;
         }
 
         // add the class label
-        var classLabelAttributes = allValuesForKeyInData(classSource.classKey, dataSet);
+        //var classLabelAttributes = allValuesForKeyInData(classSource.classKey, dataSet);
+        var classLabelAttributes = classSource.module.getNominalValues(classSource.classKey);
         arff += '@ATTRIBUTE class {' + classLabelAttributes.join(', ') + '}\n\n';
         return arff;
     }
