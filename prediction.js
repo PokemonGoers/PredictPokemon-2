@@ -38,9 +38,11 @@ predict(48.17711, 11.61785, 0);
 
 function predict(latitude, longitude, timestamp) {
     var wekaCmd = 'java -classpath ./data/weka.jar'; // add more RAM by option: -Xmx1024m
-    var classifier = 'weka.classifiers.bayes.NaiveBayes';
+    //var classifier = 'weka.classifiers.bayes.NaiveBayes';
+    var classifier = 'weka.classifiers.meta.Vote';
+    var classifierOptions = '-S 1 -B "weka.classifiers.lazy.IBk -K 100 -W 0 -A \\"weka.core.neighboursearch.LinearNNSearch -A \\\\\\"weka.core.EuclideanDistance -R first-last\\\\\\"\\"" -B "weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S BAYES -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5" -R PROD';
     // no-cv: no cross-validation, v: no training data statistics
-    var trainingOptions = '-no-cv -v';
+    var trainingOptions = '-no-cv -v -classifications "weka.classifiers.evaluation.output.prediction.Null"';
     // p <range>: print predictions and attribute values in range. if range = 0 print no attributes
     // specify the output format of the predictions. Use CSV for easier parsing and PlainText for pretty print.
     var testOptions = '-classifications "weka.classifiers.evaluation.output.prediction.CSV"';
@@ -83,9 +85,10 @@ function predict(latitude, longitude, timestamp) {
      * @return {Array|{index: number, input: string}|*|Promise}
      */
     function trainModel() {
-        var cmd = wekaCmd + ' ' + classifier + ' ' + trainingOptions
+        var cmd = wekaCmd + ' ' + classifier + ' ' + classifierOptions + ' ' + trainingOptions
             + ' -t ' + trainingData     // training data to be used to create the model
             + ' -d ' + modelName;       // store the trained model with the specified name
+        console.log('run command:\n' +cmd);
         return exec(cmd);
     }
 
@@ -98,7 +101,7 @@ function predict(latitude, longitude, timestamp) {
         var cmd = wekaCmd + ' ' + classifier + ' ' + testOptions
             + ' -l ' + modelName        // load the trained model with the specified name
             + ' -T ' + testData;        // test data to be evaluated by the trained model
-        return exec(cmd);
+        return exec(cmd, {maxBuffer: 1024 * 1024 * 2}); // 2MB
     }
 
     /**
