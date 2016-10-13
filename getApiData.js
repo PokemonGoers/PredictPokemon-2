@@ -1,19 +1,26 @@
 var fs = require('fs');
-var DS = require('./dataSet_creator.js').DC;
+var DC = require('./dataSet_creator.js').DC;
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
 var destination = 'arff/apiDataExtended.arff';
 
-httpGetAsync(url, destination);
+storeApiData();
 
-function httpGetAsync(url, destination) {
+function storeApiData() {
+    var data = getData(function (data) {
+        DC.init("feature_config.json", true);
+        DC.storeArffFile(data.slice(0, 121), destination, true, false);
+    });
+}
+
+function getData(callback) {
     console.log('requesting ' +url);
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
             console.log('downloaded ' +apiData.data.length + ' sightings from API');
-            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 121), destination, true);
+            callback(apiData.data);
         }
     };
     xmlHttp.open("GET", url, true);

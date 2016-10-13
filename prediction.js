@@ -3,12 +3,37 @@
  */
 var exec = require('child-process-promise').exec;
 var DC = require('./dataSet_creator.js').DC;
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
 
 predict(48.17711, 11.61785, 0);
 
 /*
+ * Handle queries
  * 1. create location grid for query location
  * 2. create arff test file for every location with the same timestamp
+ *     a. check if there is a new data set available from 'Prediction routine' if so use it
+ *     b. add features for each location
+ *     c. add co-occurrence by using the existing co-occurrence data
+ * 3. run weka with the current classifier model to predict the data
+ */
+
+/*
+ * Prediction routine
+ * 1. create data set from API data
+ *     a. collect 10k poke entries from API
+  *    b. create features for each entry
+  *    c. init co-occurrence
+  *    d. add co-occurrence features for each entry
+  *    f. store data set and return co-occurrence data
+  * 2. update current data set with the newly created on
+  * 3. start timer to jump to 1. when it triggers
+ */
+
+/*
+ * DC init
+ * 1. read config and sources
+ * 2. create sources
  */
 
 function predict(latitude, longitude, timestamp) {
@@ -22,6 +47,35 @@ function predict(latitude, longitude, timestamp) {
     var modelName = 'data/classifier.model';
     var trainingData = 'data/trainingData.arff';
     var testData = 'data/testData.arff';
+
+    DC.cooccClasses = [13, 16, 19, 96, 129];
+    DC.init('prediction_feature_config.json', true);
+
+    function getData(callback) {
+        console.log('requesting ' +url);
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                var apiData = JSON.parse(xmlHttp.responseText);
+                console.log('downloaded ' +apiData.data.length + ' sightings from API');
+                callback(apiData.data);
+            }
+        };
+        xmlHttp.open("GET", url, true);
+        xmlHttp.send();
+        return xmlHttp.responseText;
+    }
+
+    function createTrainingSet() {
+        return new Promise(
+            function(resolve, reject) {
+                getData(function (data) {
+                    DC.storeArffFile(data.slice(0, 100), trainingData, true, false);
+                    resolve();
+                });
+            }
+        );
+    }
 
     /**
      * train model
@@ -96,7 +150,7 @@ function predict(latitude, longitude, timestamp) {
 
     function createPokeEntry(latitude, longitude, ts) {
         return {
-            "pokemonId": 0,
+            "pokemonId": DC.existingPokemonID,
             "appearedLocalTime": ts,
             "latitude": latitude,
             "longitude": longitude
@@ -111,23 +165,32 @@ function predict(latitude, longitude, timestamp) {
             pokeEntries.push(createPokeEntry(location.latitude, location.longitude, ts));
         });
 
-        DC.cooccClasses = [13, 16, 19, 96, 129];
-        DC.storeArffFile('prediction_feature_config.json', pokeEntries, testData, false);
+        DC.storeArffFile(pokeEntries, testData, false, true);
     }
 
-    createTestData(longitude, latitude, new Date().toJSON());
-
-    trainModel()
+    createTrainingSet()
         .then(function (result) {
-            console.log('-- training completed');
-            // console.log('-- train stderr: ' + result.stderr);
-            // console.log('-- train stdout: ' + result.stdout);
-            return test();
+            console.log('-- train model');
+            var promise = trainModel();
+            console.log('-- created model');
+            return promise;
         })
         .then(function (result) {
+            if (result.stderr) {
+                console.log('-- train stderr: ' + result.stderr);
+            }
+            console.log('-- create test data');
+            createTestData(longitude, latitude, new Date().toJSON());
+            console.log('-- evaluate test data');
+            return test()
+        })
+        .then(function (result) {
+            if (result.stderr) {
+                console.log('-- test stderr: ' + result.stderr);
+            }
             console.log('-- test completed');
             // console.log('-- test stderr: ' + result.stderr);
-            console.log('-- test stdout: ' + result.stdout);
+            // console.log('-- test stdout: ' + result.stdout);
             var predictions = parsePredictionOutput(result.stdout);
             predictions.forEach(function (prediction) {
                 console.log('class: ' + prediction.classLabel + ', confidence: ' +prediction.confidence);
@@ -136,6 +199,26 @@ function predict(latitude, longitude, timestamp) {
         .catch(function (err) {
             console.error('ERROR: ', err);
         });
+
+    // trainModel()
+    //     .then(function (result) {
+    //         console.log('-- training completed');
+    //         // console.log('-- train stderr: ' + result.stderr);
+    //         // console.log('-- train stdout: ' + result.stdout);
+    //         return test();
+    //     })
+    //     .then(function (result) {
+    //         console.log('-- test completed');
+    //         // console.log('-- test stderr: ' + result.stderr);
+    //         console.log('-- test stdout: ' + result.stdout);
+    //         var predictions = parsePredictionOutput(result.stdout);
+    //         predictions.forEach(function (prediction) {
+    //             console.log('class: ' + prediction.classLabel + ', confidence: ' +prediction.confidence);
+    //         })
+    //     })
+    //     .catch(function (err) {
+    //         console.error('ERROR: ', err);
+    //     });
 
     // call test only if the model was already trained
     // test()

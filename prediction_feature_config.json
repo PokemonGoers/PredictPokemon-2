@@ -24,7 +24,7 @@
         {
           "key": "appearedLocalTime",
           "type": "string",
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -64,19 +64,6 @@
         },
         {
           "key": "closeToWater",
-          "type": "nominal",
-          "enabled": true
-        }
-      ]
-    },
-    {
-      "name": "Co-occurrence Features",
-      "path": "./feature_sources/co-occurrence_post-features.js",
-      "enabled": false,
-      "post_process": true,
-      "features": [
-        {
-          "key": "co-occ90m_Id",
           "type": "nominal",
           "enabled": true
         }
