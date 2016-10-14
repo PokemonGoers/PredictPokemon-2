@@ -1,6 +1,6 @@
 {
   "name": "predict-pokemon",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "npm-packages",
   "main": "prediction.js",
   "scripts": {

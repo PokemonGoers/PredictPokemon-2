@@ -1,7 +1,14 @@
+
+
 # PredictPokemon-2
 
 [![Join the chat at https://gitter.im/pokemongoers/PredictPokemon-2](https://badges.gitter.im/pokemongoers/PredictPokemon-2.svg)](https://gitter.im/pokemongoers/PredictPokemon-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 In this project we will apply machine learning to establish the TLN (Time, Location and Name - that is where pokemons will appear, at what date and time, and which Pokemon will it be) prediction in Pokemon Go.
+
+##Install
+```
+npm install predict-pokemon
+```
 
 ## Setup
 #### tzwhere bug
@@ -132,3 +139,18 @@ A feature is defined by:
 
 ###### Class key
 The `classKey` defines which key will be used as classLabel when an .arff file is generated. The `classKey` has to correspond to a feature key in the configuration. If a feature key corresponds to the `classKey` it does not matter if the `enabled` flag is set or not. The script generates automatically a nominal list with all distinct values that exist in the data set for that key.
+
+
+##Developers
+
+Benjamin Strobel: benjamin.strobel@tum.de
+Marcel Wagenländer: marcel.wagenlaender@tum.de
+Matthias Bauer: 
+Siamion Karcheuski: semioniy@mail.ru
+Aurel Roci: aurel_2798@hotmail.com
+
+##Licence 
+
+Copyright (c) 2015 [Developers] (https://github.com/PokemonGoers/PredictPokemon-2/graphs/contributors)
+
+Licensed under the MIT License
