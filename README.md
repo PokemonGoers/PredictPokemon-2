@@ -144,9 +144,13 @@ The `classKey` defines which key will be used as classLabel when an .arff file i
 ##Developers
 
 Benjamin Strobel: benjamin.strobel@tum.de
+
 Marcel Wagenländer: marcel.wagenlaender@tum.de
-Matthias Bauer: 
+
+Matthias Bauer:
+ 
 Siamion Karcheuski: semioniy@mail.ru
+
 Aurel Roci: aurel_2798@hotmail.com
 
 ##Licence 
