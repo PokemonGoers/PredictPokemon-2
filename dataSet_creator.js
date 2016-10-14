@@ -11,11 +11,9 @@ WeatherApiKeyCounter=0;
     var postProcessSources = null;
     var classSource = null;
     var classLables = null;
-    var consoleOn = true;
     var addCooccurence = true;
-    var coocTraingData = null;
     var arffTrainingHeader = '';
-    DC.existingPokemonID = 16;
+    DC.consoleOn = true;
     DC.cooccClasses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151];
 
 
@@ -28,7 +26,7 @@ WeatherApiKeyCounter=0;
         if (useApiData === 'undefined' || useApiData === null) {
             useApiData = true;
         }
-        if (consoleOn) console.log('initializing DC');
+        if (DC.consoleOn) console.log('initializing DC');
         var config = fileToJson(configPath);
         CachedWeather = fileToJson('json/CachedWeather.json');
         featureSources = [];
@@ -36,7 +34,7 @@ WeatherApiKeyCounter=0;
         classSource = null;
 
         // extract the configured features and load the required modules
-        if (consoleOn) console.log('parsing config...');
+        if (DC.consoleOn) console.log('parsing config...');
         config.feature_sources.forEach(function (source) {
             var features = [];
             var isClassKeySource = false;
@@ -87,7 +85,7 @@ WeatherApiKeyCounter=0;
 
         //Initialize the script to convert UTC to local time
         if (useApiData) {
-            if (consoleOn) console.log('initialize tzwhere...');
+            if (DC.consoleOn) console.log('initialize tzwhere...');
             tzwhere.init();
         }
     };
@@ -103,11 +101,11 @@ WeatherApiKeyCounter=0;
             useApiData = true;
         }
         var json_data = removeIncompleteData(json_data_raw);
-        if (consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
+        if (DC.consoleOn) console.log('processing ' + json_data.length + ' filtered data entries out of ' + json_data_raw.length);
         var cnt = 0;
         dataSet = [];
         classLables = [];
-        if (consoleOn) console.log('creating features...');
+        if (DC.consoleOn) console.log('creating features...');
 
         json_data.forEach(function (pokeEntry) {
 
@@ -136,7 +134,7 @@ WeatherApiKeyCounter=0;
                 classLables.push(classLabel[classSource.classKey]);
             }
 
-            if(consoleOn && ((cnt%1000) ===0)){
+            if(DC.consoleOn && ((cnt%1000) ===0)){
                 console.log("At tuple # " + cnt);
             }
             cnt++;
@@ -144,14 +142,14 @@ WeatherApiKeyCounter=0;
         // post processing on existing features
 
         // save weather data before other processing is done - this way we keep the data if the script crashes below
-        if (consoleOn) console.log('creating post process features...');
+        if (DC.consoleOn) console.log('creating post process features...');
         postProcessSources.forEach(function (postSource) {
             dataSet = postSource.module.addFeatures(postSource.featureGroupKeys, dataSet);
         });
 
         if (!addCooccurence) {
             // add the class label to the data row
-            if (consoleOn) console.log('adding class labels...');
+            if (DC.consoleOn) console.log('adding class labels...');
             dataSet.forEach(function (dataRow) {
                 dataRow[classSource.classKey] = classLables.shift();
             });
@@ -171,17 +169,14 @@ WeatherApiKeyCounter=0;
      * @param json_data_raw the raw JSON data received from the API
      * @param fileNamePath the path with filename where the .arff file should be stored
      * @param useApiData indicate if the raw json data is from the API or not
-     * @param useCoocTraingData indicate if the stored cooc data should be used for the calculation of the cooc. Needed if a test file will be created.
-     */
-    DC.storeArffFile = function(json_data_raw, fileNamePath, useApiData, useCoocTraingData ) {
+     * @param coocTrainingData the cooc from the training data which can be used for the calculation of the test data cooc. Can be null for creating training data.     */
+    DC.storeArffFile = function(json_data_raw, fileNamePath, useApiData, coocTrainingData ) {
         DC.createDataSet(json_data_raw, useApiData);
-        var cooc = storeArff(fileNamePath, useCoocTraingData ? coocTraingData : null);
-        if (!useCoocTraingData) {
-            coocTraingData = cooc;
-        }
+        var cooc = storeArff(fileNamePath, coocTrainingData);
+        return cooc;
     };
 
-    function createArffHeader(fileNamePath, coocTraingData) {
+    function createArffHeader(fileNamePath) {
         var arff = '@RELATION ' + fileNamePath + '\n\n';
 
         var addAttributes = function (source, featureKey, featureType) {
@@ -228,18 +223,10 @@ WeatherApiKeyCounter=0;
     /**
      * convert the data set to an .arff file and store it in the arff/ directory with the given filename
      * @param fileNamePath the path with filename where the .arff file should be stored
-     * @param coocTraingData the cooc from the training data which can be used for the calulation of the test data cooc. Can be null for creating training data.
+     * @param coocTrainingData the cooc from the training data which can be used for the calculation of the test data cooc. Can be null for creating training data.
      */
-    function storeArff(fileNamePath, coocTraingData) {
-        arff = '';
-
-        if (coocTraingData  === 'undefined' || coocTraingData === null) {
-            arff  = createArffHeader(fileNamePath, coocTraingData);
-            arffTrainingHeader = arff;
-        }
-        else {
-            arff = arffTrainingHeader;
-        }
+    function storeArff(fileNamePath, coocTrainingData) {
+        arff  = createArffHeader(fileNamePath);
 
         // add the data
         arff += '@DATA\n';
@@ -259,11 +246,11 @@ WeatherApiKeyCounter=0;
             var cooc = [];
             cooc = initCoocs(dataSet);
             //compute the cooccurence
-            computeCooc(cooc, coocTraingData);
+            computeCooc(cooc, coocTrainingData);
 
             fs.writeFileSync(fileNamePath, arff, 'utf8');
             arff="";
-            if(consoleOn) console.log("Wrote the header.");
+            if(DC.consoleOn) console.log("Wrote the header.");
             var len = dataSet.length;
             var values = [];
             var row = null;
@@ -289,14 +276,14 @@ WeatherApiKeyCounter=0;
                 }
                 arff += values.join(',') + '\n';
                 if(i%5000===0||i===(len-1)){
-                    console.log("Writing...");
+                    if (DC.consoleOn) console.log("Writing...");
                     if (i===(len-1)){
                         fs.appendFileSync(fileNamePath, arff, 'utf8');
                     } else {
                         fs.appendFileSync(fileNamePath, arff, 'utf8');
                         arff = "";
                     }
-                    if(consoleOn) console.log("" + i + " instances written.");
+                    if(DC.consoleOn) console.log("" + i + " instances written.");
                 }
             }
         }
@@ -406,7 +393,7 @@ WeatherApiKeyCounter=0;
             coocData.push(new_row);
             iter ++;
         });
-        console.log("Initialized cooc var with " + coocData.length + " rows.");
+        if (DC.consoleOn) console.log("Initialized cooc var with " + coocData.length + " rows.");
         return coocData;
     }
 
@@ -416,7 +403,7 @@ WeatherApiKeyCounter=0;
      * @param _data the cooc-structure to work on
      */
     function computeCooc (_data1, _data2){
-        if (_data2 === 'undefined' || _data2 === null) {
+        if (_data2 === undefined || _data2 === null) {
             _data2 = _data1;
         }
         var count_cooc=0;
@@ -424,7 +411,7 @@ WeatherApiKeyCounter=0;
         for(var i = 0;i <_data1.length; i++){
             if(i%100 == 0){
                 var current = i*100/_data1.length;
-                console.log("Roughly at " + current.toFixed(2) + "% of co-occurence computations with " + count_cooc +
+                if (DC.consoleOn) console.log("Roughly at " + current.toFixed(2) + "% of co-occurence computations with " + count_cooc +
                     " co-occurrences in "+ count_cell + " cell hits.");
             }
             var start = 0;

@@ -9,7 +9,7 @@ storeApiData();
 function storeApiData() {
     var data = getData(function (data) {
         DC.init("feature_config.json", true);
-        DC.storeArffFile(data.slice(0, 121), destination, true, false);
+        DC.storeArffFile(data.slice(0, 121), destination, true);
     });
 }
 
