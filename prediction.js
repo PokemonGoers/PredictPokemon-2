@@ -25,14 +25,14 @@
     var coocTrainingData = null;
     var newCoocTrainingData = null;
 
-    console.log('started prediction script, init DC');
+    log('started prediction script, init DC');
     DC.consoleOn = false;
     DC.cooccClasses = [13, 16, 19, 96, 129];
     DC.init('prediction_feature_config.json', true);
 
     var switchClassifierModel = false;
     retrainClassifier();
-    // var retrainTimer = setInterval(retrainClassifier, 1000 * 10);//60 * 15);
+    var retrainTimer = setInterval(retrainClassifier, 1000 * 60 * 15); // retrain every 15min
 
     /**
      * create predictions for a 9x9 grid with the given coordinates in the center.
@@ -56,6 +56,7 @@
                     reject('no cooc data');
                 }
 
+                var ts = new Date().getTime();
                 var pokeEntries = createTestData(longitude, latitude, timestamp);
                 test()
                     .then(function (result) {
@@ -67,7 +68,7 @@
                             prediction.latitude = pokeEntry.latitude;
                             prediction.longitude = pokeEntry.longitude;
                         }
-
+                        log('prediction took ' + (new Date().getTime() - ts));
                         resolve(predictions);
                     })
                     .catch(function (err) {
@@ -78,25 +79,38 @@
     };
 
     function getData(callback) {
-        console.log('requesting ' +url);
+        //var urlForLast24h = url + 'ts/' + new Date().toJSON() + '/range/1d';
+        var urlForLast24h = url + 'ts/2016-09-14T08:00:00Z/range/1d';
+        log('requesting ' +urlForLast24h);
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 var apiData = JSON.parse(xmlHttp.responseText);
-                console.log('downloaded ' +apiData.data.length + ' sightings from API');
-                callback(apiData.data);
+                log('downloaded ' +apiData.data.length + ' sightings from API');
+                var data = filter10kFromData(apiData.data);
+                log('filtered data, new length ' +data.length);
+                callback(data);
             }
         };
-        xmlHttp.open("GET", url, true);
+        xmlHttp.open("GET", urlForLast24h, true);
         xmlHttp.send();
         return xmlHttp.responseText;
+    }
+
+    function filter10kFromData(data) {
+        while (data.length > 10000) {
+            var index = Math.round(Math.random() * data.length);
+            data.splice(index, 1);
+        }
+
+        return data;
     }
 
     function createTrainingSet() {
         return new Promise(
             function(resolve, reject) {
                 getData(function (data) {
-                    var cooc = DC.storeArffFile(data.slice(0, 1000), trainingData, true, null);
+                    var cooc = DC.storeArffFile(data, trainingData, true, null);
                     resolve(cooc);
                 });
             }
@@ -105,12 +119,14 @@
 
     function retrainClassifier(callback) {
         var cooc = null;
+        var ts = new Date().getTime();
+        log('created training arff file');
         createTrainingSet()
             .then(function (result) {
-                console.log('-- train classifier model');
+                log('train classifier model, arff file creation took ' + (new Date().getTime() - ts));
                 cooc = result;
                 var promise = trainModel();
-                console.log('-- created classifier model');
+                log('created classifier model, training took ' + (new Date().getTime() - ts));
                 return promise;
             })
             .then(function (result) {
@@ -217,5 +233,9 @@
 
         DC.storeArffFile(pokeEntries, testData, false, coocTrainingData);
         return pokeEntries;
+    }
+
+    function log(message) {
+        console.log(new Date().toJSON() + ' ' + message);
     }
 })('undefined' !== typeof module ? module.exports : window);
