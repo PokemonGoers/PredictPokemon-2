@@ -1,0 +1,182 @@
+{
+  "classKey": "pokemonId",
+  "feature_sources": [
+    {
+      "name": "API Features",
+      "path": "./feature_sources/api_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "pokemonId",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "latitude",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "longitude",
+          "type": "numeric",
+          "enabled": true
+        },
+        {
+          "key": "appearedLocalTime",
+          "type": "string",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "name": "S2 Features",
+      "path": "./feature_sources/s2_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "cellId_90m",
+          "type": "numeric",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Time Features",
+      "path": "./feature_sources/time_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "appearedMinute",
+          "type": "numeric",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Terrain Type Feature",
+      "path": "./feature_sources/terrain_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "terrainType",
+          "type": "numeric",
+          "enabled": false
+        },
+        {
+          "key": "closeToWater",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "population density",
+      "path": "./feature_sources/population_density.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "population_density",
+          "type": "numeric",
+          "enabled": false
+        },
+        {
+          "key": "urban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "suburban",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "midurban",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "rural",
+          "type": "nominal",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Place features for gyms",
+      "path": "./feature_sources/place_features.js",
+      "enabled": true,
+      "features": [
+        {
+          "key": "gymDistanceKm",
+          "type": "numeric",
+          "enabled": false
+        },
+        {
+          "key": "gymIn100m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn250m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "gymIn500m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "gymIn1000m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "gymIn2500m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "gymIn5000m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "pokestopDistanceKm",
+          "type": "numeric",
+          "enabled": false
+        },
+        {
+          "key": "pokestopIn100m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "pokestopIn250m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn500m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "pokestopIn1000m",
+          "type": "nominal",
+          "enabled": false
+        },
+        {
+          "key": "pokestopIn2500m",
+          "type": "nominal",
+          "enabled": true
+        },
+        {
+          "key": "pokestopIn5000m",
+          "type": "nominal",
+          "enabled": false
+        }
+      ]
+    }
+  ]
+}
