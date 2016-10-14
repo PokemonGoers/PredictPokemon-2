@@ -74,6 +74,16 @@ var S2 = require('s2-geometry').S2;
         return values;
     };
 
+    module.getNominalValues = function (key) {
+        if (key.startsWith('gymIn') || key.startsWith('pokestopIn')) {
+            return [true, false];
+        }
+        else {
+            console.log("The key " + key + " does not provide nominal values.");
+            throw "UnknownNominalKey";
+        }
+    };
+
     function distanceToCell(lat, lon, face, position, faces) {
         if (!faces.hasOwnProperty(face)) {
             return 999999;

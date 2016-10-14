@@ -30,4 +30,18 @@
 
         return values;
     };
+
+    module.getNominalValues = function (key) {
+        if (key === 'pokemonId') {
+            var list = [];
+            for (var i = 1; i <= 151; i++) {
+                list.push(i);
+            }
+            return list;
+        }
+        else {
+            console.log("The key " + key + " does not provide nominal values.");
+            throw "UnknownNominalKey";
+        }
+    };
 })('undefined' !== typeof module ? module.exports : window);

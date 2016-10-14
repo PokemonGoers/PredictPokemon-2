@@ -451,12 +451,13 @@ var WEIRDDATA = [
 
 t1 = new Date().getTime();
 
-DS.storeArffFile("feature_config.json", ONEDATA, destination);             //1 entry
-//DS.storeArffFile("feature_config.json", SOMEDATA, destination);            //10 entries
-//DS.storeArffFile("feature_config.json", SOMEBIGDATA, destination);         //100 entries
-//DS.storeArffFile("feature_config.json", EVENMOREDATA, destination);        //500 entries
-//DS.storeArffFile("feature_config.json", WHOLEDATA, destination);           //~2400 entries
-//DS.storeArffFile("feature_config.json", WEIRDDATA, destination);           //this data returns weird responds
+DS.init("feature_config.json", true);
+DS.storeArffFile(ONEDATA, destination, false);               //1 entry
+//DS.storeArffFile(SOMEDATA, destination, false);            //10 entries
+//DS.storeArffFile(SOMEBIGDATA, destination, false);         //100 entries
+//DS.storeArffFile(EVENMOREDATA, destination, false);        //500 entries
+//DS.storeArffFile(WHOLEDATA, destination, false);           //~2400 entries
+//DS.storeArffFile(WEIRDDATA, destination, false);           //this data returns weird responds
 
 
 

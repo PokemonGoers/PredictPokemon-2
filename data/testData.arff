@@ -1,0 +1,15 @@
+% This is a toy example, the UCI weather dataset.
+% Any relation to real weather is purely coincidental.
+
+@relation golfWeatherMichigan_1988/02/10_14day
+
+@attribute outlook {sunny, overcast, rainy}
+@attribute temperature numeric
+@attribute humidity numeric
+@attribute windy {TRUE, FALSE}
+@attribute play {yes, no}
+
+@data
+sunny,17,87,TRUE,no
+sunny,87,47,FALSE,yes
+rainy,27,47,FALSE,yes

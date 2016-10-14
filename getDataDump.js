@@ -29,5 +29,6 @@ function processDump(_source, from_line, number_lines) {
     console.log('Read ' + jsonData.length + ' from file');
     var data_less = jsonData.slice(from_line, from_line+number_lines);
     console.log('Sliced to ' + data_less.length + ' entries');
-    DS.storeArffFile('feature_config.json', data_less, destination);
+    DC.init("feature_config.json", false);
+    DC.storeArffFile(data_less, destination, false);
 }

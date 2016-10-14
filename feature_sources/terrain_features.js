@@ -29,6 +29,16 @@ var fs = require('fs');
         return values;
     };
 
+    module.getNominalValues = function (key) {
+        if (key === "closeToWater") {
+            return [true, false];
+        }
+        else {
+            console.log("The key " + key + " does not provide nominal values.");
+            throw "UnknownNominalKey";
+        }
+    };
+
     /*
      * returns a classification of the environment at the given coordinates
      * for meaning of return values see http://glcf.umd.edu/data/lc/

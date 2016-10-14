@@ -29,6 +29,16 @@
 
         return values;
     };
+
+    module.getNominalValues = function (key) {
+        if (key === "rural" || key === "midurban" || key === "suburban" || key === "urban") {
+            return [true, false];
+        }
+        else {
+            console.log("The key " + key + " does not provide nominal values.");
+            throw "UnknownNominalKey";
+        }
+    };
     
     function isRural(number) {
         if (number < 200) {
