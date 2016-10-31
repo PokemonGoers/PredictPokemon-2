@@ -11,6 +11,25 @@ npm install predict-pokemon
 ```
 
 ## Setup
+
+#### Package parameters
+Here is a list of parameters which can be changed from outside the package:
+
+`predictor.url = http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';`
+the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
+
+`predictor.threshold = 0.1;`
+the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored. range 0..1.
+
+`predictor.useCurrentDate = true;`
+if true the current date will be used to retrieve data from the API. otherwise the `requestDate` bellow is used.
+
+`predictor.requestDate = new Date('2016-09-14T08:00:00Z');`
+if `useCurrentDate` is false this date will be used to retrieve data from the API.
+
+`predictor.gridDistance = 0.25;`
+the grid distance in km. the predictor returns 81 grids and this parameter defines the distance from one grid center to the center of an horizontal or vertically adjacent grid.
+
 #### tzwhere bug
 If you are running windows the script might get stuck in the `require('tzwhere')` call, due to an old version of *timezone* [tzwhere#13](https://github.com/mattbornski/tzwhere/issues/13).
 To fix this modify the `package.json` of tzwhere, probably under the path `PredictPokemon\node_modules\tzwhere\package.json`.
