@@ -9,6 +9,19 @@ In this project we will apply machine learning to establish the TLN (Time, Locat
 ```
 npm install predict-pokemon
 ```
+##Usage
+
+unzip the `pokestop_groups` file located in in `/json` directory
+
+```
+predict(lat, lng, timestamp)
+```
+
+The predictions will available as an array of objects
+
+```
+{"pokemonId":"16","confidence":"0.242","latitude":11.6088567,"longitude":48.1679286}
+```
 
 ## Setup
 
