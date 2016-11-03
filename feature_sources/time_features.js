@@ -43,6 +43,16 @@
         return values;
     };
 
+    module.getNominalValues = function (key) {
+        if (key === 'appearedTimeOfDay') {
+            return ['night', 'morning', 'afternoon', 'evening'];
+        }
+        else {
+            console.log("The key " + key + " does not provide nominal values.");
+            throw "UnknownNominalKey";
+        }
+    };
+
     function addHour(date) {
         return date.getHours();
     }
