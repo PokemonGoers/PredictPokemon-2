@@ -3,8 +3,8 @@ var S2 = require('s2-geometry').S2;
 
 (function (exports) {
     var module = exports.module = {};
-    var gymGroups = fileToJson('json/gym_groups.json').places;
-    var pokestopGroups = fileToJson('json/pokestop_groups.json').places;
+    var gymGroups = fileToJson(__dirname + '/json/gym_groups.json').places;
+    var pokestopGroups = fileToJson(__dirname + '/json/pokestop_groups.json').places;
 
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
@@ -23,46 +23,46 @@ var S2 = require('s2-geometry').S2;
         var values = {};
 
         keys.forEach(function (key) {
-            if(key === 'gymDistanceKm') {
+            if (key === 'gymDistanceKm') {
                 values[key] = gymDistanceInKM;
             }
-            else if(key === 'gymIn100m') {
+            else if (key === 'gymIn100m') {
                 values[key] = gymDistanceInKM <= 0.1;
             }
-            else if(key === 'gymIn250m') {
+            else if (key === 'gymIn250m') {
                 values[key] = gymDistanceInKM <= 0.25;
             }
-            else if(key === 'gymIn500m') {
+            else if (key === 'gymIn500m') {
                 values[key] = gymDistanceInKM <= 0.5;
             }
-            else if(key === 'gymIn1000m') {
+            else if (key === 'gymIn1000m') {
                 values[key] = gymDistanceInKM <= 1.0;
             }
-            else if(key === 'gymIn2500m') {
+            else if (key === 'gymIn2500m') {
                 values[key] = gymDistanceInKM <= 2.5;
             }
-            else if(key === 'gymIn5000m') {
+            else if (key === 'gymIn5000m') {
                 values[key] = gymDistanceInKM <= 5.0;
             }
-            else if(key === 'pokestopDistanceKm') {
+            else if (key === 'pokestopDistanceKm') {
                 values[key] = pokestopDistanceInKM;
             }
-            else if(key === 'pokestopIn100m') {
+            else if (key === 'pokestopIn100m') {
                 values[key] = pokestopDistanceInKM <= 0.1;
             }
-            else if(key === 'pokestopIn250m') {
+            else if (key === 'pokestopIn250m') {
                 values[key] = pokestopDistanceInKM <= 0.25;
             }
-            else if(key === 'pokestopIn500m') {
+            else if (key === 'pokestopIn500m') {
                 values[key] = pokestopDistanceInKM <= 0.5;
             }
-            else if(key === 'pokestopIn1000m') {
+            else if (key === 'pokestopIn1000m') {
                 values[key] = pokestopDistanceInKM <= 1.0;
             }
-            else if(key === 'pokestopIn2500m') {
+            else if (key === 'pokestopIn2500m') {
                 values[key] = pokestopDistanceInKM <= 2.5;
             }
-            else if(key === 'pokestopIn5000m') {
+            else if (key === 'pokestopIn5000m') {
                 values[key] = pokestopDistanceInKM <= 5.0;
             }
             else {
@@ -70,7 +70,7 @@ var S2 = require('s2-geometry').S2;
                 throw "UnknownFeatureKey";
             }
         });
-        
+
         return values;
     };
 
@@ -98,7 +98,7 @@ var S2 = require('s2-geometry').S2;
             return cellGroup;
         }
 
-        for(var gymKeyPosition in cellGroup) {
+        for (var gymKeyPosition in cellGroup) {
             if (testKeyPositions.lastIndexOf(gymKeyPosition, 0) === 0) {
                 return findPlaces(testKeyPositions, cellGroup[gymKeyPosition], face, gymKeyPosition);
             }
@@ -117,22 +117,22 @@ var S2 = require('s2-geometry').S2;
     }
 
     // from http://stackoverflow.com/a/27943
-    function latLonDistanceInKm(lat1,lon1,lat2,lon2) {
+    function latLonDistanceInKm(lat1, lon1, lat2, lon2) {
         var R = 6371; // Radius of the earth in km
-        var dLat = deg2rad(lat2-lat1);  // deg2rad below
-        var dLon = deg2rad(lon2-lon1);
+        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
         var a =
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                Math.sin(dLon/2) * Math.sin(dLon/2)
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
             ;
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = R * c; // Distance in km
         return d;
     }
 
     function deg2rad(deg) {
-        return deg * (Math.PI/180)
+        return deg * (Math.PI / 180)
     }
 
     function fileToJson(file) {

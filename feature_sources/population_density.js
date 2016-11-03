@@ -1,6 +1,6 @@
 (function (exports) {
     var module = exports.module = {};
-    var density = parseCSV('data/population_density.csv');
+    var density = parseCSV(__dirname + '/data/population_density.csv');
 
     module.getFeatures = function (keys, pokeEntry) {
         var values = {};
@@ -39,7 +39,7 @@
             throw "UnknownNominalKey";
         }
     };
-    
+
     function isRural(number) {
         if (number < 200) {
             return true;
@@ -68,7 +68,7 @@
         return false;
     }
 
-    function getPopulationDensity (density, lat, long) {
+    function getPopulationDensity(density, lat, long) {
         // map lat long to entry point
         var pixel_lat = 900 - (lat * 10);
         var pixel_long = 1800 + (long * 10);
@@ -82,7 +82,7 @@
     }
 
     //parses a csv file into a 2D array of floats
-    function parseCSV (path) {
+    function parseCSV(path) {
         const fs = require('fs');
 
         const data = fs.readFileSync(path, 'utf8');

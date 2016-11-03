@@ -3,7 +3,7 @@
  */
 (function (exports) {
     var exec = require('child-process-promise').exec;
-    var DC = require('./dataSet_creator.js').DC;
+    var DC = require(__dirname + '/dataSet_creator.js').DC;
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';
 
@@ -27,18 +27,18 @@
     // p <range>: print predictions and attribute values in range. if range = 0 print no attributes
     // specify the output format of the predictions. Use CSV for easier parsing and PlainText for pretty print.
     const testOptions = '-classifications "weka.classifiers.evaluation.output.prediction.CSV"';
-    const trainingData = 'data/trainingData.arff';
-    const testData = 'data/testData.arff';
+    const trainingData = __dirname + 'data/trainingData.arff';
+    const testData = __dirname + 'data/testData.arff';
 
-    var activeModelName = 'data/classifier1.model';
-    var trainingModelName = 'data/classifier2.model';
+    var activeModelName = __dirname + 'data/classifier1.model';
+    var trainingModelName = __dirname + 'data/classifier2.model';
     var coocTrainingData = null;
     var newCoocTrainingData = null;
 
     log('started prediction script, init DC');
     DC.consoleOn = false;
     DC.cooccClasses = [13, 16, 19, 96, 129];
-    DC.init('prediction_feature_config.json', true);
+    DC.init(__dirname + 'prediction_feature_config.json', true);
 
     var switchClassifierModel = false;
     retrainClassifier();
@@ -51,9 +51,9 @@
      * @param timestamp local time of the user in the format "2016-10-12T09:10:52.325Z"
      * @return {Array|{index: number, input: string}|*|Promise} promise which provides an array of predictions as result of the form: {"pokemonId":"16","confidence":"0.242","latitude":11.6088567,"longitude":48.1679286}
      */
-    predictor.predict = function(latitude, longitude, timestamp) {
+    predictor.predict = function (latitude, longitude, timestamp) {
         return new Promise(
-            function(resolve, reject) {
+            function (resolve, reject) {
                 if (switchClassifierModel) {
                     var temp = activeModelName;
                     activeModelName = trainingModelName;
@@ -72,7 +72,7 @@
                     .then(function (result) {
                         var predictions = parsePredictionOutput(result.stdout);
 
-                        for(var i=0; i<predictions.length; i++) {
+                        for (var i = 0; i < predictions.length; i++) {
                             var prediction = predictions[i];
                             var pokeEntry = pokeEntries[i];
                             prediction.latitude = pokeEntry.latitude;
@@ -99,14 +99,14 @@
             urlForLast24h = predictor.url + '/ts/' + predictor.requestDate.toJSON() + '/range/1d';
         }
 
-        log('requesting ' +urlForLast24h);
+        log('requesting ' + urlForLast24h);
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 var apiData = JSON.parse(xmlHttp.responseText);
-                log('downloaded ' +apiData.data.length + ' sightings from API');
+                log('downloaded ' + apiData.data.length + ' sightings from API');
                 var data = filter10kFromData(apiData.data);
-                log('filtered data, new length ' +data.length);
+                log('filtered data, new length ' + data.length);
                 callback(data);
             }
         };
@@ -126,7 +126,7 @@
 
     function createTrainingSet() {
         return new Promise(
-            function(resolve, reject) {
+            function (resolve, reject) {
                 getData(function (data) {
                     var cooc = DC.storeArffFile(data, trainingData, true, null);
                     resolve(cooc);
@@ -222,10 +222,10 @@
         // new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
         // new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / Math.cos(latitude * Math.PI/180);
         const latitudeFactor = (predictor.gridDistance / 6371) * (180 / Math.PI);
-        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI/180);
+        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI / 180);
 
-        for(var dx = -4; dx <= 4; dx++) {
-            for(var dy = -4; dy <= 4; dy++) {
+        for (var dx = -4; dx <= 4; dx++) {
+            for (var dy = -4; dy <= 4; dy++) {
                 locations.push({
                     "latitude": latitude + dy * latitudeFactor,
                     "longitude": longitude + dx * longitudeFactor
