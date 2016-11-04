@@ -3,11 +3,21 @@
  */
 (function (exports) {
     var exec = require('child-process-promise').exec;
-    var DC = require('./dataSet_creator.js').DC;
+    var DC = require(__dirname + '/dataSet_creator.js').DC;
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
+    var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';
 
     var predictor = exports.predictor = {};
+    // the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
+    predictor.url = url;
+    // the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored.
+    predictor.threshold = 0.1;
+    // if useCurrentDate is false this date will be used to retrieve data from the API
+    predictor.requestDate = new Date('2016-09-14T08:00:00Z');
+    // if true the current date will be used to retrieve data from the API
+    predictor.useCurrentDate = false;
+    // grid distance in km
+    predictor.gridDistance = 0.25;
 
     const wekaCmd = 'java -classpath ./data/weka.jar -Xmx1024m'; // add more RAM by option: -Xmx1024m
     const classifier = 'weka.classifiers.meta.Vote';
@@ -17,18 +27,18 @@
     // p <range>: print predictions and attribute values in range. if range = 0 print no attributes
     // specify the output format of the predictions. Use CSV for easier parsing and PlainText for pretty print.
     const testOptions = '-classifications "weka.classifiers.evaluation.output.prediction.CSV"';
-    const trainingData = 'data/trainingData.arff';
-    const testData = 'data/testData.arff';
+    const trainingData = __dirname + 'data/trainingData.arff';
+    const testData = __dirname + 'data/testData.arff';
 
-    var activeModelName = 'data/classifier1.model';
-    var trainingModelName = 'data/classifier2.model';
+    var activeModelName = __dirname + 'data/classifier1.model';
+    var trainingModelName = __dirname + 'data/classifier2.model';
     var coocTrainingData = null;
     var newCoocTrainingData = null;
 
     log('started prediction script, init DC');
     DC.consoleOn = false;
     DC.cooccClasses = [13, 16, 19, 96, 129];
-    DC.init('prediction_feature_config.json', true);
+    DC.init(__dirname + 'prediction_feature_config.json', true);
 
     var switchClassifierModel = false;
     retrainClassifier();
@@ -41,9 +51,9 @@
      * @param timestamp local time of the user in the format "2016-10-12T09:10:52.325Z"
      * @return {Array|{index: number, input: string}|*|Promise} promise which provides an array of predictions as result of the form: {"pokemonId":"16","confidence":"0.242","latitude":11.6088567,"longitude":48.1679286}
      */
-    predictor.predict = function(latitude, longitude, timestamp) {
+    predictor.predict = function (latitude, longitude, timestamp) {
         return new Promise(
-            function(resolve, reject) {
+            function (resolve, reject) {
                 if (switchClassifierModel) {
                     var temp = activeModelName;
                     activeModelName = trainingModelName;
@@ -62,7 +72,7 @@
                     .then(function (result) {
                         var predictions = parsePredictionOutput(result.stdout);
 
-                        for(var i=0; i<predictions.length; i++) {
+                        for (var i = 0; i < predictions.length; i++) {
                             var prediction = predictions[i];
                             var pokeEntry = pokeEntries[i];
                             prediction.latitude = pokeEntry.latitude;
@@ -79,16 +89,24 @@
     };
 
     function getData(callback) {
-        //var urlForLast24h = url + 'ts/' + new Date().toJSON() + '/range/1d';
-        var urlForLast24h = url + 'ts/2016-09-14T08:00:00Z/range/1d';
-        log('requesting ' +urlForLast24h);
+        // 'ts/2016-09-14T08:00:00Z/range/1d';
+        var urlForLast24h;
+
+        if (predictor.useCurrentDate || predictor.requestDate === null) {
+            urlForLast24h = predictor.url + '/ts/' + new Date().toJSON() + '/range/1d';
+        }
+        else {
+            urlForLast24h = predictor.url + '/ts/' + predictor.requestDate.toJSON() + '/range/1d';
+        }
+
+        log('requesting ' + urlForLast24h);
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 var apiData = JSON.parse(xmlHttp.responseText);
-                log('downloaded ' +apiData.data.length + ' sightings from API');
+                log('downloaded ' + apiData.data.length + ' sightings from API');
                 var data = filter10kFromData(apiData.data);
-                log('filtered data, new length ' +data.length);
+                log('filtered data, new length ' + data.length);
                 callback(data);
             }
         };
@@ -108,7 +126,7 @@
 
     function createTrainingSet() {
         return new Promise(
-            function(resolve, reject) {
+            function (resolve, reject) {
                 getData(function (data) {
                     var cooc = DC.storeArffFile(data, trainingData, true, null);
                     resolve(cooc);
@@ -150,6 +168,7 @@
         var cmd = wekaCmd + ' ' + classifier + ' ' + classifierOptions + ' ' + trainingOptions
             + ' -t ' + trainingData     // training data to be used to create the model
             + ' -d ' + trainingModelName;       // store the trained model with the specified name
+        console.log(cmd);
         return exec(cmd);
     }
 
@@ -178,10 +197,14 @@
         if (lines.length > 5) {
             lines.slice(5, -2).forEach(function (line) {
                 var components = line.split(',');
-                predictions.push({
-                    "pokemonId": components[2].split(':')[1],
-                    "confidence": components[4]
-                });
+                var confidence = parseFloat(components[4]);
+
+                if (confidence >= predictor.threshold) {
+                    predictions.push({
+                        "pokemonId": components[2].split(':')[1],
+                        "confidence": confidence
+                    });
+                }
             });
         }
 
@@ -194,16 +217,15 @@
      * @param longitude
      */
     function createGridLocations(latitude, longitude) {
-        const gridDistance = 0.25;  // 250m grid distance -> 2km for 9 grids from the center
         var locations = [];
         // from http://stackoverflow.com/a/7478827
         // new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
         // new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / Math.cos(latitude * Math.PI/180);
-        const latitudeFactor = (gridDistance / 6371) * (180 / Math.PI);
-        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI/180);
+        const latitudeFactor = (predictor.gridDistance / 6371) * (180 / Math.PI);
+        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI / 180);
 
-        for(var dx = -4; dx <= 4; dx++) {
-            for(var dy = -4; dy <= 4; dy++) {
+        for (var dx = -4; dx <= 4; dx++) {
+            for (var dy = -4; dy <= 4; dy++) {
                 locations.push({
                     "latitude": latitude + dy * latitudeFactor,
                     "longitude": longitude + dx * longitudeFactor

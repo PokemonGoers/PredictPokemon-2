@@ -1,11 +1,14 @@
 var fs = require('fs');
 var DC = require('./dataSet_creator.js').DC;
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting/';
-var destination = 'arff/apiDataExtended.arff';
+
 
 storeApiData();
 
+<<<<<<< HEAD
+function httpGetAsync(url, destination, callback) {
+    console.log('requesting ' + url);
+=======
 function storeApiData() {
     var data = getData(function (data) {
         DC.init("feature_config.json", true);
@@ -15,15 +18,23 @@ function storeApiData() {
 
 function getData(callback) {
     console.log('requesting ' +url);
+>>>>>>> develop
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var apiData = JSON.parse(xmlHttp.responseText);
+<<<<<<< HEAD
+            console.log('downloaded ' + apiData.data.length + ' sightings from API');
+            DS.storeArffFile("feature_config.json", apiData.data.slice(0, 121), destination);
+=======
             console.log('downloaded ' +apiData.data.length + ' sightings from API');
             callback(apiData.data);
+>>>>>>> develop
         }
     };
     xmlHttp.open("GET", url, true);
     xmlHttp.send();
-    return xmlHttp.responseText;
+    callback();
 }
+
+module.exports = {get: httpGetAsync};

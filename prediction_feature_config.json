@@ -46,8 +46,8 @@
       "enabled": true,
       "features": [
         {
-          "key": "appearedMinute",
-          "type": "numeric",
+          "key": "appearedTimeOfDay",
+          "type": "nominal",
           "enabled": true
         }
       ]

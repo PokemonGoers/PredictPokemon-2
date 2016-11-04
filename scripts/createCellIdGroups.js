@@ -6,14 +6,14 @@ var S2 = require('s2-geometry').S2;
 var fs = require('fs');
 
 // add two times 1 to handle face of s2 key separately from s2 key parts
-const s2levels = [1,1,2,3,4,6,8,10,12,13,14,15,17];
+const s2levels = [1, 1, 2, 3, 4, 6, 8, 10, 12, 13, 14, 15, 17];
 const lastLevel = s2levels[s2levels.length - 1];
-var s2levelIndices = s2levels.reduce(function(object, value, i) {
+var s2levelIndices = s2levels.reduce(function (object, value, i) {
     object[i] = value;
     return object;
 }, {});
 
-function createCellIdGroups(sourcePath,destinationPath) {
+function createCellIdGroups(sourcePath, destinationPath) {
     var file = fs.readFileSync(sourcePath, 'utf8');
     var places = JSON.parse(file);
     var cellGroups = {
@@ -51,11 +51,11 @@ function addPlace(place, currentGroup, levelIndex) {
             placeArray.push(place);
             currentGroup[key] = {};
             placeArray.forEach(function (placeToMoveDown) {
-                addPlace(placeToMoveDown, currentGroup[key], levelIndex+1);
+                addPlace(placeToMoveDown, currentGroup[key], levelIndex + 1);
             });
         }
         else {
-            addPlace(place, currentGroup[key], levelIndex+1);
+            addPlace(place, currentGroup[key], levelIndex + 1);
         }
     }
     else {
@@ -73,22 +73,21 @@ function printCellCount(places, indent) {
         text = indent + places.length;
         return text + '\n'
     }
-    else
-    {
+    else {
         text = indent + Object.keys(places).length;
-        for(key in places) {
+        for (key in places) {
             text += '\n' + printCellCount(places[key], indent + '\t');
         }
         return text;
     }
 }
 
-var src = '../json/pokestops.json';
-var out = '../json/pokestop_groups.json';
+var src = __dirname + '/../json/pokestops.json';
+var out = __dirname + '/../json/pokestop_groups.json';
 createCellIdGroups(src, out);
 
 // create log file to see cell counts
 var file = fs.readFileSync(out, 'utf8');
 var cellGroups = JSON.parse(file);
 var text = printCellCount(cellGroups.places, '');
-fs.writeFileSync('../json/cellGroup-pokestop.log', text, 'utf8');
+fs.writeFileSync(__dirname + '/../json/cellGroup-pokestop.log', text, 'utf8');

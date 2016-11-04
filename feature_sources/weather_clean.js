@@ -21,14 +21,14 @@ var temp = "emptyyet";
 (function (exports) {
     var module = exports.module = {};
     var APIkey = WeatherApiKey;
-    var S2Level =          9;  //10 by def. 10.level is about 10*10km, 9 is 23*23km, 8 is 46*46km, 23 is 1.4*1.4m(meters!)
+    var S2Level = 9;  //10 by def. 10.level is about 10*10km, 9 is 23*23km, 8 is 46*46km, 23 is 1.4*1.4m(meters!)
     var TimeFrameDividor = 3;   //2 by def. Divides 24h of the day by that number to get part of the day (timeFrame)
     module.getFeatures = function (keys, pokeEntry) {
         var missing = [];
         values = {};
         var readBadRequest = false;
         //S2_cell: level 10, time: 12 parts of the day
-        var CacheKey="S2_cell: "+getS2Cell(pokeEntry.latitude, pokeEntry.longitude)+", time:"+getTime(pokeEntry.appearedLocalTime);
+        var CacheKey = "S2_cell: " + getS2Cell(pokeEntry.latitude, pokeEntry.longitude) + ", time:" + getTime(pokeEntry.appearedLocalTime);
 
         var returnResponse = (function (keys) {
             //console.log("respond inside returnResponse: " + CachedWeatherResponses[pokeEntry["_id"]])
@@ -85,27 +85,27 @@ var temp = "emptyyet";
                     }
                 }
             }
-            var URL = 'https://api.darksky.net/forecast/'+APIKeys[APIkey]+'/'+pokeEntry.latitude+','+pokeEntry.longitude+','+timestamp+''
+            var URL = 'https://api.darksky.net/forecast/' + APIKeys[APIkey] + '/' + pokeEntry.latitude + ',' + pokeEntry.longitude + ',' + timestamp + ''
             xhr.open('GET', URL, false);
-            xhr.timeout=1500;
-            xhr.onTimeout = function(){
-                xhr.responseText="Timeout"
+            xhr.timeout = 1500;
+            xhr.onTimeout = function () {
+                xhr.responseText = "Timeout"
                 xhr.send()
             }
             xhr.send();
             if (xhr.status != 200) {
-                console.log( "Error occured when making http request. \n"+xhr.status + ': ' + xhr.statusText ); // example: 404: Not Found
+                console.log("Error occured when making http request. \n" + xhr.status + ': ' + xhr.statusText); // example: 404: Not Found
             } else {
-                if (xhr.responseText.substring(0,12) != '{"latitude":' && WeatherApiKey<(APIKeys.length-1)) { //if API key gets blocked??
+                if (xhr.responseText.substring(0, 12) != '{"latitude":' && WeatherApiKey < (APIKeys.length - 1)) { //if API key gets blocked??
                     WeatherApiKey++;
-                    if (consoleOn) console.log("Changed API Key to key No "+(WeatherApiKey+1)+". ");
+                    if (consoleOn) console.log("Changed API Key to key No " + (WeatherApiKey + 1) + ". ");
                     makeRequest()
-                } else  {
+                } else {
                     if (consoleOn) console.log(xhr.responseText);
                     var data = JSON.parse(xhr.responseText);
-                    if (data.currently!=undefined&&data.timezone!=undefined&&data.currently.summary==undefined&&
-                        data.currently.windSpeed==undefined&&data.daily==undefined&&data.currently.temperature==undefined&&
-                        data.currently.windBearing==undefined&&data.currently.pressure==undefined&&data.currently.icon==undefined) {
+                    if (data.currently != undefined && data.timezone != undefined && data.currently.summary == undefined &&
+                        data.currently.windSpeed == undefined && data.daily == undefined && data.currently.temperature == undefined &&
+                        data.currently.windBearing == undefined && data.currently.pressure == undefined && data.currently.icon == undefined) {
                         if (showErrors) {
                             console.log("Respond from weather server contains no weather")
                         }
@@ -113,9 +113,9 @@ var temp = "emptyyet";
                         missing.push("everything");
                         return values;
                     }
-                    if (data.currently==undefined||data.timezone==undefined||data.currently.summary==undefined||data.currently.windSpeed==undefined||
-                        data.daily==undefined||data.daily.data[0]==undefined||data.currently.temperature==undefined||
-                        data.currently.windBearing==undefined||data.currently.pressure==undefined||data.currently.icon==undefined) {
+                    if (data.currently == undefined || data.timezone == undefined || data.currently.summary == undefined || data.currently.windSpeed == undefined ||
+                        data.daily == undefined || data.daily.data[0] == undefined || data.currently.temperature == undefined ||
+                        data.currently.windBearing == undefined || data.currently.pressure == undefined || data.currently.icon == undefined) {
                         missing = [];
                         if (data.timezone == undefined) missing.push("timezone");
                         if (data.currently == undefined) missing.push("currently");
@@ -127,17 +127,17 @@ var temp = "emptyyet";
                             if (data.currently.pressure == undefined) missing.push("pressure");
                             if (data.currently.icon == undefined) missing.push("icon");
                         }
-                        if (data.daily==undefined) missing.push("daily");
-                        else if (data.daily.data[0]==undefined) missing.push("daily.data");
+                        if (data.daily == undefined) missing.push("daily");
+                        else if (data.daily.data[0] == undefined) missing.push("daily.data");
 
-                        var tempData=tryToReparseXMLRespond(data, missing);
-                        if (tempData!=false) {
+                        var tempData = tryToReparseXMLRespond(data, missing);
+                        if (tempData != false) {
                             if (showReparseMsg) console.log("Reparsed data for " + missing + " successfully.")
                             data = tempData;
                             values = "gotReplacementData"
                         } else {
-                            values="Error with request";
-        //saveOldWeather('json/BadRespond.json', data, true);//fur debugging
+                            values = "Error with request";
+                            //saveOldWeather('json/BadRespond.json', data, true);//fur debugging
                             return values;
                         }
                     }
@@ -145,48 +145,49 @@ var temp = "emptyyet";
                     //saveOldWeather('json/GoodRespond.json', data, true);//for debugging, to save a good object;
                 }
             }
-            if (consoleOn)console.log("Weather API Called with key No "+(APIkey+1));
-            if (values!="Error with request") {
+            if (consoleOn)console.log("Weather API Called with key No " + (APIkey + 1));
+            if (values != "Error with request") {
                 CachedWeather[CacheKey] = temp;
             }
         });
 
         if (!CachedWeather[CacheKey]) {
-            if (!CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]){
+            if (!CachedWeather[pokeEntry.latitude + ", " + pokeEntry.longitude + ", time:" + getTime(pokeEntry.appearedLocalTime)]) {
                 makeRequest(pokeEntry.latitude, pokeEntry.longitude, pokeEntry.appearedLocalTime);
             } else {
                 readBadRequest = true
                 values = "Error with request"
                 if (showWhenNotCalled) console.log("Weather Api not called, loaded existing (bad) data")
             }
-            if (values=="Error with request"&&saveBad) {
-                CachedWeather[pokeEntry.latitude+", "+ pokeEntry.longitude+", time:"+getTime(pokeEntry.appearedLocalTime)]="Bad respond, "+
-                    missing+" is missing."
+            if (values == "Error with request" && saveBad) {
+                CachedWeather[pokeEntry.latitude + ", " + pokeEntry.longitude + ", time:" + getTime(pokeEntry.appearedLocalTime)] = "Bad respond, " +
+                    missing + " is missing."
             }
-            if (values=="Error with request"){ //Error -> return empty respond and go on
-                APIkey=WeatherApiKey;
-                if (readBadRequest==false) {
+            if (values == "Error with request") { //Error -> return empty respond and go on
+                APIkey = WeatherApiKey;
+                if (readBadRequest == false) {
                     if (showErrors) {
                         console.log("Bad server respond for entry: " + pokeEntry["_id"] + ", failed to reparse bad respond, " + missing + " is missing.")
                     }
                     if (saveBad) {
-                        saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+                        saveOldWeather(__dirname + '/json/CachedWeather.json', CachedWeather, showSaveMessage);
                     }
                 }
                 return values
             }
-            else if (saveGood)saveOldWeather('json/CachedWeather.json', CachedWeather, showSaveMessage);
+            else if (saveGood)saveOldWeather(__dirname + '/json/CachedWeather.json', CachedWeather, showSaveMessage);
         }
-        else if (showWhenNotCalled) {console.log("Weather Api not called, loaded existing data");}
+        else if (showWhenNotCalled) {
+            console.log("Weather Api not called, loaded existing data");
+        }
         returnResponse(keys);//how? give the method nothing?
-        if (saveGood==false) CachedWeather={"":""}
+        if (saveGood == false) CachedWeather = {"": ""}
         return values;
     };
 
 
-
-    var parseXMLRespond = (function(data){
-        if (values!="Error with request") {
+    var parseXMLRespond = (function (data) {
+        if (values != "Error with request") {
             for (i = 0; i < data.timezone.length; i++) {
                 if (data.timezone.charAt(i) == '/') {
                     j = i;
@@ -205,45 +206,45 @@ var temp = "emptyyet";
         }
     });
     /**Try to find missing data in yet unused text from xhr.responseText*/
-    var tryToReparseXMLRespond = (function (data, missing){
+    var tryToReparseXMLRespond = (function (data, missing) {
         var error = false;
         var summary, temperature, windSpeed, windBearing, pressure, icon;
-        missing.forEach(function(missed){
-            switch(missed){
-                case "timezone":{
+        missing.forEach(function (missed) {
+            switch (missed) {
+                case "timezone": {
                     error = true;
                     return false;//nowhere else to get data from
                 }
-                case "daily":{
+                case "daily": {
                     error = true;
                     return false;//same
                 }
-                case "daily.data":{
+                case "daily.data": {
                     error = true;
                     return false;//same
                 }
-                case "currently":{
+                case "currently": {
                     //for summary
                     {
-                        if (data.hourly&&data.hourly.data) {
+                        if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.data.length; i++) {
                                 if (data.hourly.data[i].summary)
                                     summary = data.hourly.data[i].summary;
                             }
                         }
-                        if (summary==undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].summary)
+                        if (summary == undefined) {
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].summary)
                                 summary = data.daily.data[0].summary
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.summary=summary;
+                        data.currently.summary = summary;
                     }
                     //for temperature
                     {
-                        if (data.hourly&&data.hourly.data) {
+                        if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.data.length; i++) {
                                 if (data.hourly.data[i].temperature)
                                     temperature = data.hourly.data[i].temperature;
@@ -257,7 +258,7 @@ var temp = "emptyyet";
                                 return false;
                             }
                         }
-                        data.currently.temperature=temperature;
+                        data.currently.temperature = temperature;
                     }
                     //for windSpeed
                     {
@@ -270,14 +271,14 @@ var temp = "emptyyet";
                             }
                         }
                         if (windSpeed == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windSpeed)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].windSpeed)
                                 windSpeed = data.daily.data[0].windSpeed;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.windSpeed=windSpeed;
+                        data.currently.windSpeed = windSpeed;
                     }
                     //for windBearing
                     {
@@ -290,14 +291,14 @@ var temp = "emptyyet";
                             }
                         }
                         if (windBearing == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windBearing)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].windBearing)
                                 windBearing = data.daily.data[0].windBearing;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.windBearing=windBearing;
+                        data.currently.windBearing = windBearing;
                     }
                     //for pressure
                     {
@@ -310,14 +311,14 @@ var temp = "emptyyet";
                             }
                         }
                         if (pressure == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].pressure)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].pressure)
                                 pressure = data.daily.data[0].pressure;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.pressure=pressure;
+                        data.currently.pressure = pressure;
                     }
                     //for icon
                     {
@@ -330,20 +331,20 @@ var temp = "emptyyet";
                             }
                         }
                         if (icon == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].icon)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].icon)
                                 icon = data.daily.data[0].icon;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.icon=icon;
+                        data.currently.icon = icon;
                     }
                 }
                 ///////////////////
-                case "summary":{
-                    if (summary==undefined){
-                        if (data.hourly&&data.hourly.data) {
+                case "summary": {
+                    if (summary == undefined) {
+                        if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.data.length; i++) {
                                 if (data.hourly.data[i].summary) {
                                     summary = data.hourly.data[i].summary;
@@ -351,19 +352,19 @@ var temp = "emptyyet";
                                 }
                             }
                         }
-                        if (summary==undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].summary)
+                        if (summary == undefined) {
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].summary)
                                 summary = data.daily.data[0].summary
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.summary=summary;
+                        data.currently.summary = summary;
                     }
                 }
-                case "windSpeed":{
-                    if (windSpeed==undefined){
+                case "windSpeed": {
+                    if (windSpeed == undefined) {
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
                                 if (data.hourly.data[i].windSpeed) {
@@ -373,18 +374,18 @@ var temp = "emptyyet";
                             }
                         }
                         if (windSpeed == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windSpeed)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].windSpeed)
                                 windSpeed = data.daily.data[0].windSpeed;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.windSpeed=windSpeed;
+                        data.currently.windSpeed = windSpeed;
                     }
                 }
-                case "windBearing":{
-                    if (windBearing==undefined){
+                case "windBearing": {
+                    if (windBearing == undefined) {
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
                                 if (data.hourly.data[i].windBearing) {
@@ -394,19 +395,19 @@ var temp = "emptyyet";
                             }
                         }
                         if (windBearing == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].windBearing)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].windBearing)
                                 windBearing = data.daily.data[0].windBearing;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.windBearing=windBearing;
+                        data.currently.windBearing = windBearing;
                     }
                 }
-                case "temperature":{
-                    if (temperature==undefined){
-                        if (data.hourly&&data.hourly.data) {
+                case "temperature": {
+                    if (temperature == undefined) {
+                        if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.data.length; i++) {
                                 if (data.hourly.data[i].temperature) {
                                     temperature = data.hourly.data[i].temperature;
@@ -422,11 +423,11 @@ var temp = "emptyyet";
                                 return false;
                             }
                         }
-                        data.currently.temperature=temperature;
+                        data.currently.temperature = temperature;
                     }
                 }
-                case "pressure":{
-                    if (pressure==undefined) {
+                case "pressure": {
+                    if (pressure == undefined) {
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
                                 if (data.hourly.data[i].pressure) {
@@ -436,7 +437,7 @@ var temp = "emptyyet";
                             }
                         }
                         if (pressure == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].pressure)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].pressure)
                                 pressure = data.daily.data[0].pressure;
                             else {
                                 error = true;
@@ -444,10 +445,10 @@ var temp = "emptyyet";
                             }
                         }
                     }
-                    data.currently.pressure=pressure;
+                    data.currently.pressure = pressure;
                 }
-                case "icon":{
-                    if (icon==undefined){
+                case "icon": {
+                    if (icon == undefined) {
                         if (data.hourly && data.hourly.data) {
                             for (var i = 0; i < data.hourly.length; i++) {
                                 if (data.hourly.data[i].icon) {
@@ -457,14 +458,14 @@ var temp = "emptyyet";
                             }
                         }
                         if (icon == undefined) {
-                            if (data.daily&&data.daily.data&&data.daily.data[0]&&data.daily.data[0].icon)
+                            if (data.daily && data.daily.data && data.daily.data[0] && data.daily.data[0].icon)
                                 icon = data.daily.data[0].icon;
                             else {
                                 error = true;
                                 return false;
                             }
                         }
-                        data.currently.icon=icon;
+                        data.currently.icon = icon;
                     }
                 }
             }
@@ -484,15 +485,16 @@ var temp = "emptyyet";
         };
     });
     var minutesSinceMidnight = (function (momentDate) {
-        return momentDate.hours()*60 + momentDate.minutes()
+        return momentDate.hours() * 60 + momentDate.minutes()
     });
-    var getS2Cell = (function(latitude, longitude){
+    var getS2Cell = (function (latitude, longitude) {
         var key = S2.latLngToKey(latitude, longitude, S2Level);
         return S2.keyToId(key);
     })
-    function getTime(time){
+
+    function getTime(time) {
         var newDate = new Date(time);
-        return (newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"-dayPart:"+
-        (newDate.getUTCHours()/TimeFrameDividor).toFixed(0));
+        return (newDate.getFullYear() + "-" + (newDate.getMonth() + 1) + "-" + newDate.getDate() + "-dayPart:" +
+        (newDate.getUTCHours() / TimeFrameDividor).toFixed(0));
     }//TODO find out why I have to use (newDate.getMonth()+1) for month to be right
 })('undefined' !== typeof module ? module.exports : window);

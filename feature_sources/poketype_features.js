@@ -2,7 +2,7 @@ var fs = require('fs');
 
 (function (exports) {
     var module = exports.module = {};
-    var pokeTypes = fileToJson('json/pokemon_types.json');
+    var pokeTypes = fileToJson(__dirname + '/json/pokemon_types.json');
 
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
@@ -15,55 +15,55 @@ var fs = require('fs');
         var values = {};
 
         keys.forEach(function (key) {
-            if(key === 'typeSteel') {
+            if (key === 'typeSteel') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Steel') >= 0;
             }
-            else if(key === 'typeGhost') {
+            else if (key === 'typeGhost') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Ghost') >= 0;
             }
-            else if(key === 'typeElectric') {
+            else if (key === 'typeElectric') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Electric') >= 0;
             }
-            else if(key === 'typeIce') {
+            else if (key === 'typeIce') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Ice') >= 0;
             }
-            else if(key === 'typeNormal') {
+            else if (key === 'typeNormal') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Normal') >= 0;
             }
-            else if(key === 'typeFire') {
+            else if (key === 'typeFire') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Fire') >= 0;
             }
-            else if(key === 'typePsychic') {
+            else if (key === 'typePsychic') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Psychic') >= 0;
             }
-            else if(key === 'typeFlying') {
+            else if (key === 'typeFlying') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Flying') >= 0;
             }
-            else if(key === 'typePoison') {
+            else if (key === 'typePoison') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Poison') >= 0;
             }
-            else if(key === 'typeDragon') {
+            else if (key === 'typeDragon') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Dragon') >= 0;
             }
-            else if(key === 'typeWater') {
+            else if (key === 'typeWater') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Water') >= 0;
             }
-            else if(key === 'typeFighting') {
+            else if (key === 'typeFighting') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Fighting') >= 0;
             }
-            else if(key === 'typeRock') {
+            else if (key === 'typeRock') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Rock') >= 0;
             }
-            else if(key === 'typeFairy') {
+            else if (key === 'typeFairy') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Fairy') >= 0;
             }
-            else if(key === 'typeGrass') {
+            else if (key === 'typeGrass') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Grass') >= 0;
             }
-            else if(key === 'typeBug') {
+            else if (key === 'typeBug') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Bug') >= 0;
             }
-            else if(key === 'typeGround') {
+            else if (key === 'typeGround') {
                 values[key] = pokeTypes[pokeEntry.pokemonId].indexOf('Ground') >= 0;
             }
             else {
@@ -71,7 +71,7 @@ var fs = require('fs');
                 throw "UnknownFeatureKey";
             }
         });
-        
+
         return values;
     };
 

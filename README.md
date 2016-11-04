@@ -1,9 +1,48 @@
+
+
 # PredictPokemon-2
 
 [![Join the chat at https://gitter.im/pokemongoers/PredictPokemon-2](https://badges.gitter.im/pokemongoers/PredictPokemon-2.svg)](https://gitter.im/pokemongoers/PredictPokemon-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 In this project we will apply machine learning to establish the TLN (Time, Location and Name - that is where pokemons will appear, at what date and time, and which Pokemon will it be) prediction in Pokemon Go.
 
+##Install
+```
+npm install predict-pokemon
+```
+##Usage
+
+unzip the `pokestop_groups` file located in in `/json` directory
+
+```
+predict(lat, lng, timestamp)
+```
+
+The predictions will available as an array of objects
+
+```
+{"pokemonId":"16","confidence":"0.242","latitude":11.6088567,"longitude":48.1679286}
+```
+
 ## Setup
+
+#### Package parameters
+Here is a list of parameters which can be changed from outside the package:
+
+`predictor.url = http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';`
+the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
+
+`predictor.threshold = 0.1;`
+the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored. range 0..1.
+
+`predictor.useCurrentDate = true;`
+if true the current date will be used to retrieve data from the API. otherwise the `requestDate` bellow is used.
+
+`predictor.requestDate = new Date('2016-09-14T08:00:00Z');`
+if `useCurrentDate` is false this date will be used to retrieve data from the API.
+
+`predictor.gridDistance = 0.25;`
+the grid distance in km. the predictor returns 81 grids and this parameter defines the distance from one grid center to the center of an horizontal or vertically adjacent grid.
+
 #### tzwhere bug
 If you are running windows the script might get stuck in the `require('tzwhere')` call, due to an old version of *timezone* [tzwhere#13](https://github.com/mattbornski/tzwhere/issues/13).
 To fix this modify the `package.json` of tzwhere, probably under the path `PredictPokemon\node_modules\tzwhere\package.json`.
@@ -132,3 +171,22 @@ A feature is defined by:
 
 ###### Class key
 The `classKey` defines which key will be used as classLabel when an .arff file is generated. The `classKey` has to correspond to a feature key in the configuration. If a feature key corresponds to the `classKey` it does not matter if the `enabled` flag is set or not. The script generates automatically a nominal list with all distinct values that exist in the data set for that key.
+
+
+##Developers
+
+Benjamin Strobel: benjamin.strobel@tum.de
+
+Marcel Wagenländer: marcel.wagenlaender@tum.de
+
+Matthias Bauer:
+ 
+Siamion Karcheuski: semioniy@mail.ru
+
+Aurel Roci: aurel_2798@hotmail.com
+
+##Licence 
+
+Copyright (c) 2015 [Developers] (https://github.com/PokemonGoers/PredictPokemon-2/graphs/contributors)
+
+Licensed under the MIT License
