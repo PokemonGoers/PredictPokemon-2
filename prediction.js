@@ -38,7 +38,7 @@
     log('started prediction script, init DC');
     DC.consoleOn = false;
     DC.cooccClasses = [13, 16, 19, 96, 129];
-    DC.init(__dirname + 'prediction_feature_config.json', true);
+    DC.init(__dirname + '/prediction_feature_config.json', true);
 
     var switchClassifierModel = false;
     retrainClassifier();

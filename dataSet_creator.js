@@ -28,7 +28,7 @@ WeatherApiKeyCounter=0;
         }
         if (DC.consoleOn) console.log('initializing DC');
         var config = fileToJson(configPath);
-        CachedWeather = fileToJson(__dirname + 'json/CachedWeather.json');
+        // CachedWeather = fileToJson(__dirname + '/json/CachedWeather.json');
         featureSources = [];
         postProcessSources = [];
         classSource = null;
