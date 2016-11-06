@@ -170,12 +170,12 @@ var temp = "emptyyet";
                         console.log("Bad server respond for entry: " + pokeEntry["_id"] + ", failed to reparse bad respond, " + missing + " is missing.")
                     }
                     if (saveBad) {
-                        saveOldWeather(__dirname + '/json/CachedWeather.json', CachedWeather, showSaveMessage);
+                        saveOldWeather(__dirname + '/../json/CachedWeather.json', CachedWeather, showSaveMessage);
                     }
                 }
                 return values
             }
-            else if (saveGood)saveOldWeather(__dirname + '/json/CachedWeather.json', CachedWeather, showSaveMessage);
+            else if (saveGood)saveOldWeather(__dirname + '/../json/CachedWeather.json', CachedWeather, showSaveMessage);
         }
         else if (showWhenNotCalled) {
             console.log("Weather Api not called, loaded existing data");

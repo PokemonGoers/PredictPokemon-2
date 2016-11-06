@@ -5,7 +5,8 @@
     var exec = require('child-process-promise').exec;
     var DC = require(__dirname + '/dataSet_creator.js').DC;
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';
+    // var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';
+    var url = 'http://predictemall.online:65014/api/pokemon/sighting';
 
     var predictor = exports.predictor = {};
     // the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
@@ -91,13 +92,16 @@
     function getData(callback) {
         // 'ts/2016-09-14T08:00:00Z/range/1d';
         var urlForLast24h;
+        var timestamp;
 
         if (predictor.useCurrentDate || predictor.requestDate === null) {
-            urlForLast24h = predictor.url + '/ts/' + new Date().toJSON() + '/range/1d';
+            timestamp = new Date().toJSON();
         }
         else {
-            urlForLast24h = predictor.url + '/ts/' + predictor.requestDate.toJSON() + '/range/1d';
+            timestamp = predictor.requestDate.toJSON();
         }
+
+        urlForLast24h = predictor.url + '/ts/' + timestamp + '/range/1d?token=I0TPIIpCLH8lR8iDrCMV';
 
         log('requesting ' + urlForLast24h);
         var xmlHttp = new XMLHttpRequest();

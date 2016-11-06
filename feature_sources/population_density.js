@@ -1,6 +1,6 @@
 (function (exports) {
     var module = exports.module = {};
-    var density = parseCSV(__dirname + '/data/population_density.csv');
+    var density = parseCSV(__dirname + '/../data/population_density.csv');
 
     module.getFeatures = function (keys, pokeEntry) {
         var values = {};
