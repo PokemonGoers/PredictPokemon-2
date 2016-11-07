@@ -47,6 +47,9 @@
         if (key === 'appearedTimeOfDay') {
             return ['night', 'morning', 'afternoon', 'evening'];
         }
+        else if (key === 'appearedDayOfWeek') {
+            return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'dummy_day'];
+        }
         else {
             console.log("The key " + key + " does not provide nominal values.");
             throw "UnknownNominalKey";

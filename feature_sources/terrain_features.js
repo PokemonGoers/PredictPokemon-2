@@ -3,7 +3,7 @@ var fs = require('fs');
 (function (exports) {
     var module = exports.module = {};
 
-    var landcover = fileToJson(__dirname + '/json/landcover.json');
+    var landcover = fileToJson(__dirname + '/../json/landcover.json');
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
      * which represents the JSON object which is returned from the API for a Pokemon sighting.

@@ -2,11 +2,11 @@
  * Created by matt on 22.09.16.
  */
 var fs = require('fs');
-var DS = require('./dataSet_creator.js').DC;
+var DC = require('./dataSet_creator.js').DC;
 var source = 'json/pokeDump_2_sorted.json';
 var destination = 'arff/dataDump_50k_sorted.arff';
 
-processDump(source, 0, 50000);
+processDump(source, 0, 50);
 
 /**
  * take the data dump and add features to get an arff file

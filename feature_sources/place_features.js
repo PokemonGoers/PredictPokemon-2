@@ -3,8 +3,8 @@ var S2 = require('s2-geometry').S2;
 
 (function (exports) {
     var module = exports.module = {};
-    var gymGroups = fileToJson(__dirname + '/json/gym_groups.json').places;
-    var pokestopGroups = fileToJson(__dirname + '/json/pokestop_groups.json').places;
+    var gymGroups = fileToJson(__dirname + '/../json/gym_groups.json').places;
+    var pokestopGroups = fileToJson(__dirname + '/../json/pokestop_groups.json').places;
 
     /**
      * Get the feature value for the specified key by using the data of the pokeEntry,
