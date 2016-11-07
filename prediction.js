@@ -12,7 +12,7 @@
     // the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
     predictor.url = url;
     // the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored.
-    predictor.threshold = 0.1;
+    predictor.threshold = 0.5;
     // if useCurrentDate is false this date will be used to retrieve data from the API
     predictor.requestDate = new Date('2016-09-14T08:00:00Z');
     // if true the current date will be used to retrieve data from the API
