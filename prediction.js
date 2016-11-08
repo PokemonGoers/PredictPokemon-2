@@ -2,6 +2,12 @@
  * Created on 07.10.2016.
  */
 (function (exports) {
+    ////////////////////Start////////////////////// part 1 of 2
+    var unzip = require('unzip');
+    var fs = require('fs');
+    var fstream = require('fstream');
+    unzipFiles();//unzips all yet zipped files
+    //////////////////////////End///////////////////////////
     var exec = require('child-process-promise').exec;
     var DC = require(__dirname + '/dataSet_creator.js').DC;
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -12,7 +18,7 @@
     // the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
     predictor.url = url;
     // the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored.
-    predictor.threshold = 0.5;
+    predictor.threshold = 0.1;
     // if useCurrentDate is false this date will be used to retrieve data from the API
     predictor.requestDate = new Date('2016-09-14T08:00:00Z');
     // if true the current date will be used to retrieve data from the API
@@ -88,7 +94,42 @@
             }
         );
     };
-
+    /////////////////////Start/////////////////////////// part 2 of 2
+    function unzipFiles(){
+        var fileArray = ['./node_modules/predict-pokemon/arff/dataDump_50k_sorted.arff',
+            './node_modules/predict-pokemon/json/pokeDump_2_sorted.json',
+            './node_modules/predict-pokemon/json/pokestop_groups.json',
+            './node_modules/predict-pokemon/json/pokestops.json'];
+        var zipArray = ['./node_modules/predict-pokemon/arff/dataDump_50k_sorted.zip',
+            './node_modules/predict-pokemon/json/pokeDump_2_sorted.zip',
+            './node_modules/predict-pokemon/json/pokestop_groups.zip',
+            './node_modules/predict-pokemon/json/pokestops.zip'];
+        var pathArray = ['./node_modules/predict-pokemon/arff/',
+            './node_modules/predict-pokemon/arff/','./node_modules/predict-pokemon/json/',
+            './node_modules/predict-pokemon/json/', './node_modules/predict-pokemon/json/'];
+        var fileNotFound = false;
+        for (var i=0; i<fileArray.length;i++) {
+            try {
+                var exists = fs.readFileSync(fileArray[i]);
+                if (exists != undefined) console.log("File found");////to be deleted
+            } catch (error) {
+                //console.error(error);////to be deleted
+                console.error("File not found, unzipping");////to be deleted
+                fileNotFound = true;
+            } finally {
+                if (fileNotFound) {
+                    var readStream = fs.createReadStream(zipArray[i]);
+                    var writeStream = fstream.Writer(pathArray[i]);
+                    readStream
+                        .pipe(unzip.Parse())
+                        .pipe(writeStream);
+                    console.log("File "+fileArray[i]+" extracted to "+pathArray[i]);
+                }
+                fileNotFound = false;
+            }
+        }
+    }
+    ////////////////////////End///////////////////////////
     function getData(callback) {
         // 'ts/2016-09-14T08:00:00Z/range/1d';
         var urlForLast24h;
