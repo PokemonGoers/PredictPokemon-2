@@ -11,7 +11,9 @@ npm install predict-pokemon
 ```
 ##Usage
 
-unzip the `pokestop_groups` file located in in `/json` directory
+First run this to unzip files:
+var unzip = require('./node_modules/predict-pokemon/unzip.js');
+unzip.unzipFiles();
 
 ```
 predict(lat, lng, timestamp)
