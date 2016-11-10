@@ -5,21 +5,20 @@
 
     exports.unzipFiles = function unzipFiles() {
         var fileArray = [
-            './node_modules/predict-pokemon/arff/dataDump_50k_sorted.arff',
-            './node_modules/predict-pokemon/json/pokeDump_2_sorted.json',
-            './node_modules/predict-pokemon/json/pokestop_groups.json',
-            './node_modules/predict-pokemon/json/pokestops.json'];
+            '/arff/dataDump_50k_sorted.arff',
+            '/json/pokeDump_2_sorted.json',
+            '/json/pokestop_groups.json',
+            '/json/pokestops.json'];
         var zipArray = [
-            './node_modules/predict-pokemon/arff/dataDump_50k_sorted.zip',
-            './node_modules/predict-pokemon/json/pokeDump_2_sorted.zip',
-            './node_modules/predict-pokemon/json/pokestop_groups.zip',
-            './node_modules/predict-pokemon/json/pokestops.zip'];
+            '/arff/dataDump_50k_sorted.zip',
+            '/json/pokeDump_2_sorted.zip',
+            '/json/pokestop_groups.zip',
+            '/json/pokestops.zip'];
         var pathArray = [
-            './node_modules/predict-pokemon/arff/', './node_modules/predict-pokemon/json/',
-            './node_modules/predict-pokemon/json/', './node_modules/predict-pokemon/json/'];
+            '/arff/', '/json/', '/json/', '/json/'];
         var fileNotFound = false;
         try {
-            var exists = fs.readFileSync(fileArray[0]);
+            var exists = fs.readFileSync(__dirname+fileArray[0]);
             if (exists != undefined) console.log("File found");////to be deleted
         } catch (error) {
             //console.error(error);////to be deleted
@@ -33,11 +32,11 @@
     }
 
     function unzip_file(zip, path, file, check, size, i) {
-        var readStream = fs.createReadStream(zip[i]);
-        var writeStream = fstream.Writer(path[i]);
+        var readStream = fs.createReadStream(__dirname+zip[i]);
+        var writeStream = fstream.Writer(__dirname+path[i]);
         readStream.pipe(unzip.Parse()).pipe(writeStream);
         writeStream.on('close', function () {
-            check(file[i]);
+            check(__dirname+file[i]);
             if ((i + 1) < size)
                 unzip_file(zip, path, file, check, size, (i + 1));
             //else do_stuff();
