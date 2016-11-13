@@ -4,7 +4,8 @@
   "description": "npm-packages",
   "main": "prediction.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/postinstall.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "requirejs": "^2.2.0",
     "s2-geometry": "^1.2.9",
     "tzwhere": "^1.0.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "unzip": "^0.1.11"
   }
 }

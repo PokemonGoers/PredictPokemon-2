@@ -2,14 +2,9 @@
  * Created on 07.10.2016.
  */
 (function (exports) {
-    ////////////////////Start////////////////////// part 1 of 2
-    var unzip = require('unzip');
-    var fs = require('fs');
-    var fstream = require('fstream');
-    unzipFiles();//unzips all yet zipped files
-    //////////////////////////End///////////////////////////
+    var path = require('path');
     var exec = require('child-process-promise').exec;
-    var DC = require(__dirname + '/dataSet_creator.js').DC;
+    var DC = require(path.join(__dirname, '/dataSet_creator.js')).DC;
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     // var url = 'http://pokedata.c4e3f8c7.svc.dockerapp.io:65014/api/pokemon/sighting';
     var url = 'http://predictemall.online:65014/api/pokemon/sighting';
@@ -34,18 +29,18 @@
     // p <range>: print predictions and attribute values in range. if range = 0 print no attributes
     // specify the output format of the predictions. Use CSV for easier parsing and PlainText for pretty print.
     const testOptions = '-classifications "weka.classifiers.evaluation.output.prediction.CSV"';
-    const trainingData = __dirname + 'data/trainingData.arff';
-    const testData = __dirname + 'data/testData.arff';
+    const trainingData = path.join(__dirname, 'data/trainingData.arff');
+    const testData = path.join(__dirname, 'data/testData.arff');
 
-    var activeModelName = __dirname + 'data/classifier1.model';
-    var trainingModelName = __dirname + 'data/classifier2.model';
+    var activeModelName = path.join(__dirname, 'data/classifier1.model');
+    var trainingModelName = path.join(__dirname, 'data/classifier2.model');
     var coocTrainingData = null;
     var newCoocTrainingData = null;
 
     log('started prediction script, init DC');
     DC.consoleOn = false;
     DC.cooccClasses = [13, 16, 19, 96, 129];
-    DC.init(__dirname + '/prediction_feature_config.json', true);
+    DC.init(path.join(__dirname, '/prediction_feature_config.json'), true);
 
     var switchClassifierModel = false;
     retrainClassifier();
@@ -94,42 +89,7 @@
             }
         );
     };
-    /////////////////////Start/////////////////////////// part 2 of 2
-    function unzipFiles(){
-        var fileArray = ['./node_modules/predict-pokemon/arff/dataDump_50k_sorted.arff',
-            './node_modules/predict-pokemon/json/pokeDump_2_sorted.json',
-            './node_modules/predict-pokemon/json/pokestop_groups.json',
-            './node_modules/predict-pokemon/json/pokestops.json'];
-        var zipArray = ['./node_modules/predict-pokemon/arff/dataDump_50k_sorted.zip',
-            './node_modules/predict-pokemon/json/pokeDump_2_sorted.zip',
-            './node_modules/predict-pokemon/json/pokestop_groups.zip',
-            './node_modules/predict-pokemon/json/pokestops.zip'];
-        var pathArray = ['./node_modules/predict-pokemon/arff/',
-            './node_modules/predict-pokemon/arff/','./node_modules/predict-pokemon/json/',
-            './node_modules/predict-pokemon/json/', './node_modules/predict-pokemon/json/'];
-        var fileNotFound = false;
-        for (var i=0; i<fileArray.length;i++) {
-            try {
-                var exists = fs.readFileSync(fileArray[i]);
-                if (exists != undefined) console.log("File found");////to be deleted
-            } catch (error) {
-                //console.error(error);////to be deleted
-                console.error("File not found, unzipping");////to be deleted
-                fileNotFound = true;
-            } finally {
-                if (fileNotFound) {
-                    var readStream = fs.createReadStream(zipArray[i]);
-                    var writeStream = fstream.Writer(pathArray[i]);
-                    readStream
-                        .pipe(unzip.Parse())
-                        .pipe(writeStream);
-                    console.log("File "+fileArray[i]+" extracted to "+pathArray[i]);
-                }
-                fileNotFound = false;
-            }
-        }
-    }
-    ////////////////////////End///////////////////////////
+
     function getData(callback) {
         // 'ts/2016-09-14T08:00:00Z/range/1d';
         var urlForLast24h;
