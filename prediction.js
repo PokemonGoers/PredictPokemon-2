@@ -21,7 +21,7 @@
     // grid distance in km
     predictor.gridDistance = 0.25;
 
-    const wekaCmd = 'java -classpath ./data/weka.jar -Xmx1024m'; // add more RAM by option: -Xmx1024m
+    const wekaCmd = 'java -classpath ' + path.join(__dirname, 'data/weka.jar') + ' -Xmx1024m'; // add more RAM by option: -Xmx1024m
     const classifier = 'weka.classifiers.meta.Vote';
     const classifierOptions = '-S 1 -B "weka.classifiers.lazy.IBk -K 100 -W 0 -A \\"weka.core.neighboursearch.LinearNNSearch -A \\\\\\"weka.core.EuclideanDistance -R first-last\\\\\\"\\"" -B "weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S BAYES -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5" -R PROD';
     // no-cv: no cross-validation, v: no training data statistics
