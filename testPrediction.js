@@ -55,6 +55,8 @@ var a = [-38.417266, -10.868907,
 var i = 0;
 predictor.threshold = 0.0;
 predictor.gridDistance = 2.0;
+predictor.init();
+
 function testClassifier() {
     predictor.predict(a[i], a[i+1], new Date().toJSON())
         .then(function (result) {
