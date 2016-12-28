@@ -118,6 +118,9 @@
                 log('filtered data, new length ' + data.length);
                 callback(data);
             }
+            else {
+                log('download failed. ' + JSON.stringify(xmlHttp));
+            }
         };
         xmlHttp.open("GET", urlForLast24h, true);
         xmlHttp.send();
@@ -231,8 +234,13 @@
         // new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
         // new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / Math.cos(latitude * Math.PI/180);
         const latitudeFactor = (predictor.gridDistance / 6371) * (180 / Math.PI);
-        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI / 180);
-
+        const cosFactor = Math.cos(latitude * Math.PI / 180);
+        var longitudeFactor = 0;
+        
+        if (cosFactor !== 0) {
+            longitudeFactor = latitudeFactor / cosFactor;
+        }
+        
         for (var dx = -4; dx <= 4; dx++) {
             for (var dy = -4; dy <= 4; dy++) {
                 locations.push({
