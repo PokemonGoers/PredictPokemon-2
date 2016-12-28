@@ -347,7 +347,11 @@ WeatherApiKeyCounter=0;
         var complete_data = [];
 
         json_data.forEach(function (element) {
-            if (element["location"] !== null && element["pokemonId"] !== null  && typeof element["pokemonId"] !== "undefined") {
+            if (element.hasOwnProperty("location")
+                && element["location"] !== null
+                && element.hasOwnProperty("pokemonId")
+                && element["pokemonId"] !== null
+                && typeof element["pokemonId"] !== "undefined") {
                 complete_data.push(element);
             }
         });

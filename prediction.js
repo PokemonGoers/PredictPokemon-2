@@ -13,7 +13,7 @@
     // the base url to the pokeData API for sightings: http:// ... /api/pokemon/sighting, including 'api/pokemon/sighting'.
     predictor.url = url;
     // the threshold for predictions. if the confidence of a prediction is bellow the threshold it will be ignored.
-    predictor.threshold = 0.1;
+    predictor.threshold = 0.5;
     // if useCurrentDate is false this date will be used to retrieve data from the API
     predictor.requestDate = new Date('2016-09-14T08:00:00Z');
     // if true the current date will be used to retrieve data from the API
@@ -21,7 +21,7 @@
     // grid distance in km
     predictor.gridDistance = 0.25;
 
-    const wekaCmd = 'java -classpath ./data/weka.jar -Xmx1024m'; // add more RAM by option: -Xmx1024m
+    const wekaCmd = 'java -classpath ' + path.join(__dirname, 'data/weka.jar') + ' -Xmx1024m'; // add more RAM by option: -Xmx1024m
     const classifier = 'weka.classifiers.meta.Vote';
     const classifierOptions = '-S 1 -B "weka.classifiers.lazy.IBk -K 100 -W 0 -A \\"weka.core.neighboursearch.LinearNNSearch -A \\\\\\"weka.core.EuclideanDistance -R first-last\\\\\\"\\"" -B "weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S BAYES -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5" -R PROD';
     // no-cv: no cross-validation, v: no training data statistics
@@ -43,8 +43,12 @@
     DC.init(path.join(__dirname, '/prediction_feature_config.json'), true);
 
     var switchClassifierModel = false;
-    retrainClassifier();
-    var retrainTimer = setInterval(retrainClassifier, 1000 * 60 * 15); // retrain every 15min
+    var retrainTimer = null;
+    
+    predictor.init = function () {
+        retrainClassifier();
+        retrainTimer = setInterval(retrainClassifier, 1000 * 60 * 15); // retrain every 15min
+    };
 
     /**
      * create predictions for a 9x9 grid with the given coordinates in the center.
@@ -113,6 +117,9 @@
                 var data = filter10kFromData(apiData.data);
                 log('filtered data, new length ' + data.length);
                 callback(data);
+            }
+            else {
+                log('download failed. ' + JSON.stringify(xmlHttp));
             }
         };
         xmlHttp.open("GET", urlForLast24h, true);
@@ -227,8 +234,13 @@
         // new_latitude  = latitude  + (dy*gridDistance / 6371) * (180 / Math.PI);
         // new_longitude = longitude + (dx*gridDistance / 6371) * (180 / Math.PI) / Math.cos(latitude * Math.PI/180);
         const latitudeFactor = (predictor.gridDistance / 6371) * (180 / Math.PI);
-        const longitudeFactor = latitudeFactor / Math.cos(latitude * Math.PI / 180);
-
+        const cosFactor = Math.cos(latitude * Math.PI / 180);
+        var longitudeFactor = 0;
+        
+        if (cosFactor !== 0) {
+            longitudeFactor = latitudeFactor / cosFactor;
+        }
+        
         for (var dx = -4; dx <= 4; dx++) {
             for (var dy = -4; dy <= 4; dy++) {
                 locations.push({
