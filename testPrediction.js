@@ -55,6 +55,7 @@ var a = [-38.417266, -10.868907,
 var i = 0;
 predictor.threshold = 0.0;
 predictor.gridDistance = 2.0;
+predictor.mockData = true;
 predictor.init();
 
 function testClassifier() {
@@ -78,6 +79,9 @@ function testClassifier() {
             vari = vari < 0.0001 ? 0.0 : vari;
 
             i += 2;
+            if (i > a.length - 2) {
+                i = 0;
+            }
             log('#pred: ' + result.length + ', thrsh: ' + predictor.threshold
                 + ' - conf#1 ' + result[0].confidence + ' - mean ' + mean
                 + ' - var ' + vari + ' - dis ' + predictor.gridDistance);

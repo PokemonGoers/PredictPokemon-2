@@ -347,8 +347,9 @@ WeatherApiKeyCounter=0;
         var complete_data = [];
 
         json_data.forEach(function (element) {
-            if (element.hasOwnProperty("location")
-                && element["location"] !== null
+            var hasLocation = (element.hasOwnProperty("location") && element["location"] !== null)
+                                || (element.hasOwnProperty("latitude") && element.hasOwnProperty("longitude"));
+            if (hasLocation
                 && element.hasOwnProperty("pokemonId")
                 && element["pokemonId"] !== null
                 && typeof element["pokemonId"] !== "undefined") {
